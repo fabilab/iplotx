@@ -1,12 +1,40 @@
-[project]
-name = "iplotx"
-description = "Plot networkx from igraph and networkx."
-readme = "README.md"
-dynamic = ["version"]
-
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
+
+[project]
+name = "iplotx"
+description = "Plot networkx from igraph and networkx."
+authors = [
+  {name = "Fabio Zanini", email = "fabio.zanini@unsw.edu.au"}
+]
+maintainers = [
+  {name = "Fabio Zanini", email = "fabio.zanini@unsw.edu.au"}
+]
+readme = "README.md"
+dynamic = ["version"]
+dependencies = [
+  "matplotlib",
+]
+license = {text = "MIT"}
+license-files = ["LICEN[CS]E.*"]
+keywords = ["network", "graph", "visualisation", "plotting"]
+classifiers = [
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3.8",
+  "Programming Language :: Python :: 3.9",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "License :: OSI Approved :: MIT License",
+  "Operating System :: OS Independent",
+  ]
+
+[project.urls]
+Homepage = "https://github.com/fabilab/iplotx"
+Documentation = "https://readthedocs.org/iplotx"
+Repository = "https://github.com/fabilab/iplotx.git"
+"Bug Tracker" = "https://github.com/fabilab/iplotx/issues"
+Changelog = "https://github.com/fabilab/iplotx/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "iplotx/version.py"
