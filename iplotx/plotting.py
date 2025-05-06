@@ -1,3 +1,4 @@
+from typing import Union
 import matplotlib.pyplot as plt
 
 from .typing import (
@@ -25,7 +26,7 @@ def plot(
     if ax is None:
         fig, ax = plt.subplots()
 
-    nwkart = NetworkArtist(network, layout, ax)
+    nwkart = NetworkArtist(network, layout)
 
     ax.add_artist(nwkart)
 

@@ -1,3 +1,6 @@
+import numpy as np
+import pandas as pd
+
 from .importing import igraph, networkx
 from .typing import GraphType
 
@@ -28,3 +31,18 @@ def detect_directedness(
     if isinstance(network, (networkx.DiGraph, networkx.MultiDiGraph)):
         return True
     return False
+
+
+def normalise_layout(layout):
+    """Normalise the layout to a 2D numpy array."""
+    if layout is None:
+        return None
+    if isinstance(layout, str):
+        __import__('ipdb').set_trace()
+    if isinstance(layout, (list, tuple)):
+        return np.array(layout)
+    if isinstance(layout, pd.DataFrame):
+        return layout.values
+    if isinstance(layout, np.ndarray):
+        return layout
+    raise TypeError("Layout must be a string, list, tuple, numpy array or pandas DataFrame.")

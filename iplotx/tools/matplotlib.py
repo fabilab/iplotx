@@ -1,3 +1,6 @@
+from functools import wraps, partial
+
+
 # NOTE: https://github.com/networkx/grave/blob/main/grave/grave.py
 def _stale_wrapper(func):
     """Decorator to manage artist state."""
