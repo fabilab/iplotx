@@ -33,12 +33,16 @@ def detect_directedness(
     return False
 
 
-def normalise_layout(layout):
+def normalise_layout(layout, vertex_ids=None):
     """Normalise the layout to a 2D numpy array."""
     if layout is None:
         return None
+    if isinstance(layout, dict):
+        if vertex_ids is None:
+            raise ValueError("vertex_ids must be provided when layout is a dict.")
+        return np.asarray([layout[vid] for vid in vertex_ids])
     if isinstance(layout, str):
-        __import__('ipdb').set_trace()
+        raise NotImplementedError("Layout as a string is not supported yet.")
     if isinstance(layout, (list, tuple)):
         return np.array(layout)
     if isinstance(layout, pd.DataFrame):
