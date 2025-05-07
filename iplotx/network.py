@@ -20,6 +20,10 @@ from .vertex import (
     VertexCollection,
     make_patch as make_vertex_patch,
 )
+from .edge.undirected import (
+    UndirectedEdgeCollection,
+    make_stub_patch as make_undirected_edge_path,
+)
 
 
 
@@ -129,7 +133,7 @@ class NetworkArtist(mpl.artist.Artist):
 
         return (mins, maxs)
 
-    def _draw_vertices(self):
+    def _add_vertices(self):
         """Draw the vertices"""
         vertex_style = get_style(get_stylename()+".vertex")
 
@@ -157,51 +161,59 @@ class NetworkArtist(mpl.artist.Artist):
         )
         self._vertices = art
 
-    #def _draw_edges(self):
-    #    """Draw the edges"""
-    #    graph = self.graph
-    #    vertex_builder = self._vertex_builder
-    #    edge_drawer = self._edge_drawer
-    #    edge_builder = self._edge_builder
-    #    edge_order = self._edge_order
+    def _add_edges(self):
+        """Draw the edges."""
+        directed = self._ipx_internal_data["directed"]
+        if directed:
+            return self._add_directed_edges()
+        return self._add_undirected_edges()
 
-    #    es = graph.es
-    #    if edge_order is None:
-    #        # Default edge order
-    #        edge_coord_iter = zip(es, edge_builder)
-    #    else:
-    #        # Specified edge order
-    #        edge_coord_iter = ((es[i], edge_builder[i]) for i in edge_order)
+    def _add_directed_edges(self):
+        """Draw directed edges."""
+        raise NotImplementedError("Directed edges not implemented yet.")
 
-    #    directed = graph.is_directed()
+    def _add_undirected_edges(self):
+        """Draw undirected edges."""
+        edge_style = get_style(get_stylename()+".edge")
 
-    #    visual_vertices = []
-    #    edgepatches = []
-    #    arrow_sizes = []
-    #    arrow_widths = []
-    #    loop_sizes = []
-    #    curved = []
-    #    for edge, visual_edge in edge_coord_iter:
-    #        edge_vertices = [vertex_builder[v] for v in edge.tuple]
-    #        art = edge_drawer.build_patch(visual_edge, *edge_vertices)
-    #        edgepatches.append(art)
-    #        visual_vertices.append(edge_vertices)
-    #        arrow_sizes.append(visual_edge.arrow_size)
-    #        arrow_widths.append(visual_edge.arrow_width)
-    #        loop_sizes.append(visual_edge.loop_size)
-    #        curved.append(visual_edge.curved)
+        layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
+        vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
+        edge_df = self._ipx_internal_data["edge_df"].set_index(['_ipxsource', '_ipx_target'])
 
-    #    art = EdgeCollection(
-    #        edgepatches,
-    #        visual_vertices=visual_vertices,
-    #        directed=directed,
-    #        arrow_sizes=arrow_sizes,
-    #        arrow_widths=arrow_widths,
-    #        loop_sizes=loop_sizes,
-    #        curved=curved,
-    #        transform=self.axes.transData,
-    #    )
-    #    self._edges = art
+        # This contains the patches for vertices, for edge shortening and such
+        vertex_paths = self._vertices._paths
+        vertex_indices = pd.Series(np.arange(len(vertex_layout_df)), index=vertex_layout_df.index)
+
+        edgepatches = []
+        adjecent_vertex_centers = []
+        adjecent_vertex_paths = []
+        for (vid1, vid2) in edge_df.index:
+            # Get the vertices for this edge
+            vcenter1 = vertex_layout_df.loc[vid1, layout_columns].values
+            vcenter2 = vertex_layout_df.loc[vid2, layout_columns].values
+            vpath1 = vertex_paths[vertex_indices[vid1]]
+            vpath2 = vertex_paths[vertex_indices[vid2]]
+
+            # These are not the actual edges drawn, only stubs to establish
+            # the styles which are then fed into the dynamic, optimised
+            # factory (the collection) below
+            patch = make_undirected_edge_patch(
+                **edge_style,
+            )
+            edgepatches.append(patch)
+            adjecent_vertex_centers.append((vcenter1, vcenter2))
+            adjecent_vertex_paths.append((vpath1, vpath2))
+
+        # TODO:: deal with "ports" a la graphviz
+
+        art = UndirectedEdgeCollection(
+            edgepatches,
+            vertex_paths=adjecent_vertex_paths,
+            vertex_centers=adjecent_vertex_centers,
+            transform=self.axes.transData,
+            style=edge_style,
+        )
+        self._edges = art
 
     def _process(self):
         self._clear_state()
@@ -212,8 +224,8 @@ class NetworkArtist(mpl.artist.Artist):
         # but when the mpl engine runs down all children artists for actual
         # drawing it uses get_children() to get the order. Whatever is last
         # in that order will get drawn on top (vis-a-vis zorder).
-        self._draw_vertices()
-        #self._draw_edges()
+        self._add_vertices()
+        self._add_edges()
         #self._draw_vertex_labels()
         #self._draw_edge_labels()
 
