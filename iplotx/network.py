@@ -1,3 +1,4 @@
+import numpy as np
 import pandas as pd
 import matplotlib as mpl
 from matplotlib.transforms import Affine2D
@@ -22,9 +23,8 @@ from .vertex import (
 )
 from .edge.undirected import (
     UndirectedEdgeCollection,
-    make_stub_patch as make_undirected_edge_path,
+    make_stub_patch as make_undirected_edge_patch,
 )
-
 
 
 @_forwarder(
@@ -90,7 +90,9 @@ class NetworkArtist(mpl.artist.Artist):
         """
         import numpy as np
 
-        layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
+        layout_columns = [
+            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
+        ]
         layout = self._ipx_internal_data["vertex_df"].values
 
         if len(layout) == 0:
@@ -135,9 +137,11 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _add_vertices(self):
         """Draw the vertices"""
-        vertex_style = get_style(get_stylename()+".vertex")
+        vertex_style = get_style(get_stylename() + ".vertex")
 
-        layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
+        layout_columns = [
+            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
+        ]
         vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
 
         # TODO:
@@ -174,20 +178,27 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _add_undirected_edges(self):
         """Draw undirected edges."""
-        edge_style = get_style(get_stylename()+".edge")
+        edge_style = get_style(get_stylename() + ".edge")
 
-        layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
+        layout_columns = [
+            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
+        ]
         vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
-        edge_df = self._ipx_internal_data["edge_df"].set_index(['_ipxsource', '_ipx_target'])
+        edge_df = self._ipx_internal_data["edge_df"].set_index(
+            ["_ipx_source", "_ipx_target"]
+        )
 
         # This contains the patches for vertices, for edge shortening and such
         vertex_paths = self._vertices._paths
-        vertex_indices = pd.Series(np.arange(len(vertex_layout_df)), index=vertex_layout_df.index)
+        vertex_indices = pd.Series(
+            np.arange(len(vertex_layout_df)), index=vertex_layout_df.index
+        )
 
         edgepatches = []
+        adjacent_vertex_ids = []
         adjecent_vertex_centers = []
         adjecent_vertex_paths = []
-        for (vid1, vid2) in edge_df.index:
+        for vid1, vid2 in edge_df.index:
             # Get the vertices for this edge
             vcenter1 = vertex_layout_df.loc[vid1, layout_columns].values
             vcenter2 = vertex_layout_df.loc[vid2, layout_columns].values
@@ -201,13 +212,19 @@ class NetworkArtist(mpl.artist.Artist):
                 **edge_style,
             )
             edgepatches.append(patch)
+            adjacent_vertex_ids.append((vid1, vid2))
             adjecent_vertex_centers.append((vcenter1, vcenter2))
             adjecent_vertex_paths.append((vpath1, vpath2))
+
+        adjacent_vertex_ids = np.array(adjacent_vertex_ids)
+        adjecent_vertex_centers = np.array(adjecent_vertex_centers)
+        # NOTE: the paths might have different number of sides, so it cannot be recast
 
         # TODO:: deal with "ports" a la graphviz
 
         art = UndirectedEdgeCollection(
             edgepatches,
+            vertex_ids=adjacent_vertex_ids,
             vertex_paths=adjecent_vertex_paths,
             vertex_centers=adjecent_vertex_centers,
             transform=self.axes.transData,
@@ -226,8 +243,8 @@ class NetworkArtist(mpl.artist.Artist):
         # in that order will get drawn on top (vis-a-vis zorder).
         self._add_vertices()
         self._add_edges()
-        #self._draw_vertex_labels()
-        #self._draw_edge_labels()
+        # self._draw_vertex_labels()
+        # self._draw_edge_labels()
 
         # TODO: callbacks for stale vertices/edges
 
@@ -266,8 +283,6 @@ class NetworkArtist(mpl.artist.Artist):
             art.draw(renderer, *args, **kwds)
 
 
-
-
 # INTERNAL ROUTINES
 def _create_internal_data(network, layout=None):
     """Create internal data for the network."""
@@ -282,12 +297,12 @@ def _create_internal_data(network, layout=None):
         layout = normalise_layout(layout, vertex_ids=vertex_df.index)
         ndim = layout.shape[1]
         for i, layouti in enumerate(layout.T):
-            vertex_df[f'_ipx_layout_{i}'] = layouti
+            vertex_df[f"_ipx_layout_{i}"] = layouti
 
         # Edges are a list of tuples, because of multiedges
         tmp = []
         for u, v, d in network.edges.data():
-            row = {'_ipx_source': u, '_ipx_target': v}
+            row = {"_ipx_source": u, "_ipx_target": v}
             row.update(d)
             tmp.append(row)
         edge_df = pd.DataFrame(tmp)
@@ -299,12 +314,14 @@ def _create_internal_data(network, layout=None):
         ndim = layout.shape[1]
 
         # All that's left to do is to check their attributes
-        vertex_df = pd.DataFrame(layout, columns=[f'_ipx_layout_{i}' for i in range(ndim)])
+        vertex_df = pd.DataFrame(
+            layout, columns=[f"_ipx_layout_{i}" for i in range(ndim)]
+        )
 
         # Edges are a list of tuples, because of multiedges
         tmp = []
         for edge in network.es:
-            row = {'_ipx_source': edge.source, '_ipx_target': edge.target}
+            row = {"_ipx_source": edge.source, "_ipx_target": edge.target}
             row.update(edge.attributes())
             tmp.append(row)
         edge_df = pd.DataFrame(tmp)

@@ -5,6 +5,7 @@ import matplotlib as mpl
 class UndirectedEdgeCollection(mpl.collections.PatchCollection):
     def __init__(self, *args, **kwargs):
         kwargs["match_original"] = True
+        self._vertex_ids = kwargs.pop("vertex_ids", None)
         self._vertex_centers = kwargs.pop("vertex_centers", None)
         self._vertex_paths = kwargs.pop("vertex_paths", None)
         self._style = kwargs.pop("style", None)
@@ -42,7 +43,9 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
     def _compute_paths(self, transform=None):
         import numpy as np
 
-        visual_vertices = self._visual_vertices
+        vids = self._vertex_ids
+        vpaths = self._vertex_paths
+        vcenters = self._vertex_centers
         if transform is None:
             transform = self.get_transform()
         trans = transform.transform
@@ -55,119 +58,106 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         #      for vertices with loops
         # (iii) Plot each loop based on the recorded angles
         # NOTE: one could improve this based on greediness
+
+        # 1. Make a list of vertices with loops, and store them for later
         loop_vertex_dict = {}
-        for i, edge_vertices in enumerate(visual_vertices):
-            if edge_vertices[0] == edge_vertices[1]:
-                if edge_vertices[0] not in loop_vertex_dict:
-                    loop_vertex_dict[edge_vertices[0]] = {
-                        "indices": [],
-                        "sizes": [],
-                        "edge_angles": [],
-                    }
-                    if self._directed:
-                        loop_vertex_dict[edge_vertices[0]]["arrow_sizes"] = []
-                        loop_vertex_dict[edge_vertices[0]]["arrow_widths"] = []
-                loop_vertex_dict[edge_vertices[0]]["indices"].append(i)
+        for i, (v1, v2) in enumerate(vids):
+            if v1 != v2:
+                continue
+            if v1 not in loop_vertex_dict:
+                loop_vertex_dict[v1] = {
+                    "indices": [],
+                    "edge_angles": [],
+                }
+            loop_vertex_dict[v1]["indices"].append(i)
 
-        # Get actual coordinates of the vertex border (rough)
+        # 2. Make paths for non-loop edges
+        # Get actual coordinates of the vertex border
         paths = []
-        for i, edge_vertices in enumerate(visual_vertices):
-            if self._directed:
-                if (self._arrow_sizes is None) or (self._arrow_widths is None):
-                    arrow_size = 0
-                    arrow_width = 0
-                else:
-                    arrow_size = self._arrow_sizes[i]
-                    arrow_width = self._arrow_widths[i]
-
-            # Loops are positioned post-facto in the space left by the othter edges
-            if edge_vertices[0] == edge_vertices[1]:
+        for i, (v1, v2) in enumerate(vids):
+            # Postpone loops (step 3)
+            if v1 == v2:
                 paths.append(None)
-                loop_vertex_dict[edge_vertices[0]]["sizes"].append(
-                    self._loop_sizes[i],
-                )
-                if self._directed:
-                    loop_vertex_dict[edge_vertices[0]]["arrow_sizes"].append(
-                        arrow_size,
-                    )
-                    loop_vertex_dict[edge_vertices[0]]["arrow_widths"].append(
-                        arrow_width,
-                    )
                 continue
 
-            coords = np.vstack(
-                [
-                    edge_vertices[0].position,
-                    edge_vertices[1].position,
-                ]
-            )
-            coordst = trans(coords)
-            sizes = self._get_edge_vertex_sizes(edge_vertices)
-            if self._style is not None and self._style.get("curved", False):
-                curved = True
-            else:
-                curved = False
+            # Coordinates of the adjacent vertices, in data coords
+            vcoord_data = vcenters[i]
 
-            path = self._compute_path_undirected(
-                coordst,
-                sizes,
-                trans_inv,
-                curved,
-            )
+            # Coordinates in figure (default) coords
+            vcoord_fig = trans(vcoord_data)
+
+            # Vertex paths in figure (default) coords
+            vpath_fig = vpaths[i]
+
+            # Shorten edge
+            if not self._style.get("curved", False):
+                path = self._shorten_path_undirected_straight(
+                    vcoord_fig,
+                    vpath_fig,
+                    trans_inv,
+                )
+            else:
+                raise NotImplementedError("Curved edges not implemented yet.")
 
             # Collect angles for this vertex, to be used for loops plotting below
-            angles = self._compute_edge_angles(path, trans, self._directed, curved)
-            if edge_vertices[0] in loop_vertex_dict:
-                loop_vertex_dict[edge_vertices[0]]["edge_angles"].append(angles[0])
-            if edge_vertices[1] in loop_vertex_dict:
-                loop_vertex_dict[edge_vertices[1]]["edge_angles"].append(angles[1])
+            if (v1 in loop_vertex_dict) or (v2 in loop_vertex_dict):
+                angles = self._compute_edge_angles(
+                    path,
+                    trans,
+                    self._style.get("curved", False),
+                )
+                if v1 in loop_vertex_dict:
+                    loop_vertex_dict[v1]["edge_angles"].append(angles[0])
+                if v2 in loop_vertex_dict:
+                    loop_vertex_dict[v2]["edge_angles"].append(angles[1])
 
             # Add the path for this non-loop edge
             paths.append(path)
 
-        # Deal with loops at the end
-        for visual_vertex, ldict in loop_vertex_dict.items():
-            coords = np.vstack([visual_vertex.position] * 2)
-            coordst = trans(coords)
-            vertex_size = self._get_edge_vertex_sizes([visual_vertex])[0]
+        # TODO: uncomment
+        # 3. Deal with loops at the end
+        # for visual_vertex, ldict in loop_vertex_dict.items():
+        #    coords = np.vstack([visual_vertex.position] * 2)
+        #    coordst = trans(coords)
+        #    vertex_size = self._get_edge_vertex_sizes([visual_vertex])[0]
 
-            edge_angles = ldict["edge_angles"]
-            if edge_angles:
-                edge_angles.sort()
-                # Circle around
-                edge_angles.append(edge_angles[0] + 2 * pi)
-                wedges = [
-                    (a2 - a1) for a1, a2 in zip(edge_angles[:-1], edge_angles[1:])
-                ]
-                # Argsort
-                imax = max(range(len(wedges)), key=lambda i: wedges[i])
-                angle1, angle2 = edge_angles[imax], edge_angles[imax + 1]
-            else:
-                # Isolated vertices with loops
-                angle1, angle2 = -pi, pi
+        #    edge_angles = ldict["edge_angles"]
+        #    if edge_angles:
+        #        edge_angles.sort()
+        #        # Circle around
+        #        edge_angles.append(edge_angles[0] + 2 * pi)
+        #        wedges = [
+        #            (a2 - a1) for a1, a2 in zip(edge_angles[:-1], edge_angles[1:])
+        #        ]
+        #        # Argsort
+        #        imax = max(range(len(wedges)), key=lambda i: wedges[i])
+        #        angle1, angle2 = edge_angles[imax], edge_angles[imax + 1]
+        #    else:
+        #        # Isolated vertices with loops
+        #        angle1, angle2 = -pi, pi
 
-            nloops = len(ldict["indices"])
-            for i in range(nloops):
-                angle1i = angle1 + (angle2 - angle1) * i / nloops
-                angle2i = angle1 + (angle2 - angle1) * (i + 1) / nloops
-                if self._directed:
-                    loop_kwargs = {
-                        "arrow_size": ldict["arrow_sizes"][i],
-                        "arrow_width": ldict["arrow_widths"][i],
-                    }
-                else:
-                    loop_kwargs = {}
-                path = self._compute_loop_path(
-                    coordst[0],
-                    vertex_size,
-                    ldict["sizes"][i],
-                    angle1i,
-                    angle2i,
-                    trans_inv,
-                    angle_padding_fraction=0.1,
-                    **loop_kwargs,
-                )
-                paths[ldict["indices"][i]] = path
+        #    nloops = len(ldict["indices"])
+        #    for i in range(nloops):
+        #        angle1i = angle1 + (angle2 - angle1) * i / nloops
+        #        angle2i = angle1 + (angle2 - angle1) * (i + 1) / nloops
+        #        if self._directed:
+        #            loop_kwargs = {
+        #                "arrow_size": ldict["arrow_sizes"][i],
+        #                "arrow_width": ldict["arrow_widths"][i],
+        #            }
+        #        else:
+        #            loop_kwargs = {}
+        #        path = self._compute_loop_path(
+        #            coordst[0],
+        #            vertex_size,
+        #            ldict["sizes"][i],
+        #            angle1i,
+        #            angle2i,
+        #            trans_inv,
+        #            angle_padding_fraction=0.1,
+        #            **loop_kwargs,
+        #        )
+        #        paths[ldict["indices"][i]] = path
 
         return paths
 
@@ -237,53 +227,34 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         )
         return path
 
-    def _compute_path_undirected(self, coordst, sizes, trans_inv, curved):
-        path = {"vertices": [], "codes": []}
-        path["codes"].append("MOVETO")
-        if not curved:
-            path["codes"].append("LINETO")
+    def _shorten_path_undirected_straight(
+        self,
+        vcoord_fig
+        vpath_fig,
+        trans_inv,
+    ):
+        # Straight SVG instructions
+        path = {
+            "vertices": [],
+            "codes": ['MOVETO', 'LINETO'],
+        }
 
-            # Start
-            theta = atan2(*((coordst[1] - coordst[0])[::-1]))
-            voff = 0 * coordst[0]
-            voff[:] = [cos(theta), sin(theta)]
-            voff *= sizes[0] / 2
-            path["vertices"].append(coordst[0] + voff)
+        # Angle of the straight line
+        theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
 
-            # End
-            voff[:] = [cos(theta), sin(theta)]
-            voff *= sizes[1] / 2
-            path["vertices"].append(coordst[1] - voff)
-        else:
-            path["codes"].extend(["CURVE4"] * 3)
+        # Shorten at starting vertex
+        # TODO: compute the intersection between the vertex patch and the
+        # straight edge at this angle
+        voff = np.array([cos(theta), sin(theta)], dtype=vcoord_fig.dtype)
+        voff *= sizes[0] / 2
+        path["vertices"].append(coordst[0] + voff)
 
-            aux1, aux2 = get_bezier_control_points_for_curved_edge(
-                *coordst.ravel(),
-                curved,
-            )
-
-            # Start
-            theta = atan2(*((aux1 - coordst[0])[::-1]))
-            voff = 0 * coordst[0]
-            voff[:] = [cos(theta), sin(theta)]
-            voff *= sizes[0] / 2
-            path["vertices"].append(coordst[0] + voff)
-
-            # Bezier
-            path["vertices"].append(aux1)
-            path["vertices"].append(aux2)
-
-            # End
-            theta = atan2(*((coordst[1] - aux2)[::-1]))
-            voff = 0 * coordst[0]
-            voff[:] = [cos(theta), sin(theta)]
-            voff *= sizes[1] / 2
-            path["vertices"].append(coordst[1] - voff)
-
-            # This is a dirty trick to make the facecolor work
-            # without making a separate Patch, which would be a little messy
-            path["codes"].extend(["CURVE4"] * 3)
-            path["vertices"].extend(path["vertices"][-2::-1])
+        # Shorten at end vertex
+        # TODO: compute the intersection between the vertex patch and the
+        # straight edge at this angle
+        voff[:] = [cos(theta), sin(theta)]
+        voff *= sizes[1] / 2
+        path["vertices"].append(coordst[1] - voff)
 
         path = mpl.path.Path(
             path["vertices"],
@@ -293,7 +264,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         return path
 
     def draw(self, renderer):
-        if self._vertex_patches is not None:
+        if self._vertex_paths is not None:
             self._paths = self._compute_paths()
         return super().draw(renderer)
 
@@ -303,17 +274,18 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 
     @stale.setter
     def stale(self, val):
-        PatchCollection.stale.fset(self, val)
+        mpl.collections.PatchCollection.stale.fset(self, val)
         if val and hasattr(self, "stale_callback_post"):
             self.stale_callback_post(self)
 
 
 def make_stub_patch(**kwargs):
     """Make a stub undirected edge patch, without actual path information."""
-    kwargs['clip_on'] = kwargs.get('clip_on', True)
+    kwargs["clip_on"] = kwargs.get("clip_on", True)
 
     # NOTE: the path is overwritten later anyway, so no reason to spend any time here
     art = mpl.patches.PathPatch(
         mpl.path.Path([[0, 0]]),
         **kwargs,
     )
+    return art
