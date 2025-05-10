@@ -1,4 +1,5 @@
-from math import atan2, cos, pi, sin
+from math import atan2, tan, cos, pi, sin
+import numpy as np
 import matplotlib as mpl
 
 
@@ -229,32 +230,72 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 
     def _shorten_path_undirected_straight(
         self,
-        vcoord_fig
+        vcoord_fig,
         vpath_fig,
         trans_inv,
     ):
         # Straight SVG instructions
         path = {
             "vertices": [],
-            "codes": ['MOVETO', 'LINETO'],
+            "codes": ["MOVETO", "LINETO"],
         }
 
         # Angle of the straight line
         theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
 
         # Shorten at starting vertex
-        # TODO: compute the intersection between the vertex patch and the
-        # straight edge at this angle
-        voff = np.array([cos(theta), sin(theta)], dtype=vcoord_fig.dtype)
-        voff *= sizes[0] / 2
-        path["vertices"].append(coordst[0] + voff)
+        path1 = vpath_fig[0]
+        for i in range(len(path1)):
+            v1 = path1.vertices[i]
+            v2 = path1.vertices[(i + 1) % len(path1)]
+            theta1 = atan2(*((v1)[::-1]))
+            theta2 = atan2(*((v2)[::-1]))
+            # atan2 ranges ]-3.14, 3.14]
+            if theta1 <= theta <= theta2:
+                break
+            if (
+                (theta1 + pi) % (2 * pi)
+                <= (theta + pi) % (2 * pi)
+                <= (theta2 + pi) % (2 * pi)
+            ):
+                break
+        else:
+            raise ValueError("Angle for patch not found")
+
+        # The edge meets the patch of the vertex on the v1-v2 size, at angle theta from the center
+        m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
+        mtheta = tan(theta)
+        xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
+        ye = mtheta * xe
+        ve = np.array([xe, ye], dtype=vcoord_fig.dtype) + vcoord_fig[0]
+        path["vertices"].append(ve)
 
         # Shorten at end vertex
-        # TODO: compute the intersection between the vertex patch and the
-        # straight edge at this angle
-        voff[:] = [cos(theta), sin(theta)]
-        voff *= sizes[1] / 2
-        path["vertices"].append(coordst[1] - voff)
+        theta += pi
+        path2 = vpath_fig[1]
+        for i in range(len(path2)):
+            v1 = path1.vertices[i]
+            v2 = path1.vertices[(i + 1) % len(path2)]
+            theta1 = atan2(*((v1)[::-1]))
+            theta2 = atan2(*((v2)[::-1]))
+            # atan2 ranges ]-3.14, 3.14]
+            if theta1 <= theta <= theta2:
+                break
+            if (
+                (theta1 + pi) % (2 * pi)
+                <= (theta + pi) % (2 * pi)
+                <= (theta2 + pi) % (2 * pi)
+            ):
+                break
+        else:
+            raise ValueError("Angle for patch not found")
+
+        m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
+        mtheta = tan(theta)
+        xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
+        ye = mtheta * xe
+        ve = np.array([xe, ye], dtype=vcoord_fig.dtype) + vcoord_fig[1]
+        path["vertices"].append(ve)
 
         path = mpl.path.Path(
             path["vertices"],
