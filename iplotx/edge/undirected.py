@@ -292,22 +292,29 @@ def _get_shorter_edge_coords(vpath, theta):
         v2 = vpath.vertices[(i + 1) % len(vpath)]
         theta1 = atan2(*((v1)[::-1]))
         theta2 = atan2(*((v2)[::-1]))
+
         # atan2 ranges ]-3.14, 3.14]
-        if theta1 <= theta <= theta2:
-            break
-        if (
-            (theta1 + pi) % (2 * pi)
-            <= (theta + pi) % (2 * pi)
-            <= (theta2 + pi) % (2 * pi)
-        ):
+        # so it can be that theta1 is -3 and theta2 is +3
+        # therefore we need two separate cases, one that cuts at pi and one at 0
+        cond1 = theta1 <= theta <= theta2
+        cond2 = (
+            (theta1 + 2 * pi) % (2 * pi)
+            <= (theta + 2 * pi) % (2 * pi)
+            <= (theta2 + 2 * pi) % (2 * pi)
+        )
+        if cond1 or cond2:
             break
     else:
         raise ValueError("Angle for patch not found")
 
-    # The edge meets the patch of the vertex on the v1-v2 size, at angle theta from the center
-    m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
+    # The edge meets the patch of the vertex on the v1-v2 size,
+    # at angle theta from the center
     mtheta = tan(theta)
-    xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
+    if v2[0] == v1[0]:
+        xe = v1[0]
+    else:
+        m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
+        xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
     ye = mtheta * xe
     ve = np.array([xe, ye])
     return ve
