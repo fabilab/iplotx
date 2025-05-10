@@ -244,57 +244,11 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
 
         # Shorten at starting vertex
-        path1 = vpath_fig[0]
-        for i in range(len(path1)):
-            v1 = path1.vertices[i]
-            v2 = path1.vertices[(i + 1) % len(path1)]
-            theta1 = atan2(*((v1)[::-1]))
-            theta2 = atan2(*((v2)[::-1]))
-            # atan2 ranges ]-3.14, 3.14]
-            if theta1 <= theta <= theta2:
-                break
-            if (
-                (theta1 + pi) % (2 * pi)
-                <= (theta + pi) % (2 * pi)
-                <= (theta2 + pi) % (2 * pi)
-            ):
-                break
-        else:
-            raise ValueError("Angle for patch not found")
-
-        # The edge meets the patch of the vertex on the v1-v2 size, at angle theta from the center
-        m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
-        mtheta = tan(theta)
-        xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
-        ye = mtheta * xe
-        ve = np.array([xe, ye], dtype=vcoord_fig.dtype) + vcoord_fig[0]
-        path["vertices"].append(ve)
+        vs = _get_shorter_edge_coords(vpath_fig[0], theta) + vcoord_fig[0]
+        path["vertices"].append(vs)
 
         # Shorten at end vertex
-        theta += pi
-        path2 = vpath_fig[1]
-        for i in range(len(path2)):
-            v1 = path1.vertices[i]
-            v2 = path1.vertices[(i + 1) % len(path2)]
-            theta1 = atan2(*((v1)[::-1]))
-            theta2 = atan2(*((v2)[::-1]))
-            # atan2 ranges ]-3.14, 3.14]
-            if theta1 <= theta <= theta2:
-                break
-            if (
-                (theta1 + pi) % (2 * pi)
-                <= (theta + pi) % (2 * pi)
-                <= (theta2 + pi) % (2 * pi)
-            ):
-                break
-        else:
-            raise ValueError("Angle for patch not found")
-
-        m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
-        mtheta = tan(theta)
-        xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
-        ye = mtheta * xe
-        ve = np.array([xe, ye], dtype=vcoord_fig.dtype) + vcoord_fig[1]
+        ve = _get_shorter_edge_coords(vpath_fig[1], theta + pi) + vcoord_fig[1]
         path["vertices"].append(ve)
 
         path = mpl.path.Path(
@@ -330,3 +284,30 @@ def make_stub_patch(**kwargs):
         **kwargs,
     )
     return art
+
+
+def _get_shorter_edge_coords(vpath, theta):
+    for i in range(len(vpath)):
+        v1 = vpath.vertices[i]
+        v2 = vpath.vertices[(i + 1) % len(vpath)]
+        theta1 = atan2(*((v1)[::-1]))
+        theta2 = atan2(*((v2)[::-1]))
+        # atan2 ranges ]-3.14, 3.14]
+        if theta1 <= theta <= theta2:
+            break
+        if (
+            (theta1 + pi) % (2 * pi)
+            <= (theta + pi) % (2 * pi)
+            <= (theta2 + pi) % (2 * pi)
+        ):
+            break
+    else:
+        raise ValueError("Angle for patch not found")
+
+    # The edge meets the patch of the vertex on the v1-v2 size, at angle theta from the center
+    m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
+    mtheta = tan(theta)
+    xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
+    ye = mtheta * xe
+    ve = np.array([xe, ye])
+    return ve
