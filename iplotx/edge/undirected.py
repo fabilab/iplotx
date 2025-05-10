@@ -119,6 +119,8 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 
         # 3. Deal with loops at the end
         for vid, ldict in loop_vertex_dict.items():
+            vpath = vpaths[ldict["indices"][0]][0]
+            vcoord_fig = trans(vcenters[ldict["indices"][0]][0])
             nloops = len(ldict["indices"])
             edge_angles = ldict["edge_angles"]
 
@@ -126,92 +128,45 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             # One loop we can fit in the largest wedge, multiple loops we need
             nloops_per_angle = _compute_loops_per_angle(nloops, edge_angles)
 
-            coords = np.vstack([visual_vertex.position] * 2)
-            coordst = trans(coords)
-            vertex_size = self._get_edge_vertex_sizes([visual_vertex])[0]
+            idx = 0
+            for theta1, theta2, nloops in nloops_per_angle:
+                # Angular size of each loop in this wedge
+                delta = (theta2 - theta1) / nloops
 
-        #    if edge_angles:
-        #        edge_angles.sort()
-        #        # Circle around
-        #        edge_angles.append(edge_angles[0] + 2 * pi)
-        #        wedges = [
-        #            (a2 - a1) for a1, a2 in zip(edge_angles[:-1], edge_angles[1:])
-        #        ]
-        #        # Argsort
-        #        imax = max(range(len(wedges)), key=lambda i: wedges[i])
-        #        angle1, angle2 = edge_angles[imax], edge_angles[imax + 1]
-        #    else:
-        #        # Isolated vertices with loops
-        #        angle1, angle2 = -pi, pi
+                # Iterate over individual loops
+                for j in range(nloops):
+                    thetaj1 = theta1 + j * delta
+                    # Use 60 degrees as the largest possible loop wedge
+                    thetaj2 = thetaj1 + min(delta, pi / 3)
 
-        #    nloops = len(ldict["indices"])
-        #    for i in range(nloops):
-        #        angle1i = angle1 + (angle2 - angle1) * i / nloops
-        #        angle2i = angle1 + (angle2 - angle1) * (i + 1) / nloops
-        #        if self._directed:
-        #            loop_kwargs = {
-        #                "arrow_size": ldict["arrow_sizes"][i],
-        #                "arrow_width": ldict["arrow_widths"][i],
-        #            }
-        #        else:
-        #            loop_kwargs = {}
-        #        path = self._compute_loop_path(
-        #            coordst[0],
-        #            vertex_size,
-        #            ldict["sizes"][i],
-        #            angle1i,
-        #            angle2i,
-        #            trans_inv,
-        #            angle_padding_fraction=0.1,
-        #            **loop_kwargs,
-        #        )
-        #        paths[ldict["indices"][i]] = path
+                    # Get the path for this loop
+                    path = self._compute_loop_path(
+                        vcoord_fig,
+                        vpath,
+                        thetaj1,
+                        thetaj2,
+                        trans_inv,
+                    )
+                    paths[ldict["indices"][idx]] = path
+                    idx += 1
 
         return paths
 
     def _compute_loop_path(
         self,
-        coordt,
-        vertex_size,
-        loop_size,
+        vcoord_fig,
+        vpath,
         angle1,
         angle2,
         trans_inv,
-        angle_padding_fraction=0.1,
     ):
-        import numpy as np
+        # Shorten at starting angle
+        start = _get_shorter_edge_coords(vpath, angle1) + vcoord_fig
+        # Shorten at end angle
+        end = _get_shorter_edge_coords(vpath, angle2) + vcoord_fig
 
-        # Special argument for loop size to scale with vertices
-        if loop_size < 0:
-            loop_size = -loop_size * vertex_size
-
-        # Pad angles to make a little space for tight arrowheads
-        angle1, angle2 = (
-            angle1 * (1 - angle_padding_fraction) + angle2 * angle_padding_fraction,
-            angle1 * angle_padding_fraction + angle2 * (1 - angle_padding_fraction),
-        )
-
-        # Too large wedges, use a quarter as the largest loop wedge
-        if angle2 - angle1 > pi / 3:
-            angle_mid = (angle2 + angle1) * 0.5
-            angle1 = angle_mid - pi / 6
-            angle2 = angle_mid + pi / 6
-
-        start = vertex_size / 2 * np.array([cos(angle1), sin(angle1)])
-        end = vertex_size / 2 * np.array([cos(angle2), sin(angle2)])
-        amix = 0.05
-        aux1 = loop_size * np.array(
-            [
-                cos(angle1 * (1 - amix) + angle2 * amix),
-                sin(angle1 * (1 - amix) + angle2 * amix),
-            ]
-        )
-        aux2 = loop_size * np.array(
-            [
-                cos(angle1 * amix + angle2 * (1 - amix)),
-                sin(angle1 * amix + angle2 * (1 - amix)),
-            ]
-        )
+        aux1 = (start - vcoord_fig) * 2.5 + vcoord_fig
+        aux2 = (end - vcoord_fig) * 2.5 + vcoord_fig
 
         vertices = np.vstack(
             [
@@ -227,7 +182,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         codes = ["MOVETO"] + ["CURVE4"] * 6
 
         # Offset to place and transform to data coordinates
-        vertices = trans_inv(coordt + vertices)
+        vertices = trans_inv(vertices)
         codes = [getattr(mpl.path.Path, x) for x in codes]
         path = mpl.path.Path(
             vertices,
@@ -315,12 +270,6 @@ def _get_shorter_edge_coords(vpath, theta):
         if cond1 or cond2:
             break
     else:
-        print(vpath.vertices)
-        print(theta)
-        for i in range(len(vpath)):
-            v1 = vpath.vertices[i]
-            theta1 = atan2(*((v1)[::-1]))
-            print(theta1)
         raise ValueError("Angle for patch not found")
 
     # The edge meets the patch of the vertex on the v1-v2 size,
