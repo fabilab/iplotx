@@ -2,6 +2,8 @@ from math import atan2, tan, cos, pi, sin
 import numpy as np
 import matplotlib as mpl
 
+from .common import _compute_loops_per_angle
+
 
 class UndirectedEdgeCollection(mpl.collections.PatchCollection):
     def __init__(self, *args, **kwargs):
@@ -23,7 +25,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         return sizes
 
     @staticmethod
-    def _compute_edge_angles(path, trans, directed, curved):
+    def _compute_edge_angles(path, trans, curved):
         """Compute edge angles for both starting and ending vertices.
 
         NOTE: The domain of atan2 is (-pi, pi].
@@ -115,14 +117,19 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             # Add the path for this non-loop edge
             paths.append(path)
 
-        # TODO: uncomment
         # 3. Deal with loops at the end
-        # for visual_vertex, ldict in loop_vertex_dict.items():
-        #    coords = np.vstack([visual_vertex.position] * 2)
-        #    coordst = trans(coords)
-        #    vertex_size = self._get_edge_vertex_sizes([visual_vertex])[0]
+        for vid, ldict in loop_vertex_dict.items():
+            nloops = len(ldict["indices"])
+            edge_angles = ldict["edge_angles"]
 
-        #    edge_angles = ldict["edge_angles"]
+            # The space between the existing angles is where we can fit the loops
+            # One loop we can fit in the largest wedge, multiple loops we need
+            nloops_per_angle = _compute_loops_per_angle(nloops, edge_angles)
+
+            coords = np.vstack([visual_vertex.position] * 2)
+            coordst = trans(coords)
+            vertex_size = self._get_edge_vertex_sizes([visual_vertex])[0]
+
         #    if edge_angles:
         #        edge_angles.sort()
         #        # Circle around
@@ -287,6 +294,9 @@ def make_stub_patch(**kwargs):
 
 
 def _get_shorter_edge_coords(vpath, theta):
+    # Bound theta from -pi to pi (why is that not guaranteed?)
+    theta = (theta + pi) % (2 * pi) - pi
+
     for i in range(len(vpath)):
         v1 = vpath.vertices[i]
         v2 = vpath.vertices[(i + 1) % len(vpath)]
@@ -305,6 +315,12 @@ def _get_shorter_edge_coords(vpath, theta):
         if cond1 or cond2:
             break
     else:
+        print(vpath.vertices)
+        print(theta)
+        for i in range(len(vpath)):
+            v1 = vpath.vertices[i]
+            theta1 = atan2(*((v1)[::-1]))
+            print(theta1)
         raise ValueError("Angle for patch not found")
 
     # The edge meets the patch of the vertex on the v1-v2 size,
