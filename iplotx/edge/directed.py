@@ -5,7 +5,8 @@ import matplotlib as mpl
 from matplotlib.patches import PathPatch
 
 from .common import _compute_loops_per_angle
-from .tools.matplotlib import (
+from .undirected import UndirectedEdgeCollection
+from ..tools.matplotlib import (
     _stale_wrapper,
     _forwarder,
     _additional_set_methods,
@@ -28,18 +29,13 @@ class DirectedEdgeCollection(mpl.artist.Artist):
     def __init__(self, edges, arrows, **kwargs):
         super().__init__()
 
-        style = deepcopy(kwargs.pop("style"))
-        kwargs_arrows = {
-            "style": style.pop("arrow"),
-        }
-        if "color" in style:
-            kwargs_arrows["color"] = style["color"]
-
-        kwargs["style"] = style
+        kwargs_arrows = {}
+        if "color" in kwargs.get("style", {}):
+            kwargs_arrows["color"] = kwargs["style"]["color"]
 
         # FIXME: do we need a separate _clear_state and _process like in the network
-        self._edges = UndirectedEdgeCollection(*edges, **kwargs)
-        self._arrows = EdgeArrowCollection(*arrows, **kwargs_arrows)
+        self._edges = UndirectedEdgeCollection(edges, **kwargs)
+        self._arrows = EdgeArrowCollection(arrows, **kwargs_arrows)
         self._processed = False
 
     def get_children(self):
@@ -59,6 +55,10 @@ class DirectedEdgeCollection(mpl.artist.Artist):
     def get_arrows(self):
         """Get EdgeArrowCollection artist."""
         return self._arrows
+
+    def get_paths(self):
+        """Get the edge paths."""
+        return self._edges.get_paths()
 
     def _process(self):
         # Forward mpl properties to children
@@ -98,7 +98,7 @@ class DirectedEdgeCollection(mpl.artist.Artist):
             art.draw(renderer, *args, **kwds)
 
 
-class EdgeArrowCollection(PatchCollection):
+class EdgeArrowCollection(mpl.collections.PatchCollection):
     """Collection of arrow patches for plotting directed edgs."""
 
     def __init__(self, *args, **kwargs):
@@ -110,7 +110,7 @@ class EdgeArrowCollection(PatchCollection):
 
     @stale.setter
     def stale(self, val):
-        PatchCollection.stale.fset(self, val)
+        mpl.collections.PatchCollection.stale.fset(self, val)
         if val and hasattr(self, "stale_callback_post"):
             self.stale_callback_post(self)
 
@@ -128,7 +128,7 @@ def make_arrow_patch(marker: str = "|>", width: float = 3, **kwargs):
         )
         patch = PathPatch(
             path,
-            kwargs,
+            **kwargs,
         )
         return patch
 
