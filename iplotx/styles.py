@@ -12,6 +12,10 @@ default = {
         "curved": True,
         "tension": +1.5,
     },
+    "arrow": {
+        "marker": "|>",
+        "width": 3,
+    },
 }
 
 

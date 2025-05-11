@@ -25,6 +25,10 @@ from .edge.undirected import (
     UndirectedEdgeCollection,
     make_stub_patch as make_undirected_edge_patch,
 )
+from .edge.directed import (
+    DirectedEdgeCollection,
+    make_arrow_patch,
+)
 
 
 @_forwarder(
@@ -174,7 +178,67 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _add_directed_edges(self):
         """Draw directed edges."""
-        raise NotImplementedError("Directed edges not implemented yet.")
+        edge_style = get_style(get_stylename() + ".edge")
+        arrow_style = get_style(get_stylename() + ".arrow")
+
+        layout_columns = [
+            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
+        ]
+        vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
+        edge_df = self._ipx_internal_data["edge_df"].set_index(
+            ["_ipx_source", "_ipx_target"]
+        )
+
+        # This contains the patches for vertices, for edge shortening and such
+        vertex_paths = self._vertices._paths
+        vertex_indices = pd.Series(
+            np.arange(len(vertex_layout_df)), index=vertex_layout_df.index
+        )
+
+        edgepatches = []
+        arrowpatches = []
+        adjacent_vertex_ids = []
+        adjecent_vertex_centers = []
+        adjecent_vertex_paths = []
+        for vid1, vid2 in edge_df.index:
+            # Get the vertices for this edge
+            vcenter1 = vertex_layout_df.loc[vid1, layout_columns].values
+            vcenter2 = vertex_layout_df.loc[vid2, layout_columns].values
+            vpath1 = vertex_paths[vertex_indices[vid1]]
+            vpath2 = vertex_paths[vertex_indices[vid2]]
+
+            # These are not the actual edges drawn, only stubs to establish
+            # the styles which are then fed into the dynamic, optimised
+            # factory (the collection) below
+            patch = make_undirected_edge_patch(
+                **edge_style,
+            )
+            edgepatches.append(patch)
+            adjacent_vertex_ids.append((vid1, vid2))
+            adjecent_vertex_centers.append((vcenter1, vcenter2))
+            adjecent_vertex_paths.append((vpath1, vpath2))
+
+            arrow_patch = make_arrow_patch(
+                **arrow_style,
+            )
+            arrowpatches.append(arrow_patch)
+
+        adjacent_vertex_ids = np.array(adjacent_vertex_ids)
+        adjecent_vertex_centers = np.array(adjecent_vertex_centers)
+        # NOTE: the paths might have different number of sides, so it cannot be recast
+
+        # TODO:: deal with "ports" a la graphviz
+
+        art = DirectedEdgeCollection(
+            edges=edgepatches,
+            arrows=arrowpatches,
+            vertex_ids=adjacent_vertex_ids,
+            vertex_paths=adjecent_vertex_paths,
+            vertex_centers=adjecent_vertex_centers,
+            transform=self.axes.transData,
+            style=edge_style,
+        )
+        self._edges = art
 
     def _add_undirected_edges(self):
         """Draw undirected edges."""

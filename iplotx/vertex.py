@@ -16,7 +16,6 @@ class VertexCollection(PatchCollection):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self._stale_size = False
 
     def get_sizes(self):
         """Same as get_size."""
@@ -63,7 +62,6 @@ class VertexCollection(PatchCollection):
             # Rescale the path for this vertex
             path.vertices *= size / cursize
 
-        self._stale_size = True
         self.stale = True
 
     def set_sizes(self, sizes):
@@ -81,26 +79,33 @@ class VertexCollection(PatchCollection):
             self.stale_callback_post(self)
 
 
-def make_patch(marker : str, size, **kwargs):
+def make_patch(marker: str, size, **kwargs):
     """Make a patch of the given marker shape and size."""
     if isinstance(size, (int, float)):
         size = (size, size)
 
     if marker in ("o", "circle"):
         from matplotlib.patches import Circle
+
         return Circle((0, 0), size[0] / 2, **kwargs)
     elif marker in ("s", "square"):
         from matplotlib.patches import Rectangle
+
         return Rectangle((-size[0] / 2, -size[1] / 2), size[0], size[1], **kwargs)
     elif marker in ("^", "triangle"):
         from matplotlib.patches import RegularPolygon
+
         return RegularPolygon((0, 0), numVertices=3, radius=size[0] / 2, **kwargs)
     elif marker in ("d", "diamond"):
         return make_patch("s", size[0], angle=45, **kwargs)
     elif marker in ("v", "triangle_down"):
         from matplotlib.patches import RegularPolygon
-        return RegularPolygon((0, 0), numVertices=3, radius=size[0] / 2, orientation=np.pi, **kwargs)
+
+        return RegularPolygon(
+            (0, 0), numVertices=3, radius=size[0] / 2, orientation=np.pi, **kwargs
+        )
     elif marker in ("e", "ellipse"):
         from matplotlib.patches import Ellipse
+
         return Ellipse((0, 0), size[0] / 2, size[1] / 2, **kwargs)
     raise KeyError(f"Unknown marker: {marker}")
