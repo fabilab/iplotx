@@ -25,7 +25,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         return sizes
 
     @staticmethod
-    def _compute_edge_angles(path, trans, curved):
+    def _compute_edge_angles(path, trans):
         """Compute edge angles for both starting and ending vertices.
 
         NOTE: The domain of atan2 is (-pi, pi].
@@ -44,8 +44,15 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         return (angle1, angle2)
 
     def _compute_paths(self, transform=None):
-        import numpy as np
+        """Compute paths for the edges.
 
+        Loops split the largest wedge left open by other
+        edges of that vertex. The algo is:
+        (i) Find what vertices each loop belongs to
+        (ii) While going through the edges, record the angles
+             for vertices with loops
+        (iii) Plot each loop based on the recorded angles
+        """
         vids = self._vertex_ids
         vpaths = self._vertex_paths
         vcenters = self._vertex_centers
@@ -53,14 +60,6 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             transform = self.get_transform()
         trans = transform.transform
         trans_inv = transform.inverted().transform
-
-        # Loops split the largest wedge left open by other
-        # edges of that vertex. The algo is:
-        # (i) Find what vertices each loop belongs to
-        # (ii) While going through the edges, record the angles
-        #      for vertices with loops
-        # (iii) Plot each loop based on the recorded angles
-        # NOTE: one could improve this based on greediness
 
         # 1. Make a list of vertices with loops, and store them for later
         loop_vertex_dict = {}
@@ -100,14 +99,18 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                     trans_inv,
                 )
             else:
-                raise NotImplementedError("Curved edges not implemented yet.")
+                path = self._shorten_path_undirected_curved(
+                    vcoord_fig,
+                    vpath_fig,
+                    trans_inv,
+                    tension=self._style.get("tension", 1.5),
+                )
 
             # Collect angles for this vertex, to be used for loops plotting below
             if (v1 in loop_vertex_dict) or (v2 in loop_vertex_dict):
                 angles = self._compute_edge_angles(
                     path,
                     trans,
-                    self._style.get("curved", False),
                 )
                 if v1 in loop_vertex_dict:
                     loop_vertex_dict[v1]["edge_angles"].append(angles[0])
@@ -174,12 +177,9 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                 aux1,
                 aux2,
                 end,
-                aux2,
-                aux1,
-                start,
             ]
         )
-        codes = ["MOVETO"] + ["CURVE4"] * 6
+        codes = ["MOVETO"] + ["CURVE4"] * 3
 
         # Offset to place and transform to data coordinates
         vertices = trans_inv(vertices)
@@ -220,6 +220,54 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         path.vertices = trans_inv(path.vertices)
         return path
 
+    def _shorten_path_undirected_curved(
+        self,
+        vcoord_fig,
+        vpath_fig,
+        trans_inv,
+        tension=+1.5,
+    ):
+        # Angle of the straight line
+        theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
+
+        # Shorten at starting vertex
+        vs = _get_shorter_edge_coords(vpath_fig[0], theta) + vcoord_fig[0]
+
+        # Shorten at end vertex
+        ve = _get_shorter_edge_coords(vpath_fig[1], theta + pi) + vcoord_fig[1]
+
+        edge_straight_length = np.sqrt(((ve - vs) ** 2).sum())
+
+        aux1 = vs + 0.33 * (ve - vs)
+        aux2 = vs + 0.67 * (ve - vs)
+
+        # Move orthogonal to the line
+        if vs[1] == ve[1]:
+            fracs = np.array([0, 1])
+        else:
+            m_orth = -(ve[0] - vs[0]) / (ve[1] - vs[1])
+            fracs = np.array([1, m_orth]) / np.sqrt(1 + m_orth**2)
+
+        aux1 += 0.1 * fracs * tension * edge_straight_length
+        aux2 += 0.1 * fracs * tension * edge_straight_length
+
+        path = {
+            "vertices": [
+                vs,
+                aux1,
+                aux2,
+                ve,
+            ],
+            "codes": ["MOVETO"] + ["CURVE4"] * 3,
+        }
+
+        path = mpl.path.Path(
+            path["vertices"],
+            codes=[getattr(mpl.path.Path, x) for x in path["codes"]],
+        )
+        path.vertices = trans_inv(path.vertices)
+        return path
+
     def draw(self, renderer):
         if self._vertex_paths is not None:
             self._paths = self._compute_paths()
@@ -239,6 +287,14 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 def make_stub_patch(**kwargs):
     """Make a stub undirected edge patch, without actual path information."""
     kwargs["clip_on"] = kwargs.get("clip_on", True)
+    if ("color" in kwargs) and ("edgecolor" not in kwargs):
+        kwargs["edgecolor"] = kwargs.pop("color")
+    # Edges are always hollow, because they are not closed paths
+    kwargs["facecolor"] = "none"
+
+    # Forget specific properties that are not supported here
+    kwargs.pop("curved")
+    kwargs.pop("tension")
 
     # NOTE: the path is overwritten later anyway, so no reason to spend any time here
     art = mpl.patches.PathPatch(

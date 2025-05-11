@@ -9,10 +9,10 @@ from .network import NetworkArtist
 
 
 def plot(
-    network : GraphType,
-    layout : Union[LayoutType, None] = None,
-    ax : Union[None, object] = None,
-    ):
+    network: GraphType,
+    layout: Union[LayoutType, None] = None,
+    ax: Union[None, object] = None,
+):
     """Plot this network using the specified layout.
 
     Parameters:

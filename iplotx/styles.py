@@ -9,8 +9,11 @@ default = {
     "edge": {
         "linewidth": 1.5,
         "color": "black",
+        "curved": True,
+        "tension": +1.5,
     },
 }
+
 
 styles = {
     "default": default,
@@ -25,7 +28,7 @@ def get_stylename():
     return str(stylename)
 
 
-def get_style(name : str = "default"):
+def get_style(name: str = "default"):
     namelist = name.split(".")
     style = styles
     for namei in namelist:
