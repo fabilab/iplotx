@@ -268,6 +268,9 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         path.vertices = trans_inv(path.vertices)
         return path
 
+    def _extract_ends_and_angles(self, which="both"):
+        """Extract the start and/or end angles of the paths to compute arrows."""
+
     def draw(self, renderer):
         if self._vertex_paths is not None:
             self._paths = self._compute_paths()

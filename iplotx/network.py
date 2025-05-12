@@ -164,8 +164,8 @@ class NetworkArtist(mpl.artist.Artist):
             patches,
             offsets=offsets if offsets else None,
             offset_transform=self.axes.transData,
-            match_original=True,
             transform=Affine2D(),
+            match_original=True,
         )
         self._vertices = art
 

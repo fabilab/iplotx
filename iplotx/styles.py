@@ -9,12 +9,13 @@ default = {
     "edge": {
         "linewidth": 1.5,
         "color": "black",
-        "curved": True,
+        "curved": False,
         "tension": +1.5,
     },
     "arrow": {
         "marker": "|>",
-        "width": 3,
+        "width": 8,
+        "color": "black",
     },
 }
 

@@ -3,6 +3,7 @@ from math import atan2, tan, cos, pi, sin
 import numpy as np
 import matplotlib as mpl
 from matplotlib.patches import PathPatch
+from matplotlib.transforms import Affine2D
 
 from .common import _compute_loops_per_angle
 from .undirected import UndirectedEdgeCollection
@@ -29,13 +30,17 @@ class DirectedEdgeCollection(mpl.artist.Artist):
     def __init__(self, edges, arrows, **kwargs):
         super().__init__()
 
-        kwargs_arrows = {}
-        if "color" in kwargs.get("style", {}):
-            kwargs_arrows["color"] = kwargs["style"]["color"]
-
         # FIXME: do we need a separate _clear_state and _process like in the network
         self._edges = UndirectedEdgeCollection(edges, **kwargs)
-        self._arrows = EdgeArrowCollection(arrows, **kwargs_arrows)
+
+        # NOTE: offsets are a placeholder for later
+        self._arrows = EdgeArrowCollection(
+            arrows,
+            offsets=np.zeros((len(arrows), 2)),
+            offset_transform=kwargs["transform"],
+            transform=Affine2D(),
+            match_original=True,
+        )
         self._processed = False
 
     def get_children(self):
@@ -81,6 +86,29 @@ class DirectedEdgeCollection(mpl.artist.Artist):
 
         self._processed = True
 
+    def _set_edge_info_for_arrows(self, which="end", transform=None):
+        """Extract the start and/or end angles of the paths to compute arrows."""
+        if transform is None:
+            transform = self.get_transform()
+        trans = transform.transform
+        trans_inv = transform.inverted().transform
+
+        arrow_offsets = self._arrows._offsets
+        for i, epath in enumerate(self._edges._paths):
+            # Offset the arrow to point to the end of the edge
+            self._arrows._offsets[i] = epath.vertices[-1]
+
+            # Rotate the arrow to point in the direction of the edge
+            apath = self._arrows._paths[i]
+            # NOTE: because the tip of the arrow is at (0, 0) in patch space,
+            # in theory it will rotate around that point already
+            v2 = trans(epath.vertices[-1])
+            v1 = trans(epath.vertices[-2])
+            dv = v2 - v1
+            theta = atan2(*(dv[::-1]))
+            mrot = np.array([[cos(theta), -sin(theta)], [sin(theta), cos(theta)]])
+            apath.vertices = apath.vertices @ mrot
+
     @_stale_wrapper
     def draw(self, renderer, *args, **kwds):
         """Draw each of the children, with some buffering mechanism."""
@@ -90,12 +118,11 @@ class DirectedEdgeCollection(mpl.artist.Artist):
         if not self._processed:
             self._process()
 
-        # NOTE: looks like we have to manage the zorder ourselves
-        # this is kind of funny actually
-        children = list(self.get_children())
-        children.sort(key=lambda x: x.zorder)
-        for art in children:
-            art.draw(renderer, *args, **kwds)
+        # We should manage zorder ourselves, but we need to compute
+        # the new offsets and angles of arrows from the edges before drawing them
+        self._edges.draw(renderer, *args, **kwds)
+        self._set_edge_info_for_arrows(which="end")
+        self._arrows.draw(renderer, *args, **kwds)
 
 
 class EdgeArrowCollection(mpl.collections.PatchCollection):
@@ -115,9 +142,9 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
             self.stale_callback_post(self)
 
 
-def make_arrow_patch(marker: str = "|>", width: float = 3, **kwargs):
+def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
     """Make a patch of the given marker shape and size."""
-    height = kwargs.pop("height", width * 1.5)
+    height = kwargs.pop("height", width * 1.3)
 
     if marker == "|>":
         codes = ["MOVETO", "LINETO", "LINETO"]
