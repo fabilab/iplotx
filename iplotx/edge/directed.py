@@ -86,10 +86,14 @@ class DirectedEdgeCollection(mpl.artist.Artist):
 
         self._processed = True
 
-    def _set_edge_info_for_arrows(self, which="end", transform=None):
+    def _set_edge_info_for_arrows(
+        self,
+        which="end",
+        transform=None,
+    ):
         """Extract the start and/or end angles of the paths to compute arrows."""
         if transform is None:
-            transform = self.get_transform()
+            transform = self.get_edges().get_transform()
         trans = transform.transform
         trans_inv = transform.inverted().transform
 
@@ -106,8 +110,11 @@ class DirectedEdgeCollection(mpl.artist.Artist):
             v1 = trans(epath.vertices[-2])
             dv = v2 - v1
             theta = atan2(*(dv[::-1]))
-            mrot = np.array([[cos(theta), -sin(theta)], [sin(theta), cos(theta)]])
+            theta_old = self._arrows._angles[i]
+            dtheta = theta - theta_old
+            mrot = np.array([[cos(dtheta), sin(dtheta)], [-sin(dtheta), cos(dtheta)]])
             apath.vertices = apath.vertices @ mrot
+            self._arrows._angles[i] = theta
 
     @_stale_wrapper
     def draw(self, renderer, *args, **kwds):
@@ -130,6 +137,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self._angles = np.zeros(len(self._paths))
 
     @property
     def stale(self):

@@ -6,8 +6,8 @@ from .typing import GraphType
 
 
 def network_library(
-    network : GraphType,
-    ) -> str:
+    network: GraphType,
+) -> str:
     if igraph is not None and isinstance(network, igraph.Graph):
         return "igraph"
     if networkx is not None:
@@ -23,8 +23,8 @@ def network_library(
 
 
 def detect_directedness(
-    network : GraphType,
-    ) -> bool:
+    network: GraphType,
+) -> bool:
     """Detect if the network is directed or not."""
     if network_library(network) == "igraph":
         return network.is_directed()
@@ -49,4 +49,6 @@ def normalise_layout(layout, vertex_ids=None):
         return layout.values
     if isinstance(layout, np.ndarray):
         return layout
-    raise TypeError("Layout must be a string, list, tuple, numpy array or pandas DataFrame.")
+    raise TypeError(
+        "Layout must be a string, list, tuple, numpy array or pandas DataFrame."
+    )

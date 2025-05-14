@@ -141,7 +141,7 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _add_vertices(self):
         """Draw the vertices"""
-        vertex_style = get_style(get_stylename() + ".vertex")
+        vertex_style = get_style(".vertex")
 
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
@@ -178,8 +178,8 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _add_directed_edges(self):
         """Draw directed edges."""
-        edge_style = get_style(get_stylename() + ".edge")
-        arrow_style = get_style(get_stylename() + ".arrow")
+        edge_style = get_style(".edge")
+        arrow_style = get_style(".arrow")
 
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
@@ -242,7 +242,7 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _add_undirected_edges(self):
         """Draw undirected edges."""
-        edge_style = get_style(get_stylename() + ".edge")
+        edge_style = get_style(".edge")
 
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
