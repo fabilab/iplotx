@@ -2,11 +2,11 @@ from copy import deepcopy
 from math import atan2, tan, cos, pi, sin
 import numpy as np
 import matplotlib as mpl
-from matplotlib.patches import PathPatch
 from matplotlib.transforms import Affine2D
 
 from .common import _compute_loops_per_angle
 from .undirected import UndirectedEdgeCollection
+from .arrow import make_arrow_patch
 from ..tools.matplotlib import (
     _stale_wrapper,
     _forwarder,
@@ -148,23 +148,3 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
         mpl.collections.PatchCollection.stale.fset(self, val)
         if val and hasattr(self, "stale_callback_post"):
             self.stale_callback_post(self)
-
-
-def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
-    """Make a patch of the given marker shape and size."""
-    height = kwargs.pop("height", width * 1.3)
-
-    if marker == "|>":
-        codes = ["MOVETO", "LINETO", "LINETO"]
-        path = mpl.path.Path(
-            np.array([[-height, width * 0.5], [-height, -width * 0.5], [0, 0]]),
-            codes=[getattr(mpl.path.Path, x) for x in codes],
-            closed=True,
-        )
-        patch = PathPatch(
-            path,
-            **kwargs,
-        )
-        return patch
-
-    raise KeyError(f"Unknown marker: {marker}")
