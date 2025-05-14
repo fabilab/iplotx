@@ -1,4 +1,5 @@
 from math import atan2, tan, cos, pi, sin
+from collections import defaultdict
 import numpy as np
 import matplotlib as mpl
 
@@ -74,6 +75,9 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             loop_vertex_dict[v1]["indices"].append(i)
 
         # 2. Make paths for non-loop edges
+        # NOTE: keep track of parallel edges to offset them
+        parallel_edges = defaultdict(list)
+
         # Get actual coordinates of the vertex border
         paths = []
         for i, (v1, v2) in enumerate(vids):
@@ -119,6 +123,25 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 
             # Add the path for this non-loop edge
             paths.append(path)
+            # FIXME: curved parallel edges depend on the direction of curvature...!
+            parallel_edges[(v1, v2)].append(i)
+
+        # Fix parallel edges
+        if not self._style.get("curved", False):
+            for (v1, v2), indices in parallel_edges.items():
+                nparallel = len(indices)
+                indices_inv = parallel_edges[(v2, v1)]
+                nparallel_inv = len(indices_inv)
+                ntot = len(indices) + len(indices_inv)
+                if ntot > 1:
+                    self._fix_parallel_edges_straight(
+                        paths,
+                        indices,
+                        indices_inv,
+                        trans,
+                        trans_inv,
+                        offset=self._style.get("offset", 3),
+                    )
 
         # 3. Deal with loops at the end
         for vid, ldict in loop_vertex_dict.items():
@@ -154,6 +177,37 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                     idx += 1
 
         return paths
+
+    def _fix_parallel_edges_straight(
+        self,
+        paths,
+        indices,
+        indices_inv,
+        trans,
+        trans_inv,
+        offset=3,
+    ):
+        """Offset parallel edges along the same path."""
+        ntot = len(indices) + len(indices_inv)
+
+        # This is straight so two vertices anyway
+        # NOTE: all paths will be the same, which is why we need to offset them
+        vs, ve = trans(paths[indices[0]].vertices)
+
+        # Move orthogonal to the line
+        if vs[1] == ve[1]:
+            fracs = np.array([0, 1]) * (2 * int(ve[0] > vs[0]) - 1)
+        else:
+            m_orth = -(ve[0] - vs[0]) / (ve[1] - vs[1])
+            fracs = np.array([1, m_orth]) / np.sqrt(1 + m_orth**2)
+            fracs *= 2 * int(ve[1] > vs[1]) - 1
+
+        # NOTE: for now treat all the same
+        for i, idx in enumerate(indices + indices_inv):
+            # Offset the path
+            paths[idx].vertices = trans_inv(
+                trans(paths[idx].vertices) + fracs * offset * (i - ntot / 2)
+            )
 
     def _compute_loop_path(
         self,
@@ -243,10 +297,11 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 
         # Move orthogonal to the line
         if vs[1] == ve[1]:
-            fracs = np.array([0, 1])
+            fracs = np.array([0, 1]) * (2 * int(ve[0] > vs[0]) - 1)
         else:
             m_orth = -(ve[0] - vs[0]) / (ve[1] - vs[1])
             fracs = np.array([1, m_orth]) / np.sqrt(1 + m_orth**2)
+            fracs *= 2 * int(ve[1] > vs[1]) - 1
 
         aux1 += 0.1 * fracs * tension * edge_straight_length
         aux2 += 0.1 * fracs * tension * edge_straight_length
@@ -267,9 +322,6 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         )
         path.vertices = trans_inv(path.vertices)
         return path
-
-    def _extract_ends_and_angles(self, which="both"):
-        """Extract the start and/or end angles of the paths to compute arrows."""
 
     def draw(self, renderer):
         if self._vertex_paths is not None:
@@ -296,8 +348,13 @@ def make_stub_patch(**kwargs):
     kwargs["facecolor"] = "none"
 
     # Forget specific properties that are not supported here
-    kwargs.pop("curved")
-    kwargs.pop("tension")
+    forbidden_props = [
+        "curved",
+        "tension",
+        "offset",
+    ]
+    for prop in forbidden_props:
+        kwargs.pop(prop)
 
     # NOTE: the path is overwritten later anyway, so no reason to spend any time here
     art = mpl.patches.PathPatch(

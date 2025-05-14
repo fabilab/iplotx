@@ -96,6 +96,7 @@ def use(style: Union[str, dict, Sequence]):
 
 def reset():
     """Reset to default style."""
+    global current
     current = deepcopy(styles["default"])
 
 
