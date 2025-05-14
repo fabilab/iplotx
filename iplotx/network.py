@@ -1,3 +1,4 @@
+from typing import Union
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -44,11 +45,29 @@ from .edge.directed import (
     )
 )
 class NetworkArtist(mpl.artist.Artist):
-    def __init__(self, network, layout=None):
+    def __init__(
+        self,
+        network,
+        layout=None,
+        vertex_labels: Union[None, list, dict, pd.Series] = None,
+    ):
+        """Network container artist that groups all plotting elements.
+
+        Parameters:
+            network (networkx.Graph or igraph.Graph): The network to plot.
+            layout (array-like): The layout of the network. If None, this function will attempt to
+                infer the layout from the network metadata, using heuristics. If that fails, an
+                exception will be raised.
+            vertex_labels (list, dict, or pandas.Series): The labels for the vertices. If None, no vertex labels
+                will be drawn. If a list, the labels are taken from the list. If a dict, the keys
+                should be the vertex IDs and the values should be the labels.
+        """
         super().__init__()
 
         self.network = network
-        self._ipx_internal_data = _create_internal_data(network, layout)
+        self._ipx_internal_data = _create_internal_data(
+            network, layout, vertex_labels=vertex_labels
+        )
         self._clear_state()
 
     def _clear_state(self):
@@ -175,6 +194,22 @@ class NetworkArtist(mpl.artist.Artist):
         if directed:
             return self._add_directed_edges()
         return self._add_undirected_edges()
+
+    def _add_vertex_labels(self):
+        """Draw vertex labels."""
+        label_style = get_style(".vertex_label")
+
+        texts = []
+        vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
+        for offset, label in zip(self._vertices._offsets, vertex_labels):
+            text = mpl.text.Text(
+                offset[0],
+                offset[1],
+                label,
+                **label_style,
+            )
+            texts.append(text)
+        self._vertex_labels = texts
 
     def _add_directed_edges(self):
         """Draw directed edges."""
@@ -307,7 +342,8 @@ class NetworkArtist(mpl.artist.Artist):
         # in that order will get drawn on top (vis-a-vis zorder).
         self._add_vertices()
         self._add_edges()
-        # self._draw_vertex_labels()
+        if "label" in self._ipx_internal_data["vertex_df"].columns:
+            self._draw_vertex_labels()
         # self._draw_edge_labels()
 
         # TODO: callbacks for stale vertices/edges
@@ -348,7 +384,7 @@ class NetworkArtist(mpl.artist.Artist):
 
 
 # INTERNAL ROUTINES
-def _create_internal_data(network, layout=None):
+def _create_internal_data(network, layout=None, vertex_labels=None):
     """Create internal data for the network."""
     nl = network_library(network)
     directed = detect_directedness(network)
@@ -362,6 +398,10 @@ def _create_internal_data(network, layout=None):
         ndim = layout.shape[1]
         for i, layouti in enumerate(layout.T):
             vertex_df[f"_ipx_layout_{i}"] = layouti
+
+        # Vertex labels
+        if vertex_labels is None:
+            vertex_df["label"] = vertex_labels
 
         # Edges are a list of tuples, because of multiedges
         tmp = []
@@ -381,6 +421,10 @@ def _create_internal_data(network, layout=None):
         vertex_df = pd.DataFrame(
             layout, columns=[f"_ipx_layout_{i}" for i in range(ndim)]
         )
+
+        # Vertex labels
+        if vertex_labels is None:
+            vertex_df["label"] = vertex_labels
 
         # Edges are a list of tuples, because of multiedges
         tmp = []
