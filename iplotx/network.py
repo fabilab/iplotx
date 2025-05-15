@@ -4,6 +4,10 @@ import pandas as pd
 import matplotlib as mpl
 from matplotlib.transforms import Affine2D
 
+from .typing import (
+    GraphType,
+    LayoutType,
+)
 from .styles import (
     get_style,
     get_stylename,
@@ -17,6 +21,7 @@ from .tools.matplotlib import (
     _stale_wrapper,
     _forwarder,
     _additional_set_methods,
+    _get_label_width_height,
 )
 from .vertex import (
     VertexCollection,
@@ -47,8 +52,8 @@ from .edge.directed import (
 class NetworkArtist(mpl.artist.Artist):
     def __init__(
         self,
-        network,
-        layout=None,
+        network: GraphType,
+        layout: LayoutType = None,
         vertex_labels: Union[None, list, dict, pd.Series] = None,
     ):
         """Network container artist that groups all plotting elements.
@@ -116,7 +121,7 @@ class NetworkArtist(mpl.artist.Artist):
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
         ]
-        layout = self._ipx_internal_data["vertex_df"].values
+        layout = self._ipx_internal_data["vertex_df"][layout_columns].values
 
         if len(layout) == 0:
             mins = np.array([0, 0])
@@ -166,6 +171,12 @@ class NetworkArtist(mpl.artist.Artist):
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
         ]
         vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
+        if vertex_style.get("size") == "label":
+            if "label" not in self._ipx_internal_data["vertex_df"].columns:
+                raise KeyError(
+                    "No labels found, cannot resize vertices based on labels."
+                )
+            vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
 
         # TODO:
         offsets = []
@@ -174,8 +185,13 @@ class NetworkArtist(mpl.artist.Artist):
             # Centre of the vertex
             offsets.append(list(row[layout_columns].values))
 
+            if vertex_style.get("size") == "label":
+                # NOTE: it's ok to overwrite the dict here
+                vertex_style["size"] = _get_label_width_height(
+                    vertex_labels[vid], **vertex_style.get("label", {})
+                )
+
             # Shape of the vertex (Patch)
-            # FIXME: this needs to be rescaled in figure points, not data points
             art = make_vertex_patch(**vertex_style)
             patches.append(art)
 
@@ -197,7 +213,11 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _add_vertex_labels(self):
         """Draw vertex labels."""
-        label_style = get_style(".vertex_label")
+        label_style = get_style(".vertex.label")
+        forbidden_props = ["hpadding", "vpadding"]
+        for prop in forbidden_props:
+            if prop in label_style:
+                del label_style[prop]
 
         texts = []
         vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
@@ -206,6 +226,7 @@ class NetworkArtist(mpl.artist.Artist):
                 offset[0],
                 offset[1],
                 label,
+                transform=self.axes.transData,
                 **label_style,
             )
             texts.append(text)
@@ -343,7 +364,7 @@ class NetworkArtist(mpl.artist.Artist):
         self._add_vertices()
         self._add_edges()
         if "label" in self._ipx_internal_data["vertex_df"].columns:
-            self._draw_vertex_labels()
+            self._add_vertex_labels()
         # self._draw_edge_labels()
 
         # TODO: callbacks for stale vertices/edges
@@ -400,7 +421,7 @@ def _create_internal_data(network, layout=None, vertex_labels=None):
             vertex_df[f"_ipx_layout_{i}"] = layouti
 
         # Vertex labels
-        if vertex_labels is None:
+        if vertex_labels is not None:
             vertex_df["label"] = vertex_labels
 
         # Edges are a list of tuples, because of multiedges
@@ -423,7 +444,7 @@ def _create_internal_data(network, layout=None, vertex_labels=None):
         )
 
         # Vertex labels
-        if vertex_labels is None:
+        if vertex_labels is not None:
             vertex_df["label"] = vertex_labels
 
         # Edges are a list of tuples, because of multiedges

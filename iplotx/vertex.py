@@ -1,6 +1,12 @@
+import numpy as np
 from matplotlib.transforms import IdentityTransform
 from matplotlib.collections import PatchCollection
-from pandas.core.dtypes.dtypes import re
+from matplotlib.patches import (
+    Ellipse,
+    Circle,
+    RegularPolygon,
+    Rectangle,
+)
 
 
 class VertexCollection(PatchCollection):
@@ -81,31 +87,26 @@ class VertexCollection(PatchCollection):
 
 def make_patch(marker: str, size, **kwargs):
     """Make a patch of the given marker shape and size."""
+    forbidden_props = ["label"]
+    for prop in forbidden_props:
+        if prop in kwargs:
+            kwargs.pop(prop)
+
     if isinstance(size, (int, float)):
         size = (size, size)
 
     if marker in ("o", "circle"):
-        from matplotlib.patches import Circle
-
         return Circle((0, 0), size[0] / 2, **kwargs)
-    elif marker in ("s", "square"):
-        from matplotlib.patches import Rectangle
-
+    elif marker in ("s", "square", "r", "rectangle"):
         return Rectangle((-size[0] / 2, -size[1] / 2), size[0], size[1], **kwargs)
     elif marker in ("^", "triangle"):
-        from matplotlib.patches import RegularPolygon
-
         return RegularPolygon((0, 0), numVertices=3, radius=size[0] / 2, **kwargs)
     elif marker in ("d", "diamond"):
         return make_patch("s", size[0], angle=45, **kwargs)
     elif marker in ("v", "triangle_down"):
-        from matplotlib.patches import RegularPolygon
-
         return RegularPolygon(
             (0, 0), numVertices=3, radius=size[0] / 2, orientation=np.pi, **kwargs
         )
     elif marker in ("e", "ellipse"):
-        from matplotlib.patches import Ellipse
-
         return Ellipse((0, 0), size[0] / 2, size[1] / 2, **kwargs)
     raise KeyError(f"Unknown marker: {marker}")

@@ -1,4 +1,5 @@
 from functools import wraps, partial
+import matplotlib as mpl
 
 
 # NOTE: https://github.com/networkx/grave/blob/main/grave/grave.py
@@ -57,3 +58,22 @@ def _additional_set_methods(attributes, cls=None):
         setattr(cls, f"set_{attr}", method)
 
     return cls
+
+
+# FIXME: this method appears quite inconsistent, would be better to improve.
+# The issue is that to really know the size of a label on screen, we need to
+# render it first. Therefore, we should render the labels, then render the
+# vertices. Leaving for now, since this can be styled manually which covers
+# many use cases.
+def _get_label_width_height(text, hpadding=18, vpadding=12, **kwargs):
+    """Get the bounding box size for a text with certain properties."""
+    forbidden_props = ["horizontalalignment", "verticalalignment", "ha", "va"]
+    for prop in forbidden_props:
+        if prop in kwargs:
+            del kwargs[prop]
+
+    path = mpl.textpath.TextPath((0, 0), text, **kwargs)
+    boundingbox = path.get_extents()
+    width = boundingbox.width + hpadding
+    height = boundingbox.height + vpadding
+    return (width, height)

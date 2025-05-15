@@ -7,6 +7,12 @@ default = {
         "size": 30,
         "color": "black",
         "marker": "o",
+        "label": {
+            "horizontalalignment": "center",
+            "verticalalignment": "center",
+            "hpadding": 18,
+            "vpadding": 12,
+        },
     },
     "edge": {
         "linewidth": 1.5,
@@ -21,9 +27,18 @@ default = {
     },
 }
 
+hollow = deepcopy(default)
+hollow["vertex"]["color"] = None
+hollow["vertex"]["facecolor"] = "none"
+hollow["vertex"]["edgecolor"] = "black"
+hollow["vertex"]["linewidth"] = 1.5
+hollow["vertex"]["marker"] = "r"
+hollow["vertex"]["size"] = "label"
+
 
 styles = {
     "default": default,
+    "hollow": hollow,
 }
 
 
@@ -77,6 +92,8 @@ def use(style: Union[str, dict, Sequence]):
 
             if isinstance(value, dict):
                 _update(value, current[key])
+            elif value is None:
+                del current[key]
             else:
                 current[key] = value
 

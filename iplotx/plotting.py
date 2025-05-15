@@ -1,4 +1,5 @@
 from typing import Union
+import pandas as pd
 import matplotlib.pyplot as plt
 
 from .typing import (
@@ -11,6 +12,7 @@ from .network import NetworkArtist
 def plot(
     network: GraphType,
     layout: Union[LayoutType, None] = None,
+    vertex_labels: Union[None, list, dict, pd.Series] = None,
     ax: Union[None, object] = None,
 ):
     """Plot this network using the specified layout.
@@ -18,6 +20,9 @@ def plot(
     Parameters:
         network (GraphType): The network to plot. Can be a networkx or igraph graph.
         layout (Union[LayoutType, None], optional): The layout to use for plotting. If None, a layout will be looked for in the network object and, if none is found, an exception is raised. Defaults to None.
+        vertex_labels (list, dict, or pandas.Series): The labels for the vertices. If None, no vertex labels
+            will be drawn. If a list, the labels are taken from the list. If a dict, the keys
+            should be the vertex IDs and the values should be the labels.
         ax (Union[None, object], optional): The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
 
     Returns:
@@ -26,7 +31,7 @@ def plot(
     if ax is None:
         fig, ax = plt.subplots()
 
-    nwkart = NetworkArtist(network, layout)
+    nwkart = NetworkArtist(network, layout, vertex_labels=vertex_labels)
 
     ax.add_artist(nwkart)
 

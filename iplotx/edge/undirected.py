@@ -354,7 +354,8 @@ def make_stub_patch(**kwargs):
         "offset",
     ]
     for prop in forbidden_props:
-        kwargs.pop(prop)
+        if prop in kwargs:
+            kwargs.pop(prop)
 
     # NOTE: the path is overwritten later anyway, so no reason to spend any time here
     art = mpl.patches.PathPatch(
