@@ -204,13 +204,6 @@ class NetworkArtist(mpl.artist.Artist):
         )
         self._vertices = art
 
-    def _add_edges(self):
-        """Draw the edges."""
-        directed = self._ipx_internal_data["directed"]
-        if directed:
-            return self._add_directed_edges()
-        return self._add_undirected_edges()
-
     def _add_vertex_labels(self):
         """Draw vertex labels."""
         label_style = get_style(".vertex.label")
@@ -232,7 +225,18 @@ class NetworkArtist(mpl.artist.Artist):
             texts.append(text)
         self._vertex_labels = texts
 
-    def _add_directed_edges(self):
+    def _add_edges(self):
+        """Draw the edges."""
+        if "labels" in self._ipx_internal_data["edge_df"].columns:
+            labels = self._ipx_internal_data["edge_df"]["labels"]
+        else:
+            labels = None
+
+        if self._ipx_internal_data["directed"]:
+            return self._add_directed_edges(labels=labels)
+        return self._add_undirected_edges(labels=labels)
+
+    def _add_directed_edges(self, labels=None):
         """Draw directed edges."""
         edge_style = get_style(".edge")
         arrow_style = get_style(".arrow")
@@ -288,6 +292,7 @@ class NetworkArtist(mpl.artist.Artist):
         art = DirectedEdgeCollection(
             edges=edgepatches,
             arrows=arrowpatches,
+            labels=labels,
             vertex_ids=adjacent_vertex_ids,
             vertex_paths=adjecent_vertex_paths,
             vertex_centers=adjecent_vertex_centers,
@@ -296,7 +301,7 @@ class NetworkArtist(mpl.artist.Artist):
         )
         self._edges = art
 
-    def _add_undirected_edges(self):
+    def _add_undirected_edges(self, labels=None):
         """Draw undirected edges."""
         edge_style = get_style(".edge")
 
@@ -344,6 +349,7 @@ class NetworkArtist(mpl.artist.Artist):
 
         art = UndirectedEdgeCollection(
             edgepatches,
+            labels=labels,
             vertex_ids=adjacent_vertex_ids,
             vertex_paths=adjecent_vertex_paths,
             vertex_centers=adjecent_vertex_centers,
@@ -365,7 +371,6 @@ class NetworkArtist(mpl.artist.Artist):
         self._add_edges()
         if "label" in self._ipx_internal_data["vertex_df"].columns:
             self._add_vertex_labels()
-        # self._draw_edge_labels()
 
         # TODO: callbacks for stale vertices/edges
 

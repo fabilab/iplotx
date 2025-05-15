@@ -27,11 +27,11 @@ from ..tools.matplotlib import (
     )
 )
 class DirectedEdgeCollection(mpl.artist.Artist):
-    def __init__(self, edges, arrows, **kwargs):
+    def __init__(self, edges, arrows, labels=None, **kwargs):
         super().__init__()
 
         # FIXME: do we need a separate _clear_state and _process like in the network
-        self._edges = UndirectedEdgeCollection(edges, **kwargs)
+        self._edges = UndirectedEdgeCollection(edges, labels=labels, **kwargs)
 
         # NOTE: offsets are a placeholder for later
         self._arrows = EdgeArrowCollection(

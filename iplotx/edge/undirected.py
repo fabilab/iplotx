@@ -13,6 +13,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         self._vertex_centers = kwargs.pop("vertex_centers", None)
         self._vertex_paths = kwargs.pop("vertex_paths", None)
         self._style = kwargs.pop("style", None)
+        self._labels = kwargs.pop("labels", None)
         super().__init__(*args, **kwargs)
 
     @staticmethod
@@ -323,9 +324,28 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         path.vertices = trans_inv(path.vertices)
         return path
 
+    def _compute_labels(self):
+        offsets = []
+        for path in self._paths:
+            offset = _compute_mid_coord(path)
+            offsets.append(offset)
+
+        if not hasattr(self, "_label_collection"):
+            self._label_collection = LabelCollection(self._labels, offsets=offsets)
+        else:
+            self._label_collection.set_offsets(offsets)
+
+    def get_children(self):
+        children = []
+        if hasattr(self, "_label_collection"):
+            children.append(self._label_collection)
+        return children
+
     def draw(self, renderer):
         if self._vertex_paths is not None:
             self._paths = self._compute_paths()
+            if self._labels is not None:
+                self._compute_labels()
         return super().draw(renderer)
 
     @property
@@ -352,6 +372,7 @@ def make_stub_patch(**kwargs):
         "curved",
         "tension",
         "offset",
+        "label",
     ]
     for prop in forbidden_props:
         if prop in kwargs:
