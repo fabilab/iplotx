@@ -1,4 +1,5 @@
 from typing import Union, Sequence
+import warnings
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -178,10 +179,12 @@ class NetworkArtist(mpl.artist.Artist):
         vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
         if vertex_style.get("size") == "label":
             if "label" not in self._ipx_internal_data["vertex_df"].columns:
-                raise KeyError(
+                warnings.warn(
                     "No labels found, cannot resize vertices based on labels."
                 )
-            vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
+                vertex_style["size"] = get_style("default.vertex")["size"]
+            else:
+                vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
 
         # TODO:
         offsets = []
