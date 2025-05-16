@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Sequence
 import pandas as pd
 import matplotlib.pyplot as plt
 
@@ -13,6 +13,7 @@ def plot(
     network: GraphType,
     layout: Union[LayoutType, None] = None,
     vertex_labels: Union[None, list, dict, pd.Series] = None,
+    edge_labels: Union[None, Sequence] = None,
     ax: Union[None, object] = None,
 ):
     """Plot this network using the specified layout.
@@ -31,7 +32,12 @@ def plot(
     if ax is None:
         fig, ax = plt.subplots()
 
-    nwkart = NetworkArtist(network, layout, vertex_labels=vertex_labels)
+    nwkart = NetworkArtist(
+        network,
+        layout,
+        vertex_labels=vertex_labels,
+        edge_labels=edge_labels,
+    )
 
     ax.add_artist(nwkart)
 

@@ -19,6 +19,10 @@ default = {
         "color": "black",
         "curved": True,
         "tension": +1.5,
+        "label": {
+            "horizontalalignment": "center",
+            "verticalalignment": "center",
+        },
     },
     "arrow": {
         "marker": "|>",
@@ -83,6 +87,7 @@ def use(style: Union[str, dict, Sequence]):
             "default" resets the style to the default one. If this is a sequence,
             each style is applied in order.
     """
+    global current
 
     def _update(style: dict, current: dict):
         for key, value in style.items():
@@ -107,8 +112,9 @@ def use(style: Union[str, dict, Sequence]):
             reset()
         else:
             if isinstance(style, str):
-                style = get_style(style)
-            _update(style, current)
+                current = get_style(style)
+            else:
+                _update(style, current)
 
 
 def reset():

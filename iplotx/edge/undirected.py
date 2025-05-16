@@ -4,6 +4,11 @@ import numpy as np
 import matplotlib as mpl
 
 from .common import _compute_loops_per_angle
+from .label import LabelCollection
+from ..tools.matplotlib import (
+    _compute_mid_coord,
+    _stale_wrapper,
+)
 
 
 class UndirectedEdgeCollection(mpl.collections.PatchCollection):
@@ -325,15 +330,33 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         return path
 
     def _compute_labels(self):
+        style = self._style.get("label", None) if self._style is not None else None
         offsets = []
         for path in self._paths:
             offset = _compute_mid_coord(path)
             offsets.append(offset)
 
         if not hasattr(self, "_label_collection"):
-            self._label_collection = LabelCollection(self._labels, offsets=offsets)
-        else:
-            self._label_collection.set_offsets(offsets)
+            self._label_collection = LabelCollection(
+                self._labels,
+                style=style,
+            )
+
+            # Forward a bunch of mpl settings that are needed
+            self._label_collection.set_figure(self.figure)
+            self._label_collection.axes = self.axes
+            # forward the clippath/box to the children need this logic
+            # because mpl exposes some fast-path logic
+            clip_path = self.get_clip_path()
+            if clip_path is None:
+                clip_box = self.get_clip_box()
+                self._label_collection.set_clip_box(clip_box)
+            else:
+                self._label_collection.set_clip_path(clip_path)
+
+            # Finally make the patches
+            self._label_collection._create_labels()
+        self._label_collection.set_offsets(offsets)
 
     def get_children(self):
         children = []
@@ -341,12 +364,16 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             children.append(self._label_collection)
         return children
 
-    def draw(self, renderer):
+    @_stale_wrapper
+    def draw(self, renderer, *args, **kwds):
         if self._vertex_paths is not None:
             self._paths = self._compute_paths()
             if self._labels is not None:
                 self._compute_labels()
-        return super().draw(renderer)
+        super().draw(renderer)
+
+        for child in self.get_children():
+            child.draw(renderer, *args, **kwds)
 
     @property
     def stale(self):

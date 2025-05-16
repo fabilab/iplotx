@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Sequence
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -55,6 +55,7 @@ class NetworkArtist(mpl.artist.Artist):
         network: GraphType,
         layout: LayoutType = None,
         vertex_labels: Union[None, list, dict, pd.Series] = None,
+        edge_labels: Union[None, Sequence] = None,
     ):
         """Network container artist that groups all plotting elements.
 
@@ -66,12 +67,16 @@ class NetworkArtist(mpl.artist.Artist):
             vertex_labels (list, dict, or pandas.Series): The labels for the vertices. If None, no vertex labels
                 will be drawn. If a list, the labels are taken from the list. If a dict, the keys
                 should be the vertex IDs and the values should be the labels.
+            elge_labels (sequence): The labels for the edges. If None, no edge labels will be drawn.
         """
         super().__init__()
 
         self.network = network
         self._ipx_internal_data = _create_internal_data(
-            network, layout, vertex_labels=vertex_labels
+            network,
+            layout,
+            vertex_labels=vertex_labels,
+            edge_labels=edge_labels,
         )
         self._clear_state()
 
@@ -410,7 +415,12 @@ class NetworkArtist(mpl.artist.Artist):
 
 
 # INTERNAL ROUTINES
-def _create_internal_data(network, layout=None, vertex_labels=None):
+def _create_internal_data(
+    network,
+    layout=None,
+    vertex_labels=None,
+    edge_labels=None,
+):
     """Create internal data for the network."""
     nl = network_library(network)
     directed = detect_directedness(network)
@@ -427,6 +437,10 @@ def _create_internal_data(network, layout=None, vertex_labels=None):
 
         # Vertex labels
         if vertex_labels is not None:
+            if len(vertex_labels) != len(vertex_df):
+                raise ValueError(
+                    "Vertex labels must be the same length as the number of vertices."
+                )
             vertex_df["label"] = vertex_labels
 
         # Edges are a list of tuples, because of multiedges
@@ -437,6 +451,14 @@ def _create_internal_data(network, layout=None, vertex_labels=None):
             tmp.append(row)
         edge_df = pd.DataFrame(tmp)
         del tmp
+
+        # Edge labels
+        if edge_labels is not None:
+            if len(edge_labels) != len(edge_df):
+                raise ValueError(
+                    "Edge labels must be the same length as the number of edges."
+                )
+            edge_df["labels"] = edge_labels
 
     else:
         # Vertices are ordered integers, no gaps
@@ -450,6 +472,10 @@ def _create_internal_data(network, layout=None, vertex_labels=None):
 
         # Vertex labels
         if vertex_labels is not None:
+            if len(vertex_labels) != len(vertex_df):
+                raise ValueError(
+                    "Vertex labels must be the same length as the number of vertices."
+                )
             vertex_df["label"] = vertex_labels
 
         # Edges are a list of tuples, because of multiedges
@@ -460,6 +486,14 @@ def _create_internal_data(network, layout=None, vertex_labels=None):
             tmp.append(row)
         edge_df = pd.DataFrame(tmp)
         del tmp
+
+        # Edge labels
+        if edge_labels is not None:
+            if len(edge_labels) != len(edge_df):
+                raise ValueError(
+                    "Edge labels must be the same length as the number of edges."
+                )
+            edge_df["labels"] = edge_labels
 
     internal_data = {
         "vertex_df": vertex_df,

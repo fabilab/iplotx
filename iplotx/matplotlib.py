@@ -1,11 +1,6 @@
 from functools import wraps, partial
 import matplotlib as mpl
 
-from .geometry import (
-    _evaluate_squared_bezier,
-    _evaluate_cubic_bezier,
-)
-
 
 # NOTE: https://github.com/networkx/grave/blob/main/grave/grave.py
 def _stale_wrapper(func):
@@ -85,19 +80,5 @@ def _get_label_width_height(text, hpadding=18, vpadding=12, **kwargs):
 
 
 def _compute_mid_coord(path):
-    """Compute mid point of an edge, straight or curved."""
-    # Distinguish between straight and curved paths
-    if path.codes[-1] == mpl.path.Path.LINETO:
-        return path.vertices.mean(axis=0)
+            if (path.codes[-1] in (mpl.path.CURVE4, mpl.CURVE3)):
 
-    # Cubic Bezier
-    if path.codes[-1] == mpl.path.Path.CURVE4:
-        return _evaluate_cubic_bezier(path.vertices, 0.5)
-
-    # Square Bezier
-    if path.codes[-1] == mpl.path.Path.CURVE3:
-        return _evaluate_squared_bezier(path.vertices, 0.5)
-
-    raise ValueError(
-        "Curve type not straight and not squared/cubic Bezier, cannot compute mid point."
-    )
