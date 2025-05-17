@@ -430,13 +430,9 @@ def _create_internal_data(
 
     if nl == "networkx":
         # Vertices are indexed by node ID
-        # NOTE: unclear we need all these data for just plotting
-        vertex_df = pd.DataFrame(index=pd.Index(network.nodes))
-        # Add layout
-        layout = normalise_layout(layout, vertex_ids=vertex_df.index)
-        ndim = layout.shape[1]
-        for i, layouti in enumerate(layout.T):
-            vertex_df[f"_ipx_layout_{i}"] = layouti
+        vertex_df = normalise_layout(layout).loc[pd.Index(network.nodes)]
+        ndim = vertex_df.shape[1]
+        vertex_df.columns = [f"_ipx_layout_{i}" for i in range(ndim)]
 
         # Vertex labels
         if vertex_labels is not None:
@@ -465,13 +461,9 @@ def _create_internal_data(
 
     else:
         # Vertices are ordered integers, no gaps
-        layout = normalise_layout(layout)
-        ndim = layout.shape[1]
-
-        # All that's left to do is to check their attributes
-        vertex_df = pd.DataFrame(
-            layout, columns=[f"_ipx_layout_{i}" for i in range(ndim)]
-        )
+        vertex_df = normalise_layout(layout)
+        ndim = vertex_df.shape[1]
+        vertex_df.columns = [f"_ipx_layout_{i}" for i in range(ndim)]
 
         # Vertex labels
         if vertex_labels is not None:

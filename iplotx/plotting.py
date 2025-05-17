@@ -5,13 +5,15 @@ import matplotlib.pyplot as plt
 from .typing import (
     GraphType,
     LayoutType,
+    GroupingType,
 )
 from .network import NetworkArtist
 
 
 def plot(
-    network: GraphType,
+    network: Union[GraphType, None] = None,
     layout: Union[LayoutType, None] = None,
+    grouping: Union[None, GroupingType] = None,
     vertex_labels: Union[None, list, dict, pd.Series] = None,
     edge_labels: Union[None, Sequence] = None,
     ax: Union[None, object] = None,
@@ -29,31 +31,43 @@ def plot(
     Returns:
         A NetworkArtist object.
     """
+    if (network is None) and (grouping is None):
+        raise ValueError("At least one of network or grouping must be provided.")
+
     if ax is None:
         fig, ax = plt.subplots()
 
-    nwkart = NetworkArtist(
-        network,
-        layout,
-        vertex_labels=vertex_labels,
-        edge_labels=edge_labels,
-    )
+    artists = []
+    if network is not None:
+        nwkart = NetworkArtist(
+            network,
+            layout,
+            vertex_labels=vertex_labels,
+            edge_labels=edge_labels,
+        )
+        ax.add_artist(nwkart)
+        # Postprocess for things that require an axis (transform, etc.)
+        nwkart._process()
+        artists.append(nwkart)
 
-    ax.add_artist(nwkart)
+    if grouping is not None:
+        grpart = GroupingArtist(
+            grouping,
+            layout,
+        )
+        ax.add_artist(grpart)
+        # Postprocess for things that require an axis (transform, etc.)
+        grpart._process()
+        artists.append(grpart)
 
-    nwkart._process()
+    _postprocess_axis(ax, artists)
 
-    _postprocess_axis(ax, nwkart)
-
-    return nwkart
+    return artists
 
 
 # INTERNAL ROUTINES
-def _postprocess_axis(ax, art):
+def _postprocess_axis(ax, artists):
     """Postprocess axis after plotting."""
-
-    # Set new data limits
-    ax.update_datalim(art.get_datalim())
 
     # Despine
     ax.spines["right"].set_visible(False)
@@ -64,6 +78,17 @@ def _postprocess_axis(ax, art):
     # Remove axis ticks
     ax.set_xticks([])
     ax.set_yticks([])
+
+    # Set new data limits
+    # FIXME: take the union of bounds
+    for i, art in enumerate(artists):
+        minsi, maxsi = art.get_datalim()
+        if i == 0:
+            mins, maxs = minsi, maxsi
+        else:
+            mins = pd.minimum(mins, minsi)
+            maxs = pd.maximum(maxs, maxsi)
+    ax.update_datalim((mins, maxs))
 
     # Autoscale for x/y axis limits
     ax.autoscale_view()
