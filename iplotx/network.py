@@ -115,13 +115,15 @@ class NetworkArtist(mpl.artist.Artist):
         """Get list of edge label artists."""
         return self._edge_labels
 
-    def get_datalim(self, pad=0.05):
+    def get_datalim(self, transData, pad=0.05):
         """Get limits on x/y axes based on the graph layout data.
 
         Parameters:
+            transData (Transform): The transform to use for the data.
             pad (float): Padding to add to the limits. Default is 0.05.
                 Units are a fraction of total axis range before padding.
         """
+        # FIXME: transData works here, but it's probably kind of broken in general
         import numpy as np
 
         layout_columns = [
@@ -142,8 +144,8 @@ class NetworkArtist(mpl.artist.Artist):
         # PatchCollection with an offset transform using transData. Therefore,
         # care should be taken if one wants to include it here
         if self._vertices is not None:
-            trans = self.axes.transData.transform
-            trans_inv = self.axes.transData.inverted().transform
+            trans = transData.transform
+            trans_inv = transData.inverted().transform
             verts = self._vertices
             for path, offset in zip(verts.get_paths(), verts._offsets):
                 bbox = path.get_extents()
@@ -167,7 +169,7 @@ class NetworkArtist(mpl.artist.Artist):
         mins -= pad
         maxs += pad
 
-        return (mins, maxs)
+        return mpl.transforms.Bbox([mins, maxs])
 
     def _add_vertices(self):
         """Draw the vertices"""

@@ -29,6 +29,12 @@ default = {
         "width": 8,
         "color": "black",
     },
+    "grouping": {
+        "facecolor": "grey",
+        "edgecolor": "black",
+        "linewidth": 1.5,
+        "alpha": 0.5,
+    },
 }
 
 hollow = deepcopy(default)

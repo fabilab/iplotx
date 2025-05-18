@@ -13,9 +13,10 @@ from .typing import (
 )
 from .heuristics import normalise_layout, normalise_grouping
 from .styles import get_style
+from .tools.geometry import convex_hull
 
 
-class GroupArtist(PatchCollection):
+class GroupingArtist(PatchCollection):
     def __init__(
         self,
         grouping: GroupingType,
@@ -43,21 +44,28 @@ class GroupArtist(PatchCollection):
     def _create_patches(self, grouping, layout, **kwargs):
         layout = normalise_layout(layout)
         grouping = normalise_grouping(grouping, layout)
+        style = get_style(".grouping")
+
+        style.update(kwargs)
 
         patches = []
-        for name, vertices in grouping.items():
-            vertices = np.array(vertices)
-            if len(vertices) == 0:
+        for name, vids in grouping.items():
+            if len(vids) == 0:
                 continue
-            coords = layout.loc[vertices].values
+            vids = np.array(list(vids))
+            coords = layout.loc[vids].values
+            idx_hull = convex_hull(coords)
+            coords_hull = coords[idx_hull]
+
             patches.append(
                 mpl.patches.Polygon(
-                    np.column_stack((x, y)),
+                    coords_hull,
                     label=name,
                     # NOTE: the transform is set later on
-                    **kwargs,
+                    **style,
                 )
             )
+        return patches, grouping, layout
 
     def _process(self):
         self.set_transform(self.axes.transData)

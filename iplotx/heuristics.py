@@ -61,13 +61,14 @@ def normalise_grouping(
         return {}
 
     if isinstance(grouping, dict):
+        val0 = next(iter(grouping.values()))
         # If already the right data type or compatible, leave as is
-        if isinstance(next(grouping), (set, frozenset)):
+        if isinstance(val0, (set, frozenset)):
             return grouping
 
         # If a dict of integers or strings, assume each key is a vertex id and each value is a
         # group, convert (i.e. invert the dict)
-        if isinstance(next(grouping), (int, str)):
+        if isinstance(val0, (int, str)):
             group_dic = defaultdict(set)
             for key, val in grouping.items():
                 group_dic[val].add(key)

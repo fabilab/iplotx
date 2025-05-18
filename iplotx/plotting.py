@@ -1,5 +1,6 @@
 from typing import Union, Sequence
 import pandas as pd
+import matplotlib as mpl
 import matplotlib.pyplot as plt
 
 from .typing import (
@@ -8,6 +9,7 @@ from .typing import (
     GroupingType,
 )
 from .network import NetworkArtist
+from .groups import GroupingArtist
 
 
 def plot(
@@ -80,15 +82,10 @@ def _postprocess_axis(ax, artists):
     ax.set_yticks([])
 
     # Set new data limits
-    # FIXME: take the union of bounds
-    for i, art in enumerate(artists):
-        minsi, maxsi = art.get_datalim()
-        if i == 0:
-            mins, maxs = minsi, maxsi
-        else:
-            mins = pd.minimum(mins, minsi)
-            maxs = pd.maximum(maxs, maxsi)
-    ax.update_datalim((mins, maxs))
+    bboxes = []
+    for art in artists:
+        bboxes.append(art.get_datalim(ax.transData))
+    ax.update_datalim(mpl.transforms.Bbox.union(bboxes))
 
     # Autoscale for x/y axis limits
     ax.autoscale_view()
