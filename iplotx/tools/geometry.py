@@ -1,3 +1,4 @@
+from math import tan, atan2
 import numpy as np
 
 
@@ -132,3 +133,48 @@ def _convex_hull_Graham_scan(points):
     stack = np.asarray(stack)
 
     return stack
+
+
+def _compute_group_path_with_vertex_padding(
+    points,
+    transform,
+    vertexpadding=10,
+):
+    """Offset path for a group based on vertex padding.
+
+    At the input, the structure is [v1, v1, v1, v2, v2, v2, ...]
+    """
+
+    # Transform into figure coordinates
+    trans = transform.transform
+    trans_inv = transform.inverted().transform
+    points = trans(points)
+
+    # Compute all shift vectors by diff, arctan2, then add 90 degrees, tan, norm
+    # This maintains chirality
+
+    # Diff
+    vpoints = points[:-1:3].copy()
+    vpoints[1:] -= vpoints[:-1]
+    vpoints[0] -= vpoints[-1]
+
+    # Argtan etc
+    angles = np.arctan2(vpoints[:, 1], vpoints[:, 0])
+    angles_orth = angles + np.pi / 2
+    m_orth = np.tan(angles_orth)
+
+    # Normalise to 1
+    vpads = (np.vstack([np.ones_like(m_orth), m_orth]) / (1 + m_orth**2) ** 0.5).T
+    vpads_rot = np.zeros_like(vpads)
+    vpads_rot[:-1] = vpads[1:]
+    vpads_rot[-1] = vpads[0]
+
+    # Shift the points
+    points[:-1:3] += vpads_rot * vertexpadding
+    points[1:-1:3] += (vpads + vpads_rot) * vertexpadding
+    points[2:-1:3] += vpads * vertexpadding
+
+    # Transform back to data coordinates
+    points = trans_inv(points)
+
+    return points
