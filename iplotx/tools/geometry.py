@@ -142,7 +142,7 @@ def _compute_group_path_with_vertex_padding(
 ):
     """Offset path for a group based on vertex padding.
 
-    At the input, the structure is [v1, v1, v1, v2, v2, v2, ...]
+    At the input, the structure is [v1, v1, v1, ..., vn, vn, vn, v1]
     """
 
     # Transform into figure coordinates
@@ -152,27 +152,31 @@ def _compute_group_path_with_vertex_padding(
 
     # Compute all shift vectors by diff, arctan2, then add 90 degrees, tan, norm
     # This maintains chirality
+    # NOTE: the last point is just going back to the beginning, this
+    # is a quirk or how mpl's closed paths work
 
     # Diff
     vpoints = points[:-1:3].copy()
-    vpoints[1:] -= vpoints[:-1]
-    vpoints[0] -= vpoints[-1]
+    vpoints[0] -= points[-2]
+    vpoints[1:] -= points[:-4:3]
 
-    # Argtan etc
-    angles = np.arctan2(vpoints[:, 1], vpoints[:, 0])
-    angles_orth = angles + np.pi / 2
-    m_orth = np.tan(angles_orth)
+    # Normalise vpoints to 1
+    norm = np.sqrt((vpoints**2).sum(axis=1))
+    vpoints_norm = (vpoints.T / norm).T
 
-    # Normalise to 1
-    vpads = (np.vstack([np.ones_like(m_orth), m_orth]) / (1 + m_orth**2) ** 0.5).T
-    vpads_rot = np.zeros_like(vpads)
-    vpads_rot[:-1] = vpads[1:]
-    vpads_rot[-1] = vpads[0]
+    # Rotate vpoints by 90 degrees
+    vpads = vpoints_norm @ np.array([[0, 1], [-1, 0]])
+    vpads_perm = np.zeros_like(vpads)
+    vpads_perm[:-1] = vpads[1:]
+    vpads_perm[-1] = vpads[0]
 
     # Shift the points
-    points[:-1:3] += vpads_rot * vertexpadding
-    points[1:-1:3] += (vpads + vpads_rot) * vertexpadding
-    points[2:-1:3] += vpads * vertexpadding
+    points[:-1:3] += vpads * vertexpadding
+    points[1:-1:3] += (vpads + vpads_perm) * vertexpadding
+    points[2:-1:3] += vpads_perm * vertexpadding
+
+    # mpl's quirky closed-path thing
+    points[-1] = points[0]
 
     # Transform back to data coordinates
     points = trans_inv(points)

@@ -4,7 +4,7 @@ from contextlib import contextmanager
 
 default = {
     "vertex": {
-        "size": 30,
+        "size": 20,
         "color": "black",
         "marker": "o",
         "label": {
@@ -17,8 +17,8 @@ default = {
     "edge": {
         "linewidth": 1.5,
         "color": "black",
-        "curved": True,
-        "tension": +1.5,
+        "curved": False,
+        "tension": 0,
         "label": {
             "horizontalalignment": "center",
             "verticalalignment": "center",
@@ -34,7 +34,7 @@ default = {
         "edgecolor": "black",
         "linewidth": 1.5,
         "alpha": 0.5,
-        "vertexpadding": 10,
+        "vertexpadding": 25,
     },
 }
 

@@ -134,7 +134,12 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 
         # Fix parallel edges
         if not self._style.get("curved", False):
-            for (v1, v2), indices in parallel_edges.items():
+            pass
+            while len(parallel_edges) > 0:
+                print(parallel_edges)
+                (v1, v2), indices = parallel_edges.popitem()
+                indices_inv = parallel_edges.pop((v2, v1), [])
+
                 nparallel = len(indices)
                 indices_inv = parallel_edges[(v2, v1)]
                 nparallel_inv = len(indices_inv)

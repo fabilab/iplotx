@@ -105,7 +105,7 @@ def _compute_group_patch_stub(
         codes.extend(["LINETO", "CURVE3", "CURVE3"])
     codes[0] = "MOVETO"
     vertices.append(vertices[0])
-    codes.append("CLOSEPOLY")
+    codes.append("LINETO")
 
     codes = [getattr(mpl.path.Path, x) for x in codes]
     patch = mpl.patches.PathPatch(
