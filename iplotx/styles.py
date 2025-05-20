@@ -1,6 +1,9 @@
 from typing import Union, Sequence
 from copy import deepcopy
 from contextlib import contextmanager
+import numpy as np
+import pandas as pd
+
 
 default = {
     "vertex": {
@@ -31,7 +34,7 @@ default = {
         "color": "black",
     },
     "grouping": {
-        "facecolor": "grey",
+        "facecolor": ["grey", "steelblue", "tomato"],
         "edgecolor": "black",
         "linewidth": 1.5,
         "alpha": 0.5,
@@ -139,3 +142,16 @@ def stylecontext(style: Union[str, dict, Sequence]):
         yield
     finally:
         use(current)
+
+
+def rotate_style(style, i, props=("edgecolor", "facecolor")):
+    style = deepcopy(style)
+
+    for prop in props:
+        val = style.get(prop, None)
+        if val is None:
+            continue
+        if isinstance(val, (tuple, list, np.ndarray, pd.Index, pd.Series)):
+            style[prop] = val[i % len(val)]
+
+    return style

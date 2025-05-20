@@ -1,4 +1,5 @@
 from typing import Union, Sequence
+from copy import deepcopy
 from collections import defaultdict
 import numpy as np
 import pandas as pd
@@ -12,7 +13,7 @@ from .typing import (
     LayoutType,
 )
 from .heuristics import normalise_layout, normalise_grouping
-from .styles import get_style
+from .styles import get_style, rotate_style
 from .tools.geometry import convex_hull
 from .tools.geometry import _compute_group_path_with_vertex_padding
 
@@ -57,7 +58,7 @@ class GroupingArtist(PatchCollection):
         style.update(kwargs)
 
         patches = []
-        for name, vids in grouping.items():
+        for i, (name, vids) in enumerate(grouping.items()):
             if len(vids) == 0:
                 continue
             vids = np.array(list(vids))
@@ -65,19 +66,20 @@ class GroupingArtist(PatchCollection):
             idx_hull = convex_hull(coords)
             coords_hull = coords[idx_hull]
 
+            stylei = rotate_style(style, i)
+
             # NOTE: the transform is set later on
             patch = _compute_group_patch_stub(
                 coords_hull,
                 self._vertexpadding,
                 label=name,
-                **style,
+                **stylei,
             )
 
             patches.append(patch)
         return patches, grouping, layout
 
-    def _process(self):
-        self.set_transform(self.axes.transData)
+    def _compute_paths(self):
         if self._vertexpadding > 0:
             for i, path in enumerate(self._paths):
                 self._paths[i].vertices = _compute_group_path_with_vertex_padding(
@@ -85,6 +87,14 @@ class GroupingArtist(PatchCollection):
                     self.get_transform(),
                     vertexpadding=self._vertexpadding,
                 )
+
+    def _process(self):
+        self.set_transform(self.axes.transData)
+        self._compute_paths()
+
+    def draw(self, renderer):
+        self._compute_paths()
+        super().draw(renderer)
 
 
 def _compute_group_patch_stub(
@@ -103,9 +113,17 @@ def _compute_group_patch_stub(
     for point in points:
         vertices.extend([point] * 3)
         codes.extend(["LINETO", "CURVE3", "CURVE3"])
+    if len(points) == 1:
+        vertices.append(points[0])
+        codes.append("CURVE3")
+    # Closing point: mpl is a bit quirky here
+    vertices.append(vertices[0] if len(vertices) else [0, 0])
+    if len(points) == 1:
+        codes.append("CURVE3")
+    else:
+        codes.append("LINETO")
+    # The first point is always a moveto
     codes[0] = "MOVETO"
-    vertices.append(vertices[0])
-    codes.append("LINETO")
 
     codes = [getattr(mpl.path.Path, x) for x in codes]
     patch = mpl.patches.PathPatch(

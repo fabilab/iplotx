@@ -143,6 +143,8 @@ def _compute_group_path_with_vertex_padding(
     """Offset path for a group based on vertex padding.
 
     At the input, the structure is [v1, v1, v1, ..., vn, vn, vn, v1]
+
+    # NOTE: this would look better as a cubic Bezier, but ok for now.
     """
 
     # Transform into figure coordinates
@@ -150,30 +152,59 @@ def _compute_group_path_with_vertex_padding(
     trans_inv = transform.inverted().transform
     points = trans(points)
 
-    # Compute all shift vectors by diff, arctan2, then add 90 degrees, tan, norm
-    # This maintains chirality
-    # NOTE: the last point is just going back to the beginning, this
-    # is a quirk or how mpl's closed paths work
+    # Find the vertex centers, to recompute the offsets from scratch
+    # Independent whether this is a first call or a later draw,
+    # finding the vertex center can be done at once
+    # 0.         .->.vcenter
+    #  |         |  ^
+    #  |         |  |
+    # 1.--.2     .--.
+    # singleton group
+    if len(points) == 5:
+        points[:] = 0.5 * (points[0] + points[2])
+        points[0] -= np.array([0, 1]) * vertexpadding
+        points[1] -= np.array([1, 0]) * 2 * vertexpadding
+        points[2] += np.array([0, 1]) * vertexpadding
+        points[3] += np.array([1, 0]) * 2 * vertexpadding
 
-    # Diff
-    vpoints = points[:-1:3].copy()
-    vpoints[0] -= points[-2]
-    vpoints[1:] -= points[:-4:3]
+    else:
+        # doublet group
+        if len(points) == 7:
+            points[:-1:3] = 0.5 * (points[:-1:3] + points[2:-1:3])
+        # triangle+ groups
+        else:
+            points[:-1:3] = points[:-1:3] + points[2:-1:3] - points[1:-1:3]
+        points[1:-1:3] = points[:-1:3]
+        points[2:-1:3] = points[:-1:3]
+        points[-1] = points[0]
 
-    # Normalise vpoints to 1
-    norm = np.sqrt((vpoints**2).sum(axis=1))
-    vpoints_norm = (vpoints.T / norm).T
+        # Compute all shift vectors by diff, arctan2, then add 90 degrees, tan, norm
+        # This maintains chirality
+        # NOTE: the last point is just going back to the beginning, this
+        # is a quirk or how mpl's closed paths work
 
-    # Rotate vpoints by 90 degrees
-    vpads = vpoints_norm @ np.array([[0, 1], [-1, 0]])
-    vpads_perm = np.zeros_like(vpads)
-    vpads_perm[:-1] = vpads[1:]
-    vpads_perm[-1] = vpads[0]
+        # Diff
+        vpoints = points[:-1:3].copy()
+        vpoints[0] -= points[-2]
+        vpoints[1:] -= points[:-4:3]
 
-    # Shift the points
-    points[:-1:3] += vpads * vertexpadding
-    points[1:-1:3] += (vpads + vpads_perm) * vertexpadding
-    points[2:-1:3] += vpads_perm * vertexpadding
+        # Normalise vpoints to 1
+        norm = np.sqrt((vpoints**2).sum(axis=1))
+        vpoints_norm = (vpoints.T / norm).T
+
+        # Rotate vpoints by 90 degrees
+        vpads = vpoints_norm @ np.array([[0, 1], [-1, 0]])
+        vpads_perm = np.zeros_like(vpads)
+        vpads_perm[:-1] = vpads[1:]
+        vpads_perm[-1] = vpads[0]
+
+        # Shift the points
+        points[:-1:3] += vpads * vertexpadding
+        points[2:-1:3] += vpads_perm * vertexpadding
+        if len(vpoints) == 2:
+            points[1:-1:3] += vpoints_norm * 2 * vertexpadding
+        else:
+            points[1:-1:3] += (vpads + vpads_perm) * vertexpadding
 
     # mpl's quirky closed-path thing
     points[-1] = points[0]
