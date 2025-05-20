@@ -133,15 +133,14 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             parallel_edges[(v1, v2)].append(i)
 
         # Fix parallel edges
+        # If none found, empty the dictionary already
+        if max(parallel_edges.values(), key=len) == 1:
+            parallel_edges = {}
         if not self._style.get("curved", False):
-            pass
             while len(parallel_edges) > 0:
-                print(parallel_edges)
                 (v1, v2), indices = parallel_edges.popitem()
                 indices_inv = parallel_edges.pop((v2, v1), [])
-
                 nparallel = len(indices)
-                indices_inv = parallel_edges[(v2, v1)]
                 nparallel_inv = len(indices_inv)
                 ntot = len(indices) + len(indices_inv)
                 if ntot > 1:
@@ -206,14 +205,11 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         vs, ve = trans(paths[indices[0]].vertices)
 
         # Move orthogonal to the line
-        if vs[1] == ve[1]:
-            fracs = np.array([0, 1]) * (2 * int(ve[0] > vs[0]) - 1)
-        else:
-            m_orth = -(ve[0] - vs[0]) / (ve[1] - vs[1])
-            fracs = np.array([1, m_orth]) / np.sqrt(1 + m_orth**2)
-            fracs *= 2 * int(ve[1] > vs[1]) - 1
+        fracs = (
+            (vs - ve) / np.sqrt(((vs - ve) ** 2).sum()) @ np.array([[0, 1], [-1, 0]])
+        )
 
-        # NOTE: for now treat all the same
+        # NOTE: for now treat both direction the same
         for i, idx in enumerate(indices + indices_inv):
             # Offset the path
             paths[idx].vertices = trans_inv(
@@ -306,14 +302,10 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         aux1 = vs + 0.33 * (ve - vs)
         aux2 = vs + 0.67 * (ve - vs)
 
-        # Move orthogonal to the line
-        if vs[1] == ve[1]:
-            fracs = np.array([0, 1]) * (2 * int(ve[0] > vs[0]) - 1)
-        else:
-            m_orth = -(ve[0] - vs[0]) / (ve[1] - vs[1])
-            fracs = np.array([1, m_orth]) / np.sqrt(1 + m_orth**2)
-            fracs *= 2 * int(ve[1] > vs[1]) - 1
-
+        # Move Bezier points orthogonal to the line
+        fracs = (
+            (vs - ve) / np.sqrt(((vs - ve) ** 2).sum()) @ np.array([[0, 1], [-1, 0]])
+        )
         aux1 += 0.1 * fracs * tension * edge_straight_length
         aux2 += 0.1 * fracs * tension * edge_straight_length
 

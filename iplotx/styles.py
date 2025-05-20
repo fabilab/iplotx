@@ -18,7 +18,8 @@ default = {
         "linewidth": 1.5,
         "color": "black",
         "curved": False,
-        "tension": 0,
+        "offset": 3,
+        "tension": 1,
         "label": {
             "horizontalalignment": "center",
             "verticalalignment": "center",
