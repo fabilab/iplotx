@@ -271,18 +271,20 @@ class NetworkArtist(mpl.artist.Artist):
         adjacent_vertex_ids = []
         adjecent_vertex_centers = []
         adjecent_vertex_paths = []
-        for vid1, vid2 in edge_df.index:
+        for i, (vid1, vid2) in enumerate(edge_df.index):
             # Get the vertices for this edge
             vcenter1 = vertex_layout_df.loc[vid1, layout_columns].values
             vcenter2 = vertex_layout_df.loc[vid2, layout_columns].values
             vpath1 = vertex_paths[vertex_indices[vid1]]
             vpath2 = vertex_paths[vertex_indices[vid2]]
 
+            edge_stylei = rotate_style(edge_style, i)
+
             # These are not the actual edges drawn, only stubs to establish
             # the styles which are then fed into the dynamic, optimised
             # factory (the collection) below
             patch = make_undirected_edge_patch(
-                **edge_style,
+                **edge_stylei,
             )
             edgepatches.append(patch)
             adjacent_vertex_ids.append((vid1, vid2))
@@ -334,18 +336,20 @@ class NetworkArtist(mpl.artist.Artist):
         adjacent_vertex_ids = []
         adjecent_vertex_centers = []
         adjecent_vertex_paths = []
-        for vid1, vid2 in edge_df.index:
+        for i, (vid1, vid2) in enumerate(edge_df.index):
             # Get the vertices for this edge
             vcenter1 = vertex_layout_df.loc[vid1, layout_columns].values
             vcenter2 = vertex_layout_df.loc[vid2, layout_columns].values
             vpath1 = vertex_paths[vertex_indices[vid1]]
             vpath2 = vertex_paths[vertex_indices[vid2]]
 
+            edge_stylei = rotate_style(edge_style, i)
+
             # These are not the actual edges drawn, only stubs to establish
             # the styles which are then fed into the dynamic, optimised
             # factory (the collection) below
             patch = make_undirected_edge_patch(
-                **edge_style,
+                **edge_stylei,
             )
             edgepatches.append(patch)
             adjacent_vertex_ids.append((vid1, vid2))

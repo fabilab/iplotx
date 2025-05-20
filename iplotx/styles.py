@@ -19,6 +19,7 @@ default = {
     },
     "edge": {
         "linewidth": 1.5,
+        "linestyle": "-",
         "color": "black",
         "curved": False,
         "offset": 3,
