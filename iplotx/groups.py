@@ -108,22 +108,24 @@ def _compute_group_patch_stub(
             **kwargs,
         )
 
+    # NOTE: Closing point: mpl is a bit quirky here
     vertices = []
     codes = []
-    for point in points:
-        vertices.extend([point] * 3)
-        codes.extend(["LINETO", "CURVE3", "CURVE3"])
-    if len(points) == 1:
-        vertices.append(points[0])
-        codes.append("CURVE3")
-    # Closing point: mpl is a bit quirky here
-    vertices.append(vertices[0] if len(vertices) else [0, 0])
-    if len(points) == 1:
-        codes.append("CURVE3")
+    if len(points) == 0:
+        vertices = np.zeros((0, 2))
+    elif len(points) == 1:
+        vertices = [points[0]] * 9
+        codes = ["MOVETO"] + ["CURVE3"] * 8
+    elif len(points) == 2:
+        vertices = [points[0]] * 5 + [points[1]] * 5 + [points[0]]
+        codes = ["MOVETO"] + ["CURVE3"] * 4 + ["LINETO"] + ["CURVE3"] * 4 + ["LINETO"]
     else:
+        for point in points:
+            vertices.extend([point] * 3)
+            codes.extend(["LINETO", "CURVE3", "CURVE3"])
+        vertices.append(vertices[0])
         codes.append("LINETO")
-    # The first point is always a moveto
-    codes[0] = "MOVETO"
+        codes[0] = "MOVETO"
 
     codes = [getattr(mpl.path.Path, x) for x in codes]
     patch = mpl.patches.PathPatch(

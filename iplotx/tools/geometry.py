@@ -160,22 +160,31 @@ def _compute_group_path_with_vertex_padding(
     #  |         |  |
     # 1.--.2     .--.
     # singleton group
-    if len(points) == 5:
-        points[:] = 0.5 * (points[0] + points[2])
-        points[0] -= np.array([0, 1]) * vertexpadding
-        points[1] -= np.array([1, 0]) * 2 * vertexpadding
-        points[2] += np.array([0, 1]) * vertexpadding
-        points[3] += np.array([1, 0]) * 2 * vertexpadding
-
+    s2 = 0.96
+    if len(points) == 9:
+        points[:] = 0.5 * (points[0] + points[4])
+        points[0] += np.array([0, -1]) * vertexpadding
+        points[1] += np.array([-s2, -s2]) * vertexpadding
+        points[2] += np.array([-1, 0]) * vertexpadding
+        points[3] += np.array([-s2, s2]) * vertexpadding
+        points[4] += np.array([0, 1]) * vertexpadding
+        points[5] += np.array([s2, s2]) * vertexpadding
+        points[6] += np.array([1, 0]) * vertexpadding
+        points[7] += np.array([s2, -s2]) * vertexpadding
+        points[8] += np.array([0, -1]) * vertexpadding
     else:
-        # doublet group
-        if len(points) == 7:
-            points[:-1:3] = 0.5 * (points[:-1:3] + points[2:-1:3])
-        # triangle+ groups
+        # doublet group are a bit different from triangles+
+        if len(points) == 11:
+            # points per vertex
+            ppv = 5
+            points[:-1:ppv] = 0.5 * (points[:-1:ppv] + points[ppv - 1 : -1 : ppv])
         else:
-            points[:-1:3] = points[:-1:3] + points[2:-1:3] - points[1:-1:3]
-        points[1:-1:3] = points[:-1:3]
-        points[2:-1:3] = points[:-1:3]
+            ppv = 3
+            points[:-1:ppv] = (
+                points[:-1:ppv] + points[ppv - 1 : -1 : ppv] - points[1:-1:ppv]
+            )
+        for j in range(1, ppv):
+            points[j:-1:ppv] = points[:-1:ppv]
         points[-1] = points[0]
 
         # Compute all shift vectors by diff, arctan2, then add 90 degrees, tan, norm
@@ -183,28 +192,31 @@ def _compute_group_path_with_vertex_padding(
         # NOTE: the last point is just going back to the beginning, this
         # is a quirk or how mpl's closed paths work
 
-        # Diff
-        vpoints = points[:-1:3].copy()
+        # Normalised diff
+        vpoints = points[:-1:ppv].copy()
         vpoints[0] -= points[-2]
-        vpoints[1:] -= points[:-4:3]
+        vpoints[1:] -= points[:-1:ppv][:-1]
+        vpoints = (vpoints.T / np.sqrt((vpoints**2).sum(axis=1))).T
 
-        # Normalise vpoints to 1
-        norm = np.sqrt((vpoints**2).sum(axis=1))
-        vpoints_norm = (vpoints.T / norm).T
+        # Rotate by 90 degrees
+        vpads = vpoints @ np.array([[0, 1], [-1, 0]])
 
-        # Rotate vpoints by 90 degrees
-        vpads = vpoints_norm @ np.array([[0, 1], [-1, 0]])
+        # Permute diff for the end
         vpads_perm = np.zeros_like(vpads)
         vpads_perm[:-1] = vpads[1:]
         vpads_perm[-1] = vpads[0]
 
         # Shift the points
-        points[:-1:3] += vpads * vertexpadding
-        points[2:-1:3] += vpads_perm * vertexpadding
-        if len(vpoints) == 2:
-            points[1:-1:3] += vpoints_norm * 2 * vertexpadding
+        if ppv == 3:
+            points[:-1:ppv] += vpads * vertexpadding
+            points[1:-1:ppv] += (vpads + vpads_perm) * vertexpadding
+            points[2:-1:ppv] += vpads_perm * vertexpadding
         else:
-            points[1:-1:3] += (vpads + vpads_perm) * vertexpadding
+            points[:-1:ppv] += vpads * vertexpadding
+            points[1:-1:ppv] += (vpads + vpoints) * vertexpadding
+            points[2:-1:ppv] += vpoints * vertexpadding
+            points[3:-1:ppv] += (vpads_perm + vpoints) * vertexpadding
+            points[4:-1:ppv] += vpads_perm * vertexpadding
 
     # mpl's quirky closed-path thing
     points[-1] = points[0]
