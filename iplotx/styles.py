@@ -8,7 +8,7 @@ import pandas as pd
 default = {
     "vertex": {
         "size": 20,
-        "color": "black",
+        "facecolor": "black",
         "marker": "o",
         "label": {
             "horizontalalignment": "center",
@@ -144,7 +144,11 @@ def stylecontext(style: Union[str, dict, Sequence]):
         use(current)
 
 
-def rotate_style(style, i, props=("edgecolor", "facecolor")):
+def rotate_style(
+    style,
+    i,
+    props=("edgecolor", "facecolor", "linewidth", "linestyle", "alpha", "zorder"),
+):
     style = deepcopy(style)
 
     for prop in props:

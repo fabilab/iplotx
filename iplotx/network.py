@@ -11,7 +11,7 @@ from .typing import (
 )
 from .styles import (
     get_style,
-    get_stylename,
+    rotate_style,
 )
 from .heuristics import (
     network_library,
@@ -21,7 +21,6 @@ from .heuristics import (
 from .tools.matplotlib import (
     _stale_wrapper,
     _forwarder,
-    _additional_set_methods,
     _get_label_width_height,
 )
 from .vertex import (
@@ -188,10 +187,10 @@ class NetworkArtist(mpl.artist.Artist):
             else:
                 vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
 
-        # TODO:
+        # FIXME:: this would be better off in the VertexCollection itself, like we do for groups
         offsets = []
         patches = []
-        for vid, row in vertex_layout_df.iterrows():
+        for i, (vid, row) in enumerate(vertex_layout_df.iterrows()):
             # Centre of the vertex
             offsets.append(list(row[layout_columns].values))
 
@@ -201,8 +200,10 @@ class NetworkArtist(mpl.artist.Artist):
                     vertex_labels[vid], **vertex_style.get("label", {})
                 )
 
+            vertex_stylei = rotate_style(vertex_style, i)
+
             # Shape of the vertex (Patch)
-            art = make_vertex_patch(**vertex_style)
+            art = make_vertex_patch(**vertex_stylei)
             patches.append(art)
 
         art = VertexCollection(
