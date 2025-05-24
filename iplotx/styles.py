@@ -1,8 +1,18 @@
-from typing import Union, Sequence
+from typing import Union, Sequence, Hashable
 from copy import deepcopy
 from contextlib import contextmanager
 import numpy as np
 import pandas as pd
+
+
+style_leaves = (
+    "edgecolor",
+    "facecolor",
+    "linewidth",
+    "linestyle",
+    "alpha",
+    "zorder",
+)
 
 
 default = {
@@ -107,7 +117,8 @@ def use(style: Union[str, dict, Sequence]):
                 current[key] = value
                 continue
 
-            if isinstance(value, dict):
+            # Style leaves are by definition not to be recurred into
+            if isinstance(value, dict) and (key not in style_leaves):
                 _update(value, current[key])
             elif value is None:
                 del current[key]
@@ -147,16 +158,29 @@ def stylecontext(style: Union[str, dict, Sequence]):
 
 def rotate_style(
     style,
-    i,
-    props=("edgecolor", "facecolor", "linewidth", "linestyle", "alpha", "zorder"),
+    index: Union[int, None] = None,
+    id: Union[Hashable, None] = None,
+    props=style_leaves,
 ):
+    if (index is None) and (id is None):
+        raise ValueError(
+            "At least one of 'index' or 'id' must be provided to rotate_style."
+        )
+
     style = deepcopy(style)
 
     for prop in props:
         val = style.get(prop, None)
         if val is None:
             continue
-        if isinstance(val, (tuple, list, np.ndarray, pd.Index, pd.Series)):
-            style[prop] = val[i % len(val)]
+        # NOTE: this assumes that these properties are leaves of the style tree
+        # Btw: dict includes defaultdict, Couter, etc.
+        if (id is not None) and isinstance(val, (dict, pd.Series)):
+            # This works on both dict-like and Series
+            style[prop] = val[id]
+        elif (index is not None) and isinstance(
+            val, (tuple, list, np.ndarray, pd.Index, pd.Series)
+        ):
+            style[prop] = np.asarray(val)[index % len(val)]
 
     return style

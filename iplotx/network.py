@@ -200,7 +200,7 @@ class NetworkArtist(mpl.artist.Artist):
                     vertex_labels[vid], **vertex_style.get("label", {})
                 )
 
-            vertex_stylei = rotate_style(vertex_style, i)
+            vertex_stylei = rotate_style(vertex_style, index=i, id=vid)
 
             # Shape of the vertex (Patch)
             art = make_vertex_patch(**vertex_stylei)
@@ -278,7 +278,7 @@ class NetworkArtist(mpl.artist.Artist):
             vpath1 = vertex_paths[vertex_indices[vid1]]
             vpath2 = vertex_paths[vertex_indices[vid2]]
 
-            edge_stylei = rotate_style(edge_style, i)
+            edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
 
             # These are not the actual edges drawn, only stubs to establish
             # the styles which are then fed into the dynamic, optimised
@@ -343,7 +343,7 @@ class NetworkArtist(mpl.artist.Artist):
             vpath1 = vertex_paths[vertex_indices[vid1]]
             vpath2 = vertex_paths[vertex_indices[vid2]]
 
-            edge_stylei = rotate_style(edge_style, i)
+            edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
 
             # These are not the actual edges drawn, only stubs to establish
             # the styles which are then fed into the dynamic, optimised
