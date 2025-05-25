@@ -38,10 +38,15 @@ networkx = [
 igraph = [
   "igraph>=0.11.0",
 ]
+
+[dependency-groups]
 test = [
   "pytest>=7.0.0",
-  "pytest-mpl",
+  "flake8>=3.9.0",
 ]
+docs = ["sphinx", "sphinx-rtd-theme"]
+typing = ["mypy", "types-requests"]
+typing-test = [{include-group = "typing"}, {include-group = "test"}, "useful-types"]
 
 [project.urls]
 Homepage = "https://github.com/fabilab/iplotx"
