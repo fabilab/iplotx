@@ -9,17 +9,6 @@ try:
 except ImportError:
     matplotlib = None
 
-__all__ = ("find_image_comparison",)
-
-
-def find_image_comparison():
-    def dummy_comparison(*args, **kwargs):
-        return lambda *args, **kwargs: None
-
-    if matplotlib is None:
-        return dummy_comparison
-    return image_comparison
-
 
 # NOTE: Parametrizing this requires pytest (see matplotlib's test suite)
 _default_extension = "png"

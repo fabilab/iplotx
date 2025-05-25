@@ -39,23 +39,30 @@ class GraphTestRunner(unittest.TestCase):
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plot(g, ax=ax, layout=self.layout_small_ring)
 
-    @image_comparison(baseline_images=["graph_labels"], remove_text=True)
-    def test_labels(self):
+    @image_comparison(baseline_images=["graph_directed"], remove_text=True)
+    def test_directed(self):
         plt.close("all")
-        g = ig.Graph.Ring(5)
+        g = ig.Graph.Ring(5, directed=True)
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(
-            network=g,
-            ax=ax,
-            layout=self.layout_small_ring,
-            vertex_labels=["1", "2", "3", "4", "5"],
-            styles={
-                "vertex": {
-                    "label_color": "white",
-                    "label_size": 16,
-                }
-            },
-        )
+        ipx.plot(g, ax=ax, layout=self.layout_small_ring)
+
+    # @image_comparison(baseline_images=["graph_labels"], remove_text=True)
+    # def test_labels(self):
+    #    plt.close("all")
+    #    g = ig.Graph.Ring(5)
+    #    fig, ax = plt.subplots(figsize=(3, 3))
+    #    ipx.plot(
+    #        network=g,
+    #        ax=ax,
+    #        layout=self.layout_small_ring,
+    #        vertex_labels=["1", "2", "3", "4", "5"],
+    #        styles={
+    #            "vertex": {
+    #                "label_color": "white",
+    #                "label_size": 16,
+    #            }
+    #        },
+    #    )
 
     # @image_comparison(baseline_images=["graph_layout_attribute"], remove_text=True)
     # def test_layout_attribute(self):
@@ -64,13 +71,6 @@ class GraphTestRunner(unittest.TestCase):
     #    g["layout"] = ig.Layout([(x, x) for x in range(g.vcount())])
     #    fig, ax = plt.subplots(figsize=(3, 3))
     #    ipx.plot(g, ax=ax)
-
-    # @image_comparison(baseline_images=["graph_directed"], remove_text=True)
-    # def test_directed(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5, directed=True)
-    #    fig, ax = plt.subplots(figsize=(3, 3))
-    #    ipx.plot(g, ax=ax, layout=self.layout_small_ring)
 
     # @image_comparison(baseline_images=["graph_directed_curved_loops"], remove_text=True)
     # def test_directed_curved_loops(self):

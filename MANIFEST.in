@@ -1,0 +1,13 @@
+prune .git
+prune .github
+
+include iplotx
+include MANIFEST.in
+include tests/*.py
+
+graft doc
+prune doc/html
+prune doc/source/tutorials
+
+global-exclude .dockerignore .DS_Store .gitattributes .gitignore .gitmodules
+
