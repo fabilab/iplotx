@@ -19,13 +19,13 @@ sphinx:
 # See https://docs.readthedocs.io/en/stable/guides/reproducible-builds.html
 python:
    install:
-     - myst-parser
-     - sphinx-design
-     - sphinx-gallery
-     - matplotlib
-     - pandas
-     - igraph
-     - networkx
+     myst-parser: "4.0.1"
+     sphinx-design: "0.6.1"
+     sphinx-gallery: "0.19.0"
+     matplotlib: "3.10.3"
+     pandas: "2.2.3"
+     igraph: "0.11.8"
+     networkx: "3.4.2"
 #    - requirements: docs/requirements.txt
         
 
