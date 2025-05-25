@@ -7,6 +7,11 @@ Plotting networks from igraph and networkx.
 
 **NOTE**: This is currently alpha quality software. The API and functionality will break constantly, so use at your own risk. That said, if you have things you would like to see improved, please open a GitHub issue.
 
+## Installation
+```bash
+pip install iplotx
+```
+
 ## Quick Start
 ```python
 import networkx as nx
