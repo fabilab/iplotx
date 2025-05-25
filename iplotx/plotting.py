@@ -20,7 +20,7 @@ def plot(
     vertex_labels: Union[None, list, dict, pd.Series] = None,
     edge_labels: Union[None, Sequence] = None,
     ax: Union[None, object] = None,
-    styles: Sequence[Union[str, dict]] = (),
+    style: Sequence[Union[str, dict]] = (),
 ):
     """Plot this network using the specified layout.
 
@@ -32,18 +32,19 @@ def plot(
             should be the vertex IDs and the values should be the labels.
         edge_labels (Union[None, Sequence], optional): The labels for the edges. If None, no edge labels will be drawn. Defaults to None.
         ax (Union[None, object], optional): The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
-        **style: Additional keyword arguments are treated as style for the objects to plot.
+        style: Apply this style for the objects to plot. This can be a sequence (e.g. list) of styles and they will be applied in order.
 
     Returns:
         A NetworkArtist object.
     """
-    if len(styles):
-        with stylecontext(styles):
+    if len(style) or isinstance(style, dict):
+        with stylecontext(style):
             return plot(
                 network=network,
                 layout=layout,
                 grouping=grouping,
                 edge_labels=edge_labels,
+                ax=ax,
             )
 
     if (network is None) and (grouping is None):
