@@ -28,8 +28,6 @@ def _compute_loops_per_angle(nloops, angles):
 
     # 3. Check how small the second-largest wedge would become
     idx_dsort = np.argsort(deltas)
-    dsplit_new = dsplit * nloops / (nloops - 1)
-    dsplit2_new = deltas[idx_sort[-2]]
     return [
         (
             angles_sorted_closed[idx_dmax],
@@ -43,4 +41,7 @@ def _compute_loops_per_angle(nloops, angles):
         ),
     ]
 
-    # TODO: we should greedily iterate from this
+    ## TODO: we should greedily iterate from this
+    ## TODO: finish this
+    # dsplit_new = dsplit * nloops / (nloops - 1)
+    # dsplit2_new = deltas[idx_dsort[-2]]
