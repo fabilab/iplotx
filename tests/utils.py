@@ -1,4 +1,17 @@
-# Functions adapted from matplotlib.testing.
+"""
+Utility function for tests.
+
+Mostly functions adapted from matplotlib.testing.
+
+NOTE: folders for expected and generated images are as explained at:
+https://github.com/matplotlib/matplotlib/blob/def8fa4eaf6b97958b0a6b48a4da2558ba0942c4/lib/matplotlib/testing/decorators.py#L457
+i.e.:
+   For test module ``foo.bar.test_baz``, the baseline directory is at
+   ``foo/bar/baseline_images/test_baz`` and the result directory at
+   ``$(pwd)/result_images/test_baz``.  The result directory is created if it
+   doesn't exist.
+"""
+
 import sys
 import inspect
 import functools
