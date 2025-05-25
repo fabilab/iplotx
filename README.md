@@ -29,6 +29,9 @@ ipx.plot(g, ax=ax, layout=layout)
 ## Documentation
 See [readthedocs](https://iplotx.readthedocs.io/en/latest/) for the full documentation.
 
+## Gallery
+See [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
+
 ## Roadmap
 - Plot networks from igraph and networkx interchangeably, using matplotlib as a backend. ✅
 - Support interactive plotting, e.g. zooming and panning after the plot is created. ✅
