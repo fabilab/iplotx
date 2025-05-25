@@ -39,3 +39,16 @@ Changelog = "https://github.com/fabilab/iplotx/blob/main/CHANGELOG.md"
 
 [tool.hatch.version]
 path = "iplotx/version.py"
+
+[tool.tox]
+requires = ["tox>=4.19"]
+env_list = ["3.13", "3.12", "3.11", "3.10"]
+
+[tool.tox.env_run_base]
+description = "Run test under {base_python}"
+commands = [["pytest"]]
+
+[tool.tox.env.type]
+description = "run type check on code base"
+deps = ["mypy==1.11.2", "types-cachetools>=5.5.0.20240820", "types-chardet>=5.0.4.6"]
+commands = [["mypy", "iplotx{/}tox"], ["mypy", "tests"]]
