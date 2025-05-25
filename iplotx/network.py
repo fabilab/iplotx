@@ -18,7 +18,7 @@ from .heuristics import (
     normalise_layout,
     detect_directedness,
 )
-from .tools.matplotlib import (
+from .utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
     _get_label_width_height,

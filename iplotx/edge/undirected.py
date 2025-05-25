@@ -5,7 +5,7 @@ import matplotlib as mpl
 
 from .common import _compute_loops_per_angle
 from .label import LabelCollection
-from ..tools.matplotlib import (
+from ..utils.matplotlib import (
     _compute_mid_coord,
     _stale_wrapper,
 )

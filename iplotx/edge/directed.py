@@ -7,10 +7,9 @@ from matplotlib.transforms import Affine2D
 from .common import _compute_loops_per_angle
 from .undirected import UndirectedEdgeCollection
 from .arrow import make_arrow_patch
-from ..tools.matplotlib import (
+from ..utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
-    _additional_set_methods,
 )
 
 

@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib as mpl
 
-from ..tools.matplotlib import (
+from ..utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
     _additional_set_methods,

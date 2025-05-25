@@ -14,8 +14,10 @@ from .typing import (
 )
 from .heuristics import normalise_layout, normalise_grouping
 from .styles import get_style, rotate_style
-from .tools.geometry import convex_hull
-from .tools.geometry import _compute_group_path_with_vertex_padding
+from .utils.geometry import (
+    convex_hull,
+    _compute_group_path_with_vertex_padding,
+)
 
 
 class GroupingArtist(PatchCollection):
