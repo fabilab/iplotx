@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.294** total execution time for 3 files **from all galleries**:
+**00:00.227** total execution time for 4 files **from all galleries**:
 
 .. container::
 
@@ -32,12 +32,15 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
-     - 00:00.221
+   * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
+     - 00:00.227
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
-     - 00:00.051
+   * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_directed.py` (``../../gallery/plot_directed.py``)
-     - 00:00.023
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
+     - 00:00.000
      - 0.0
