@@ -16,6 +16,7 @@ dynamic = ["version"]
 dependencies = [
   "matplotlib",
   "pandas",
+  "numpy",
 ]
 license = {text = "MIT"}
 license-files = ["LICEN[CS]E.*"]
