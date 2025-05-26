@@ -133,7 +133,7 @@ class NetworkArtist(mpl.artist.Artist):
         if len(layout) == 0:
             mins = np.array([0, 0])
             maxs = np.array([1, 1])
-            return (mins, maxs)
+            return mpl.transforms.Bbox([mins, maxs])
 
         # Use the layout as a base, and expand using bboxes from other artists
         mins = np.min(layout, axis=0).astype(float)
@@ -473,6 +473,7 @@ def _create_internal_data(
         # Vertices are ordered integers, no gaps
         vertex_df = normalise_layout(layout, network=network)
         ndim = vertex_df.shape[1]
+        print(vertex_df, ndim)
         vertex_df.columns = [f"_ipx_layout_{i}" for i in range(ndim)]
 
         # Vertex labels
@@ -489,7 +490,10 @@ def _create_internal_data(
             row = {"_ipx_source": edge.source, "_ipx_target": edge.target}
             row.update(edge.attributes())
             tmp.append(row)
-        edge_df = pd.DataFrame(tmp)
+        if len(tmp):
+            edge_df = pd.DataFrame(tmp)
+        else:
+            edge_df = pd.DataFrame(columns=["_ipx_source", "_ipx_target"])
         del tmp
 
         # Edge labels

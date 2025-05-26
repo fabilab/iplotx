@@ -139,7 +139,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 
         # Fix parallel edges
         # If none found, empty the dictionary already
-        if max(parallel_edges.values(), key=len) == 1:
+        if (len(parallel_edges) == 0) or (max(parallel_edges.values(), key=len) == 1):
             parallel_edges = {}
         if not self._style.get("curved", False):
             while len(parallel_edges) > 0:

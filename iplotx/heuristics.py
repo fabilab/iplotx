@@ -1,4 +1,5 @@
 from collections import defaultdict
+from networkx import number_of_nodes
 import numpy as np
 import pandas as pd
 
@@ -23,6 +24,15 @@ def network_library(
     raise TypeError("Unsupported graph type. Supported types are igraph and networkx.")
 
 
+def number_of_vertices(network: GraphType) -> int:
+    """Get the number of vertices in the network."""
+    if network_library(network) == "igraph":
+        return network.vcount()
+    if network_library(network) == "networkx":
+        return network.number_of_nodes()
+    raise TypeError("Unsupported graph type. Supported types are igraph and networkx.")
+
+
 def detect_directedness(
     network: GraphType,
 ) -> np.ndarray:
@@ -37,6 +47,8 @@ def detect_directedness(
 def normalise_layout(layout, network=None):
     """Normalise the layout to a pandas.DataFrame."""
     if layout is None:
+        if (network is not None) and (number_of_vertices(network) == 0):
+            return pd.DataFrame(np.zeros((0, 2)))
         return None
     if (
         (network is not None)
