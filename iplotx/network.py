@@ -22,6 +22,7 @@ from .utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
     _get_label_width_height,
+    _build_cmap_fun,
 )
 from .vertex import (
     VertexCollection,
@@ -238,19 +239,43 @@ class NetworkArtist(mpl.artist.Artist):
         self._vertex_labels = texts
 
     def _add_edges(self):
-        """Draw the edges."""
+        """Draw the edges.
+
+        NOTE: UndirectedEdgeCollection and ArrowCollection are both subclasses of
+        PatchCollection. When used with a cmap/norm, they set their facecolor
+        according to the cmap, even though most likely we only want the edgecolor
+        set that way. It can make for funny looking plots that are not uninteresting
+        but mostly niche at this stage. Therefore we sidestep the whole cmap thing
+        here.
+        """
         if "labels" in self._ipx_internal_data["edge_df"].columns:
             labels = self._ipx_internal_data["edge_df"]["labels"]
         else:
             labels = None
 
-        if self._ipx_internal_data["directed"]:
-            return self._add_directed_edges(labels=labels)
-        return self._add_undirected_edges(labels=labels)
-
-    def _add_directed_edges(self, labels=None):
-        """Draw directed edges."""
         edge_style = get_style(".edge")
+        if "cmap" in edge_style:
+            cmap_fun = _build_cmap_fun(
+                edge_style["color"],
+                edge_style["cmap"],
+            )
+        else:
+            cmap_fun = None
+
+        if self._ipx_internal_data["directed"]:
+            return self._add_directed_edges(
+                labels=labels,
+                edge_style=edge_style,
+                cmap_fun=cmap_fun,
+            )
+        return self._add_undirected_edges(
+            labels=labels,
+            edge_style=edge_style,
+            cmap_fun=cmap_fun,
+        )
+
+    def _add_directed_edges(self, edge_style, labels=None, cmap_fun=None):
+        """Draw directed edges."""
         arrow_style = get_style(".arrow")
 
         layout_columns = [
@@ -280,6 +305,8 @@ class NetworkArtist(mpl.artist.Artist):
             vpath2 = vertex_paths[vertex_indices[vid2]]
 
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
+            if cmap_fun is not None:
+                edge_stylei["color"] = cmap_fun(edge_stylei["color"])
 
             # These are not the actual edges drawn, only stubs to establish
             # the styles which are then fed into the dynamic, optimised
@@ -292,6 +319,11 @@ class NetworkArtist(mpl.artist.Artist):
             adjecent_vertex_centers.append((vcenter1, vcenter2))
             adjecent_vertex_paths.append((vpath1, vpath2))
 
+            arrow_style["color"] = edge_stylei.get("color", "black")
+            if "alpha" in edge_stylei:
+                arrow_style["alpha"] = edge_stylei["alpha"]
+            if "linewidth" in edge_stylei:
+                arrow_style["linewidth"] = edge_stylei["linewidth"]
             arrow_patch = make_arrow_patch(
                 **arrow_style,
             )
@@ -315,9 +347,8 @@ class NetworkArtist(mpl.artist.Artist):
         )
         self._edges = art
 
-    def _add_undirected_edges(self, labels=None):
+    def _add_undirected_edges(self, edge_style, labels=None, cmap_fun=None):
         """Draw undirected edges."""
-        edge_style = get_style(".edge")
 
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
@@ -345,6 +376,8 @@ class NetworkArtist(mpl.artist.Artist):
             vpath2 = vertex_paths[vertex_indices[vid2]]
 
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
+            if cmap_fun is not None:
+                edge_stylei["color"] = cmap_fun(edge_stylei["color"])
 
             # These are not the actual edges drawn, only stubs to establish
             # the styles which are then fed into the dynamic, optimised
@@ -480,7 +513,6 @@ def _create_internal_data(
         # Vertices are ordered integers, no gaps
         vertex_df = normalise_layout(layout, network=network)
         ndim = vertex_df.shape[1]
-        print(vertex_df, ndim)
         vertex_df.columns = [f"_ipx_layout_{i}" for i in range(ndim)]
 
         # Vertex labels

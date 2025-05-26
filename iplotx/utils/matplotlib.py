@@ -1,5 +1,6 @@
 from functools import wraps, partial
 from math import atan2
+import numpy as np
 import matplotlib as mpl
 
 from .geometry import (
@@ -149,3 +150,18 @@ def _compute_group_path_with_vertex_padding(
 
     points = trans_inv(points)
     return points
+
+
+def _build_cmap_fun(values, cmap):
+    """Map colormap on top of numerical values."""
+    if np.isscalar(values):
+        values = [values]
+
+    if isinstance(values, dict):
+        values = np.array(list(values.values()))
+
+    vmin = np.nanmin(values)
+    vmax = np.nanmax(values)
+    norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+
+    return lambda x: cmap(norm(x))

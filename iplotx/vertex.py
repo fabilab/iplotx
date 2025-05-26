@@ -92,7 +92,8 @@ def make_patch(marker: str, size, **kwargs):
         if prop in kwargs:
             kwargs.pop(prop)
 
-    if isinstance(size, (int, float)):
+    if np.isscalar(size):
+        size = float(size)
         size = (size, size)
 
     if marker in ("o", "circle"):

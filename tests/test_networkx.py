@@ -134,13 +134,13 @@ class GraphTestRunner(unittest.TestCase):
         G = nx.random_k_out_graph(10, 3, 0.5, seed=seed)
         pos = nx.spring_layout(G, seed=seed)
 
-        node_sizes = [3 + 50 * i for i in range(len(G))]
+        node_sizes = [3 + 1.5 * i for i in range(len(G))]
         M = G.number_of_edges()
-        edge_colors = range(2, M + 2)
+        edge_colors = list(range(2, M + 2))
         edge_alphas = [(5 + i) / (M + 4) for i in range(M)]
         cmap = plt.cm.plasma
 
-        fig, ax = plt.subplots(figsize=(4, 4))
+        fig, ax = plt.subplots(figsize=(6, 4))
 
         ipx.plot(
             network=G,
@@ -157,12 +157,21 @@ class GraphTestRunner(unittest.TestCase):
                     "alpha": edge_alphas,
                     "cmap": cmap,
                     "linewidth": 2,
+                    "offset": 0,
                 },
                 "arrow": {
                     "marker": ">",
-                    "width": 10,
+                    "width": 5,
                 },
             },
+        )
+
+        fig.colorbar(
+            plt.cm.ScalarMappable(
+                cmap=cmap,
+                norm=mpl.colors.Normalize(vmin=min(edge_colors), vmax=max(edge_colors)),
+            ),
+            ax=ax,
         )
 
     # @image_comparison(baseline_images=["igraph_layout_object"], remove_text=True)

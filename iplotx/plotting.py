@@ -20,7 +20,7 @@ def plot(
     vertex_labels: Union[None, list, dict, pd.Series] = None,
     edge_labels: Union[None, Sequence] = None,
     ax: Union[None, object] = None,
-    style: Sequence[Union[str, dict]] = (),
+    style: Union[str, dict, Sequence[Union[str, dict]]] = (),
 ):
     """Plot this network using the specified layout.
 

@@ -6,6 +6,9 @@ import pandas as pd
 
 
 style_leaves = (
+    "cmap",
+    "color",
+    "size",
     "edgecolor",
     "facecolor",
     "linewidth",
@@ -155,7 +158,7 @@ def stylecontext(style: Union[str, dict, Sequence]):
         use(style)
         yield
     finally:
-        use(current)
+        use(["default", current])
 
 
 def rotate_style(

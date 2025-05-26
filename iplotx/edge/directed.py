@@ -6,7 +6,10 @@ from matplotlib.transforms import Affine2D
 
 from .common import _compute_loops_per_angle
 from .undirected import UndirectedEdgeCollection
-from .arrow import make_arrow_patch
+from .arrow import (
+    EdgeArrowCollection,
+    make_arrow_patch,
+)
 from ..utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
@@ -39,8 +42,16 @@ class DirectedEdgeCollection(mpl.artist.Artist):
             offset_transform=kwargs["transform"],
             transform=Affine2D(),
             match_original=True,
+            cmap=self._edges.get_cmap(),
         )
         self._processed = False
+
+    def set_array(self, array):
+        self._edges.set_array(array)
+        self._arrows.set_array(array)
+
+    def get_array(self):
+        return self._edges.get_array()
 
     def get_children(self):
         artists = []
@@ -129,21 +140,3 @@ class DirectedEdgeCollection(mpl.artist.Artist):
         self._edges.draw(renderer, *args, **kwds)
         self._set_edge_info_for_arrows(which="end")
         self._arrows.draw(renderer, *args, **kwds)
-
-
-class EdgeArrowCollection(mpl.collections.PatchCollection):
-    """Collection of arrow patches for plotting directed edgs."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self._angles = np.zeros(len(self._paths))
-
-    @property
-    def stale(self):
-        return super().stale
-
-    @stale.setter
-    def stale(self, val):
-        mpl.collections.PatchCollection.stale.fset(self, val)
-        if val and hasattr(self, "stale_callback_post"):
-            self.stale_callback_post(self)

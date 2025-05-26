@@ -3,6 +3,30 @@ import matplotlib as mpl
 from matplotlib.patches import PathPatch
 
 
+class EdgeArrowCollection(mpl.collections.PatchCollection):
+    """Collection of arrow patches for plotting directed edgs."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._angles = np.zeros(len(self._paths))
+
+    def set_array(self, array):
+        """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
+        fcs = self.get_facecolors()
+        super().set_array(array)
+        self.set_facecolors(fcs)
+
+    @property
+    def stale(self):
+        return super().stale
+
+    @stale.setter
+    def stale(self, val):
+        mpl.collections.PatchCollection.stale.fset(self, val)
+        if val and hasattr(self, "stale_callback_post"):
+            self.stale_callback_post(self)
+
+
 def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
     """Make a patch of the given marker shape and size."""
     height = kwargs.pop("height", width * 1.3)
@@ -118,5 +142,3 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
         **kwargs,
     )
     return patch
-
-    raise KeyError(f"Unknown marker: {marker}")

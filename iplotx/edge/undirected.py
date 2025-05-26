@@ -26,6 +26,13 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             kwargs["cmap"] = self._style["cmap"]
         super().__init__(*args, **kwargs)
 
+    def set_array(self, array):
+        """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
+        fcs = self.get_facecolors()
+        print(fcs)
+        super().set_array(array)
+        self.set_facecolors(fcs)
+
     @staticmethod
     def _get_edge_vertex_sizes(edge_vertices):
         sizes = []
