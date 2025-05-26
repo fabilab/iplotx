@@ -27,9 +27,9 @@ def plot(
     Parameters:
         network (GraphType): The network to plot. Can be a networkx or igraph graph.
         layout (Union[LayoutType, None], optional): The layout to use for plotting. If None, a layout will be looked for in the network object and, if none is found, an exception is raised. Defaults to None.
-        vertex_labels (list, dict, or pandas.Series): The labels for the vertices. If None, no vertex labels
+        vertex_labels (list, dict, pandas.Series, or bool): The labels for the vertices. If None or False, no vertex labels
             will be drawn. If a list, the labels are taken from the list. If a dict, the keys
-            should be the vertex IDs and the values should be the labels.
+            should be the vertex IDs and the values should be the labels. If True (a single bool value), the vertex IDs will be used as labels.
         edge_labels (Union[None, Sequence], optional): The labels for the edges. If None, no edge labels will be drawn. Defaults to None.
         ax (Union[None, object], optional): The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
         style: Apply this style for the objects to plot. This can be a sequence (e.g. list) of styles and they will be applied in order.

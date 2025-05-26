@@ -73,15 +73,30 @@ def _additional_set_methods(attributes, cls=None):
 # many use cases.
 def _get_label_width_height(text, hpadding=18, vpadding=12, **kwargs):
     """Get the bounding box size for a text with certain properties."""
-    forbidden_props = ["horizontalalignment", "verticalalignment", "ha", "va"]
+    forbidden_props = [
+        "horizontalalignment",
+        "verticalalignment",
+        "ha",
+        "va",
+        "color",
+        "edgecolor",
+        "facecolor",
+    ]
     for prop in forbidden_props:
         if prop in kwargs:
             del kwargs[prop]
 
     path = mpl.textpath.TextPath((0, 0), text, **kwargs)
     boundingbox = path.get_extents()
-    width = boundingbox.width + hpadding
-    height = boundingbox.height + vpadding
+    width = boundingbox.width
+    height = boundingbox.height
+
+    # Scaling with font size appears broken... try to patch it up linearly here, even though we know it don't work well
+    width *= kwargs.get("size", 12) / 12.0
+    height *= kwargs.get("size", 12) / 12.0
+
+    width += hpadding
+    height += vpadding
     return (width, height)
 
 

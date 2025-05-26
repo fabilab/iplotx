@@ -22,6 +22,8 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         self._vertex_paths = kwargs.pop("vertex_paths", None)
         self._style = kwargs.pop("style", None)
         self._labels = kwargs.pop("labels", None)
+        if "cmap" in self._style:
+            kwargs["cmap"] = self._style["cmap"]
         super().__init__(*args, **kwargs)
 
     @staticmethod
@@ -405,6 +407,7 @@ def make_stub_patch(**kwargs):
         "loop_tension",
         "offset",
         "label",
+        "cmap",
     ]
     for prop in forbidden_props:
         if prop in kwargs:

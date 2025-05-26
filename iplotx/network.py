@@ -151,11 +151,12 @@ class NetworkArtist(mpl.artist.Artist):
                 mins = np.minimum(mins, trans_inv(bbox.min + trans(offset)))
                 maxs = np.maximum(maxs, trans_inv(bbox.max + trans(offset)))
 
-        if self._edges is not None:
-            for path in self._edges.get_paths():
-                bbox = path.get_extents()
-                mins = np.minimum(mins, bbox.min)
-                maxs = np.maximum(maxs, bbox.max)
+        ## FIXME: edge extents are currently broken
+        # if self._edges is not None:
+        #    for path in self._edges.get_paths():
+        #        bbox = path.get_extents()
+        #        mins = np.minimum(mins, bbox.min)
+        #        maxs = np.maximum(maxs, bbox.max)
 
         if hasattr(self, "_groups") and self._groups is not None:
             for path in self._groups.get_paths():
@@ -197,7 +198,7 @@ class NetworkArtist(mpl.artist.Artist):
             if vertex_style.get("size") == "label":
                 # NOTE: it's ok to overwrite the dict here
                 vertex_style["size"] = _get_label_width_height(
-                    vertex_labels[vid], **vertex_style.get("label", {})
+                    str(vertex_labels[vid]), **vertex_style.get("label", {})
                 )
 
             vertex_stylei = rotate_style(vertex_style, index=i, id=vid)
@@ -435,6 +436,10 @@ def _create_internal_data(
     nl = network_library(network)
     directed = detect_directedness(network)
 
+    # Recast vertex_labels=False as vertex_labels=None
+    if np.isscalar(vertex_labels) and (not vertex_labels):
+        vertex_labels = None
+
     if nl == "networkx":
         # Vertices are indexed by node ID
         vertex_df = normalise_layout(
@@ -446,6 +451,8 @@ def _create_internal_data(
 
         # Vertex labels
         if vertex_labels is not None:
+            if vertex_labels is True:
+                vertex_labels = vertex_df.index
             if len(vertex_labels) != len(vertex_df):
                 raise ValueError(
                     "Vertex labels must be the same length as the number of vertices."
