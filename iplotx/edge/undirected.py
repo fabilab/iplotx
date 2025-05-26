@@ -9,6 +9,9 @@ from ..utils.matplotlib import (
     _compute_mid_coord,
     _stale_wrapper,
 )
+from ..styles import (
+    rotate_style,
+)
 
 
 class UndirectedEdgeCollection(mpl.collections.PatchCollection):
@@ -109,11 +112,13 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                     trans_inv,
                 )
             else:
+                edge_stylei = rotate_style(self._style, index=i, id=(v1, v2))
+                tension = edge_stylei.get("tension", 1.5)
                 path = self._shorten_path_undirected_curved(
                     vcoord_fig,
                     vpath_fig,
                     trans_inv,
-                    tension=self._style.get("tension", 1.5),
+                    tension,
                 )
 
             # Collect angles for this vertex, to be used for loops plotting below
@@ -182,6 +187,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                         thetaj1,
                         thetaj2,
                         trans_inv,
+                        loop_tension=self._style.get("loop_tension", 2.5),
                     )
                     paths[ldict["indices"][idx]] = path
                     idx += 1
@@ -223,14 +229,15 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         angle1,
         angle2,
         trans_inv,
+        loop_tension,
     ):
         # Shorten at starting angle
         start = _get_shorter_edge_coords(vpath, angle1) + vcoord_fig
         # Shorten at end angle
         end = _get_shorter_edge_coords(vpath, angle2) + vcoord_fig
 
-        aux1 = (start - vcoord_fig) * 2.5 + vcoord_fig
-        aux2 = (end - vcoord_fig) * 2.5 + vcoord_fig
+        aux1 = (start - vcoord_fig) * loop_tension + vcoord_fig
+        aux2 = (end - vcoord_fig) * loop_tension + vcoord_fig
 
         vertices = np.vstack(
             [
@@ -286,7 +293,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         vcoord_fig,
         vpath_fig,
         trans_inv,
-        tension=+1.5,
+        tension,
     ):
         # Angle of the straight line
         theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
@@ -395,6 +402,7 @@ def make_stub_patch(**kwargs):
     forbidden_props = [
         "curved",
         "tension",
+        "loop_tension",
         "offset",
         "label",
     ]

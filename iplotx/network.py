@@ -437,7 +437,10 @@ def _create_internal_data(
 
     if nl == "networkx":
         # Vertices are indexed by node ID
-        vertex_df = normalise_layout(layout).loc[pd.Index(network.nodes)]
+        vertex_df = normalise_layout(
+            layout,
+            network=network,
+        ).loc[pd.Index(network.nodes)]
         ndim = vertex_df.shape[1]
         vertex_df.columns = [f"_ipx_layout_{i}" for i in range(ndim)]
 
@@ -468,7 +471,7 @@ def _create_internal_data(
 
     else:
         # Vertices are ordered integers, no gaps
-        vertex_df = normalise_layout(layout)
+        vertex_df = normalise_layout(layout, network=network)
         ndim = vertex_df.shape[1]
         vertex_df.columns = [f"_ipx_layout_{i}" for i in range(ndim)]
 

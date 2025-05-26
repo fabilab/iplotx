@@ -46,49 +46,66 @@ class GraphTestRunner(unittest.TestCase):
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plot(g, ax=ax, layout=self.layout_small_ring)
 
-    # @image_comparison(baseline_images=["graph_labels"], remove_text=True)
-    # def test_labels(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5)
-    #    fig, ax = plt.subplots(figsize=(3, 3))
-    #    ipx.plot(
-    #        network=g,
-    #        ax=ax,
-    #        layout=self.layout_small_ring,
-    #        vertex_labels=["1", "2", "3", "4", "5"],
-    #        styles={
-    #            "vertex": {
-    #                "label_color": "white",
-    #                "label_size": 16,
-    #            }
-    #        },
-    #    )
+    @image_comparison(baseline_images=["graph_labels"], remove_text=True)
+    def test_labels(self):
+        plt.close("all")
+        g = ig.Graph.Ring(5)
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ipx.plot(
+            network=g,
+            ax=ax,
+            layout=self.layout_small_ring,
+            vertex_labels=["1", "2", "3", "4", "5"],
+            style={
+                "vertex": {
+                    "size": 30,
+                    "label": {
+                        "color": "white",
+                        "size": 10,
+                    },
+                }
+            },
+        )
 
-    # @image_comparison(baseline_images=["graph_layout_attribute"], remove_text=True)
-    # def test_layout_attribute(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5)
-    #    g["layout"] = ig.Layout([(x, x) for x in range(g.vcount())])
-    #    fig, ax = plt.subplots(figsize=(3, 3))
-    #    ipx.plot(g, ax=ax)
+    @image_comparison(baseline_images=["igraph_layout_object"], remove_text=True)
+    def test_layout_attribute(self):
+        plt.close("all")
+        g = ig.Graph.Ring(5)
+        layout = g.layout("circle")
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ipx.plot(g, layout=layout, ax=ax)
 
-    # @image_comparison(baseline_images=["graph_directed_curved_loops"], remove_text=True)
-    # def test_directed_curved_loops(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5, directed=True)
-    #    g.add_edge(0, 0)
-    #    g.add_edge(0, 0)
-    #    g.add_edge(2, 2)
-    #    fig, ax = plt.subplots()
-    #    ax.set_xlim(-1.2, 1.2)
-    #    ax.set_ylim(-1.2, 1.2)
-    #    ipx.plot(
-    #        g,
-    #        ax=ax,
-    #        layout=self.layout_small_ring,
-    #        edge_curved=[0] * 4 + [0.3],
-    #        edge_loop_size=[0] * 5 + [30, 50, 40],
-    #    )
+    @image_comparison(baseline_images=["graph_layout_attribute"], remove_text=True)
+    def test_layout_attribute(self):
+        plt.close("all")
+        g = ig.Graph.Ring(5)
+        g["layout"] = ig.Layout([(x, x) for x in range(g.vcount())])
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ipx.plot(g, layout="layout", ax=ax)
+
+    # FIXME: curved edges are currently slightly off-center
+    @image_comparison(baseline_images=["graph_directed_curved_loops"], remove_text=True)
+    def test_directed_curved_loops(self):
+        plt.close("all")
+        g = ig.Graph.Ring(5, directed=True)
+        g.add_edge(0, 0)
+        g.add_edge(0, 0)
+        g.add_edge(2, 2)
+        fig, ax = plt.subplots(figsize=(4, 4))
+        ax.set_xlim(-1.2, 1.2)
+        ax.set_ylim(-1.2, 1.2)
+        ipx.plot(
+            g,
+            ax=ax,
+            layout=self.layout_small_ring,
+            style={
+                "edge": {
+                    "curved": True,
+                    "tension": 1.7,
+                    "loop_tension": 5,
+                }
+            },
+        )
 
     # @image_comparison(baseline_images=["graph_mark_groups_directed"], remove_text=True)
     # def test_mark_groups(self):

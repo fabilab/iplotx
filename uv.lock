@@ -339,6 +339,8 @@ docs = [
 ]
 test = [
     { name = "flake8" },
+    { name = "igraph" },
+    { name = "networkx" },
     { name = "pytest" },
 ]
 typing = [
@@ -347,7 +349,9 @@ typing = [
 ]
 typing-test = [
     { name = "flake8" },
+    { name = "igraph" },
     { name = "mypy" },
+    { name = "networkx" },
     { name = "pytest" },
     { name = "types-requests" },
     { name = "useful-types" },
@@ -374,6 +378,8 @@ docs = [
 ]
 test = [
     { name = "flake8", specifier = ">=3.9.0" },
+    { name = "igraph", specifier = ">=0.11.8" },
+    { name = "networkx", specifier = ">=3.4.2" },
     { name = "pytest", specifier = ">=7.0.0" },
 ]
 typing = [
@@ -382,7 +388,9 @@ typing = [
 ]
 typing-test = [
     { name = "flake8", specifier = ">=3.9.0" },
+    { name = "igraph", specifier = ">=0.11.8" },
     { name = "mypy" },
+    { name = "networkx", specifier = ">=3.4.2" },
     { name = "pytest", specifier = ">=7.0.0" },
     { name = "types-requests" },
     { name = "useful-types" },

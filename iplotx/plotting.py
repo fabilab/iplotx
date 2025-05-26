@@ -43,6 +43,7 @@ def plot(
                 network=network,
                 layout=layout,
                 grouping=grouping,
+                vertex_labels=vertex_labels,
                 edge_labels=edge_labels,
                 ax=ax,
             )

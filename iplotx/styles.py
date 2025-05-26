@@ -12,6 +12,8 @@ style_leaves = (
     "linestyle",
     "alpha",
     "zorder",
+    "tension",
+    "loop_tension",
 )
 
 

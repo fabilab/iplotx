@@ -34,12 +34,20 @@ def detect_directedness(
     return False
 
 
-def normalise_layout(layout):
+def normalise_layout(layout, network=None):
     """Normalise the layout to a pandas.DataFrame."""
     if layout is None:
         return None
+    if (
+        (network is not None)
+        and (network_library(network) == "igraph")
+        and isinstance(layout, str)
+    ):
+        return pd.DataFrame(network[layout].coords)
+    if (igraph is not None) and isinstance(layout, igraph.layout.Layout):
+        return pd.DataFrame(layout.coords)
     if isinstance(layout, dict):
-        layout = pd.DataFrame(layout).T
+        return pd.DataFrame(layout).T
     if isinstance(layout, str):
         raise NotImplementedError("Layout as a string is not supported yet.")
     if isinstance(layout, (list, tuple)):
@@ -48,9 +56,7 @@ def normalise_layout(layout):
         return layout
     if isinstance(layout, np.ndarray):
         return pd.DataFrame(layout)
-    raise TypeError(
-        "Layout must be a string, list, tuple, numpy array or pandas DataFrame."
-    )
+    raise TypeError("Layout could not be normalised.")
 
 
 def normalise_grouping(
