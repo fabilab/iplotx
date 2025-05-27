@@ -50,12 +50,12 @@ def normalise_layout(layout, network=None):
         if (network is not None) and (number_of_vertices(network) == 0):
             return pd.DataFrame(np.zeros((0, 2)))
         return None
-    if (
-        (network is not None)
-        and (network_library(network) == "igraph")
-        and isinstance(layout, str)
-    ):
-        return pd.DataFrame(network[layout].coords)
+    if (network is not None) and isinstance(layout, str):
+        if network_library(network) == "igraph":
+            layout = network[layout]
+        if network_library(network) == "networkx":
+            layout = dict(network.nodes.data(layout))
+
     if (igraph is not None) and isinstance(layout, igraph.layout.Layout):
         return pd.DataFrame(layout.coords)
     if isinstance(layout, dict):

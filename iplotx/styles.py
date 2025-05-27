@@ -17,6 +17,7 @@ style_leaves = (
     "zorder",
     "tension",
     "loop_tension",
+    "rotate",
 )
 
 
@@ -26,6 +27,7 @@ default = {
         "facecolor": "black",
         "marker": "o",
         "label": {
+            "color": "white",
             "horizontalalignment": "center",
             "verticalalignment": "center",
             "hpadding": 18,
@@ -42,6 +44,12 @@ default = {
         "label": {
             "horizontalalignment": "center",
             "verticalalignment": "center",
+            "rotate": False,
+            "bbox": {
+                "boxstyle": "round",
+                "facecolor": "white",
+                "edgecolor": "none",
+            },
         },
     },
     "arrow": {

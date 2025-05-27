@@ -126,7 +126,9 @@ class GraphTestRunner(unittest.TestCase):
             ax=ax,
         )
 
-    @image_comparison(baseline_images=["directed_graph"], remove_text=True)
+    @image_comparison(
+        baseline_images=["directed_graph_with_colorbar"], remove_text=True
+    )
     def test_directed_graph(self):
         plt.close("all")
 
@@ -142,7 +144,7 @@ class GraphTestRunner(unittest.TestCase):
 
         fig, ax = plt.subplots(figsize=(6, 4))
 
-        ipx.plot(
+        arts = ipx.plot(
             network=G,
             ax=ax,
             layout=pos,
@@ -165,14 +167,60 @@ class GraphTestRunner(unittest.TestCase):
                 },
             },
         )
-
         fig.colorbar(
-            plt.cm.ScalarMappable(
-                cmap=cmap,
-                norm=mpl.colors.Normalize(vmin=min(edge_colors), vmax=max(edge_colors)),
-            ),
+            arts[0].get_edges().get_edges(),
             ax=ax,
         )
+
+    @image_comparison(baseline_images=["empty_graph"], remove_text=True)
+    def test_display_empty_graph(self):
+        plt.close("all")
+        G = nx.empty_graph()
+        fig, ax = plt.subplots()
+        ipx.plot(G, ax=ax)
+
+    @image_comparison(baseline_images=["shortest_path"], remove_text=True)
+    def test_display_shortest_path(self):
+        G = nx.Graph()
+        G.add_nodes_from(["A", "B", "C", "D", "E", "F", "G", "H"])
+        G.add_edge("A", "B", weight=4)
+        G.add_edge("A", "H", weight=8)
+        G.add_edge("B", "C", weight=8)
+        G.add_edge("B", "H", weight=11)
+        G.add_edge("C", "D", weight=7)
+        G.add_edge("C", "F", weight=4)
+        G.add_edge("C", "I", weight=2)
+        G.add_edge("D", "E", weight=9)
+        G.add_edge("D", "F", weight=14)
+        G.add_edge("E", "F", weight=10)
+        G.add_edge("F", "G", weight=2)
+        G.add_edge("G", "H", weight=1)
+        G.add_edge("G", "I", weight=6)
+        G.add_edge("H", "I", weight=7)
+
+        # Find the shortest path from node A to node E
+        path = nx.shortest_path(G, "A", "E", weight="weight")
+
+        # Create a list of edges in the shortest path
+        path_edges = list(zip(path, path[1:]))
+        nx.set_node_attributes(G, nx.spring_layout(G, seed=37), "pos")
+        nx.set_edge_attributes(
+            G,
+            {
+                (u, v): {
+                    "color": (
+                        "red"
+                        if (u, v) in path_edges or tuple(reversed((u, v))) in path_edges
+                        else "black"
+                    ),
+                    "label": d["weight"],
+                }
+                for u, v, d in G.edges(data=True)
+            },
+        )
+
+        fig, ax = plt.subplots()
+        ipx.plot(G, ax=ax, layout="pos", vertex_labels=True, edge_labels=True)
 
     # @image_comparison(baseline_images=["igraph_layout_object"], remove_text=True)
     # def test_layout_attribute(self):

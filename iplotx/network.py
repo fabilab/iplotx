@@ -248,8 +248,8 @@ class NetworkArtist(mpl.artist.Artist):
         but mostly niche at this stage. Therefore we sidestep the whole cmap thing
         here.
         """
-        if "labels" in self._ipx_internal_data["edge_df"].columns:
-            labels = self._ipx_internal_data["edge_df"]["labels"]
+        if "label" in self._ipx_internal_data["edge_df"].columns:
+            labels = self._ipx_internal_data["edge_df"]["label"]
         else:
             labels = None
 
@@ -292,6 +292,8 @@ class NetworkArtist(mpl.artist.Artist):
             np.arange(len(vertex_layout_df)), index=vertex_layout_df.index
         )
 
+        if "cmap" in edge_style:
+            edgearray = []
         edgepatches = []
         arrowpatches = []
         adjacent_vertex_ids = []
@@ -305,7 +307,11 @@ class NetworkArtist(mpl.artist.Artist):
             vpath2 = vertex_paths[vertex_indices[vid2]]
 
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
+            # NOTE: Not sure this is the best way but can't think of another one
+            # Prioritise network internal styles
+            _update_from_internal(edge_stylei, edge_df.iloc[i], kind="edge")
             if cmap_fun is not None:
+                edgearray.append(edge_style["color"])
                 edge_stylei["color"] = cmap_fun(edge_stylei["color"])
 
             # These are not the actual edges drawn, only stubs to establish
@@ -334,6 +340,12 @@ class NetworkArtist(mpl.artist.Artist):
         # NOTE: the paths might have different number of sides, so it cannot be recast
 
         # TODO:: deal with "ports" a la graphviz
+
+        if "cmap" in edge_style:
+            vmin = np.min(edgearray)
+            vmax = np.max(edgearray)
+            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+            edge_style["norm"] = norm
 
         art = DirectedEdgeCollection(
             edges=edgepatches,
@@ -376,6 +388,10 @@ class NetworkArtist(mpl.artist.Artist):
             vpath2 = vertex_paths[vertex_indices[vid2]]
 
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
+            # NOTE: Not sure this is the best way but can't think of another one
+            # Prioritise network internal styles
+            _update_from_internal(edge_stylei, edge_df.iloc[i], kind="edge")
+
             if cmap_fun is not None:
                 edge_stylei["color"] = cmap_fun(edge_stylei["color"])
 
@@ -482,6 +498,9 @@ def _create_internal_data(
         ndim = vertex_df.shape[1]
         vertex_df.columns = [f"_ipx_layout_{i}" for i in range(ndim)]
 
+        # Vertex internal properties
+        # TODO: networkx is a bit of a quagmire on this, due to flexibility
+
         # Vertex labels
         if vertex_labels is not None:
             if vertex_labels is True:
@@ -498,16 +517,28 @@ def _create_internal_data(
             row = {"_ipx_source": u, "_ipx_target": v}
             row.update(d)
             tmp.append(row)
-        edge_df = pd.DataFrame(tmp)
+        if len(tmp):
+            edge_df = pd.DataFrame(tmp)
+        else:
+            edge_df = pd.DataFrame(columns=["_ipx_source", "_ipx_target"])
         del tmp
 
         # Edge labels
-        if edge_labels is not None:
-            if len(edge_labels) != len(edge_df):
-                raise ValueError(
-                    "Edge labels must be the same length as the number of edges."
-                )
-            edge_df["labels"] = edge_labels
+        # Even though they could exist in the dataframe, request the to be explicitely mentioned
+        if (edge_labels is None) and ("label" in edge_df):
+            del edge_df["label"]
+        elif edge_labels is not None:
+            if np.isscalar(edge_labels):
+                if (not edge_labels) and ("label" in edge_df):
+                    del edge_df["label"]
+                if (edge_labels is True) and ("label" not in edge_df):
+                    edge_df["label"] = [str(i) for i in edge_df.index]
+            else:
+                if len(edge_labels) != len(edge_df):
+                    raise ValueError(
+                        "Edge labels must be the same length as the number of edges."
+                    )
+                edge_df["label"] = edge_labels
 
     else:
         # Vertices are ordered integers, no gaps
@@ -541,7 +572,7 @@ def _create_internal_data(
                 raise ValueError(
                     "Edge labels must be the same length as the number of edges."
                 )
-            edge_df["labels"] = edge_labels
+            edge_df["label"] = edge_labels
 
     internal_data = {
         "vertex_df": vertex_df,
@@ -551,3 +582,23 @@ def _create_internal_data(
         "ndim": ndim,
     }
     return internal_data
+
+
+def _update_from_internal(style, row, kind):
+    """Update single vertex/edge style from internal data."""
+    if "color" in row:
+        style["color"] = row["color"]
+    if "facecolor" in row:
+        style["facecolor"] = row["facecolor"]
+    if "edgecolor" in row:
+        if kind == "vertex":
+            style["edgecolor"] = row["edgecolor"]
+        else:
+            style["color"] = row["edgecolor"]
+
+    if "linewidth" in row:
+        style["linewidth"] = row["linewidth"]
+    if "linestyle" in row:
+        style["linestyle"] = row["linestyle"]
+    if "alpha" in row:
+        style["alpha"] = row["alpha"]

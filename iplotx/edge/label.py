@@ -1,3 +1,4 @@
+from copy import deepcopy
 import numpy as np
 import matplotlib as mpl
 
@@ -15,10 +16,15 @@ class LabelCollection(mpl.artist.Artist):
         super().__init__()
 
     def _create_labels(self):
-        style = self._style if self._style is not None else {}
+        style = deepcopy(self._style) if self._style is not None else {}
+
+        forbidden_props = ["rotate"]
+        for prop in forbidden_props:
+            if prop in style:
+                del style[prop]
 
         arts = []
-        for label in self._labels:
+        for i, label in enumerate(self._labels):
             art = mpl.text.Text(
                 0,
                 0,
@@ -37,6 +43,15 @@ class LabelCollection(mpl.artist.Artist):
     def set_offsets(self, offsets):
         for art, offset in zip(self._labels, offsets):
             art.set_position((offset[0], offset[1]))
+        stale = True
+
+    def set_rotations(self, rotations):
+        for art, rotation in zip(self._labels, rotations):
+            rot_deg = 180.0 / np.pi * rotation
+            # Force the font size to be upwards
+            rot_deg = ((rot_deg + 90) % 180) - 90
+            art.set_rotation(rot_deg)
+        stale = True
 
     @_stale_wrapper
     def draw(self, renderer, *args, **kwds):

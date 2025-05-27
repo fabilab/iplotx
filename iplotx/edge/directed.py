@@ -32,7 +32,6 @@ class DirectedEdgeCollection(mpl.artist.Artist):
     def __init__(self, edges, arrows, labels=None, **kwargs):
         super().__init__()
 
-        # FIXME: do we need a separate _clear_state and _process like in the network
         self._edges = UndirectedEdgeCollection(edges, labels=labels, **kwargs)
 
         # NOTE: offsets are a placeholder for later
@@ -43,6 +42,7 @@ class DirectedEdgeCollection(mpl.artist.Artist):
             transform=Affine2D(),
             match_original=True,
             cmap=self._edges.get_cmap(),
+            norm=self._edges.norm,
         )
         self._processed = False
 

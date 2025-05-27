@@ -6,7 +6,7 @@ import matplotlib as mpl
 from .common import _compute_loops_per_angle
 from .label import LabelCollection
 from ..utils.matplotlib import (
-    _compute_mid_coord,
+    _compute_mid_coord_and_rot,
     _stale_wrapper,
 )
 from ..styles import (
@@ -24,12 +24,12 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         self._labels = kwargs.pop("labels", None)
         if "cmap" in self._style:
             kwargs["cmap"] = self._style["cmap"]
+            kwargs["norm"] = self._style["norm"]
         super().__init__(*args, **kwargs)
 
     def set_array(self, array):
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
         fcs = self.get_facecolors()
-        print(fcs)
         super().set_array(array)
         self.set_facecolors(fcs)
 
@@ -343,11 +343,18 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         return path
 
     def _compute_labels(self):
-        style = self._style.get("label", None) if self._style is not None else None
+        transform = self.get_transform()
+        trans = transform.transform
+
+        style = self._style.get("label", None) if self._style is not None else {}
         offsets = []
+        if not style.get("rotate", True):
+            rotations = []
         for path in self._paths:
-            offset = _compute_mid_coord(path)
+            offset, rotation = _compute_mid_coord_and_rot(path, trans)
             offsets.append(offset)
+            if not style.get("rotate", True):
+                rotations.append(rotation)
 
         if not hasattr(self, "_label_collection"):
             self._label_collection = LabelCollection(
@@ -370,6 +377,8 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             # Finally make the patches
             self._label_collection._create_labels()
         self._label_collection.set_offsets(offsets)
+        if not style.get("rotate", True):
+            self._label_collection.set_rotations(rotations)
 
     def get_children(self):
         children = []
