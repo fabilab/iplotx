@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.227** total execution time for 4 files **from all galleries**:
+**00:00.268** total execution time for 13 files **from all galleries**:
 
 .. container::
 
@@ -32,15 +32,42 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
-     - 00:00.227
+   * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
+     - 00:00.268
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_complex.py` (``../../gallery/plot_complex.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_directed.py` (``../../gallery/plot_directed.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_plot_house.py` (``../../gallery/plot_house.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_labels_and_colors.py` (``../../gallery/plot_labels_and_colors.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_multipartite_layout.py` (``../../gallery/plot_multipartite_layout.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
      - 00:00.000
      - 0.0
