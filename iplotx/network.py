@@ -4,10 +4,15 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 from matplotlib.transforms import Affine2D
+from pandas._libs.lib import is_scalar
 
 from .typing import (
     GraphType,
     LayoutType,
+)
+from .importing import (
+    igraph,
+    networkx,
 )
 from .styles import (
     get_style,
@@ -499,17 +504,38 @@ def _create_internal_data(
         vertex_df.columns = [f"_ipx_layout_{i}" for i in range(ndim)]
 
         # Vertex internal properties
-        # TODO: networkx is a bit of a quagmire on this, due to flexibility
+        tmp = pd.DataFrame(dict(network.nodes.data())).T
+        # Arrays become a single column, which we have already anyway
+        if isinstance(layout, str) and (layout in tmp.columns):
+            del tmp[layout]
+        for col in tmp.columns:
+            vertex_df[col] = tmp[col]
+        del tmp
 
         # Vertex labels
-        if vertex_labels is not None:
-            if vertex_labels is True:
-                vertex_labels = vertex_df.index
-            if len(vertex_labels) != len(vertex_df):
+        if vertex_labels is None:
+            if "label" in vertex_df:
+                del vertex_df["label"]
+        else:
+            if (
+                np.isscalar(vertex_labels)
+                and (not vertex_labels)
+                and ("label" in vertex_df)
+            ):
+                del vertex_df["label"]
+            elif vertex_labels is True:
+                if "label" not in vertex_df:
+                    vertex_df["label"] = vertex_df.index
+            elif (not np.isscalar(vertex_labels)) and (
+                len(vertex_labels) != len(vertex_df)
+            ):
                 raise ValueError(
                     "Vertex labels must be the same length as the number of vertices."
                 )
-            vertex_df["label"] = vertex_labels
+            elif isinstance(vertex_labels, networkx.classes.reportviews.NodeDataView):
+                vertex_df["label"] = pd.Series(dict(vertex_labels))
+            else:
+                vertex_df["label"] = vertex_labels
 
         # Edges are a list of tuples, because of multiedges
         tmp = []

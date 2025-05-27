@@ -441,6 +441,10 @@ def _get_shorter_edge_coords(vpath, theta):
     # Bound theta from -pi to pi (why is that not guaranteed?)
     theta = (theta + pi) % (2 * pi) - pi
 
+    # Size zero vertices need no shortening
+    if np.abs(vpath.vertices).max() < 0.1:
+        return vpath.vertices[0]
+
     for i in range(len(vpath)):
         v1 = vpath.vertices[i]
         v2 = vpath.vertices[(i + 1) % len(vpath)]

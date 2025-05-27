@@ -4,6 +4,8 @@ from contextlib import contextmanager
 import numpy as np
 import pandas as pd
 
+from .importing import igraph, networkx
+
 
 style_leaves = (
     "cmap",
@@ -186,14 +188,15 @@ def rotate_style(
         val = style.get(prop, None)
         if val is None:
             continue
-        # NOTE: this assumes that these properties are leaves of the style tree
-        # Btw: dict includes defaultdict, Couter, etc.
-        if (id is not None) and isinstance(val, (dict, pd.Series)):
-            # This works on both dict-like and Series
-            style[prop] = val[id]
-        elif (index is not None) and isinstance(
+        if (index is not None) and isinstance(
             val, (tuple, list, np.ndarray, pd.Index, pd.Series)
         ):
             style[prop] = np.asarray(val)[index % len(val)]
+        if (
+            (id is not None)
+            and (not isinstance(val, (str, tuple, list, np.ndarray)))
+            and hasattr(val, "__getitem__")
+        ):
+            style[prop] = val[id]
 
     return style

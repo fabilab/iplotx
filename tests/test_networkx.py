@@ -222,7 +222,111 @@ class GraphTestRunner(unittest.TestCase):
         fig, ax = plt.subplots()
         ipx.plot(G, ax=ax, layout="pos", vertex_labels=True, edge_labels=True)
 
-    # @image_comparison(baseline_images=["igraph_layout_object"], remove_text=True)
+    @image_comparison(baseline_images=["house_with_colors"], remove_text=True)
+    def test_display_house_with_colors(self):
+        G = nx.house_graph()
+        fig, ax = plt.subplots()
+        nx.set_node_attributes(
+            G, {0: (0, 0), 1: (1, 0), 2: (0, 1), 3: (1, 1), 4: (0.5, 2.0)}, "pos"
+        )
+        nx.set_node_attributes(
+            G,
+            {
+                n: {
+                    "size": 60 if n != 4 else 40,
+                    "color": "tab:blue" if n != 4 else "tab:orange",
+                }
+                for n in G.nodes()
+            },
+        )
+        ipx.plot(
+            G,
+            ax=ax,
+            layout="pos",
+            style={
+                "edge": {
+                    "alpha": 0.5,
+                    "linewidth": 6,
+                },
+                "vertex": {
+                    "size": G.nodes.data("size"),
+                    "facecolor": G.nodes.data("color"),
+                    "edgecolor": "k",
+                },
+            },
+        )
+        ax.margins(0.17)
+        plt.tight_layout()
+
+    @image_comparison(baseline_images=["labels_and_colors"], remove_text=True)
+    def test_labels_and_colors(self):
+        """Test complex labels and colors."""
+        G = nx.cubical_graph()
+        pos = nx.spring_layout(G, seed=3113794652)  # positions for all nodes
+        nx.set_node_attributes(G, pos, "pos")  # Will not be needed after PR 7571
+        labels = iter(
+            [
+                r"$a$",
+                r"$b$",
+                r"$c$",
+                r"$d$",
+                r"$\alpha$",
+                r"$\beta$",
+                r"$\gamma$",
+                r"$\delta$",
+            ]
+        )
+        nx.set_node_attributes(
+            G,
+            {
+                n: {
+                    "color": "tab:red" if n < 4 else "tab:blue",
+                    "label": next(labels),
+                }
+                for n in G.nodes()
+            },
+        )
+
+        fig, ax = plt.subplots(figsize=(5, 4))
+        ipx.plot(
+            G,
+            ax=ax,
+            layout="pos",
+            vertex_labels=True,
+            style={
+                "vertex": {
+                    "facecolor": G.nodes.data("color"),
+                    "alpha": G.nodes.data("alpha"),
+                    "size": 40,
+                    "label": {"size": 22, "color": "whitesmoke"},
+                    "zorder": 7,
+                },
+                "edge": {
+                    "color": "tab:grey",
+                },
+            },
+        )
+        for i in range(2):
+            subG = G.subgraph(range(i * 4, (i + 1) * 4))
+            ipx.plot(
+                subG,
+                layout="pos",
+                ax=ax,
+                style={
+                    "edge": {
+                        "color": ["tab:red", "tab:blue"][i],
+                        "alpha": 0.5,
+                        "linewidth": 8,
+                        "zorder": 0,
+                    },
+                    "vertex": {
+                        "size": 35,
+                        "alpha": 0,
+                    },
+                },
+            )
+        plt.tight_layout()
+
     # def test_layout_attribute(self):
     #    plt.close("all")
     #    g = ig.Graph.Ring(5)
