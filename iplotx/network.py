@@ -340,7 +340,6 @@ class NetworkArtist(mpl.artist.Artist):
             )
             arrowpatches.append(arrow_patch)
 
-        adjacent_vertex_ids = np.array(adjacent_vertex_ids)
         adjecent_vertex_centers = np.array(adjecent_vertex_centers)
         # NOTE: the paths might have different number of sides, so it cannot be recast
 
@@ -411,7 +410,6 @@ class NetworkArtist(mpl.artist.Artist):
             adjecent_vertex_centers.append((vcenter1, vcenter2))
             adjecent_vertex_paths.append((vpath1, vpath2))
 
-        adjacent_vertex_ids = np.array(adjacent_vertex_ids)
         adjecent_vertex_centers = np.array(adjecent_vertex_centers)
         # NOTE: the paths might have different number of sides, so it cannot be recast
 

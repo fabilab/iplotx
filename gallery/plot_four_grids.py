@@ -23,6 +23,7 @@ ipx.plot(
     ax=axs[0],
     style={
         "vertex": {
+            "size": 25,
             "facecolor": "steelblue",
             "edgecolor": "none",
         }
@@ -46,7 +47,7 @@ ipx.plot(
     ax=axs[2],
     style={
         "vertex": {
-            "size": 50,
+            "size": 25,
             "facecolor": "tab:green",
             "edgecolor": "tab:gray",
         },
@@ -67,13 +68,15 @@ ipx.plot(
         "vertex": {
             "facecolor": "tab:orange",
             "edgecolor": "none",
-            "size": 20,
+            "size": 10,
         },
         "edge": {
-            "linewidth": 2,
+            "linewidth": 1.7,
+            "offset": 0,
         },
         "arrow": {
-            "height": 2,
+            "height": 5,
+            "marker": "|>",
         },
     },
 )
