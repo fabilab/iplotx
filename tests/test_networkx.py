@@ -327,149 +327,48 @@ class GraphTestRunner(unittest.TestCase):
             )
         plt.tight_layout()
 
-    # def test_layout_attribute(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5)
-    #    layout = g.layout("circle")
-    #    fig, ax = plt.subplots(figsize=(3, 3))
-    #    ipx.plot(g, layout=layout, ax=ax)
+    @image_comparison(baseline_images=["complex"], remove_text=True)
+    def test_complex(self):
+        import itertools as it
 
-    # @image_comparison(baseline_images=["graph_layout_attribute"], remove_text=True)
-    # def test_layout_attribute(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5)
-    #    g["layout"] = ig.Layout([(x, x) for x in range(g.vcount())])
-    #    fig, ax = plt.subplots(figsize=(3, 3))
-    #    ipx.plot(g, layout="layout", ax=ax)
+        nodes = "ABC"
+        prod = list(it.product(nodes, repeat=2)) * 4
+        G = nx.MultiDiGraph()
+        for i, (u, v) in enumerate(prod):
+            G.add_edge(u, v, w=round(i / 3, 2))
+        nx.set_node_attributes(G, nx.spring_layout(G, seed=3113794652), "pos")
+        csi = it.cycle([5 * r for r in it.accumulate([0.15] * 4)])
+        nx.set_edge_attributes(G, {e: next(csi) for e in G.edges(keys=True)}, "tension")
+        nx.set_edge_attributes(
+            G,
+            {tuple(e): w for *e, w in G.edges(keys=True, data="w")},
+            "label",
+        )
 
-    # @pytest.mark.skip(reason="curved edges are currently a little off-center")
-    # @image_comparison(baseline_images=["graph_directed_curved_loops"], remove_text=True)
-    # def test_directed_curved_loops(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5, directed=True)
-    #    g.add_edge(0, 0)
-    #    g.add_edge(0, 0)
-    #    g.add_edge(2, 2)
-    #    fig, ax = plt.subplots(figsize=(4, 4))
-    #    ax.set_xlim(-1.2, 1.2)
-    #    ax.set_ylim(-1.2, 1.2)
-    #    ipx.plot(
-    #        g,
-    #        ax=ax,
-    #        layout=self.layout_small_ring,
-    #        style={
-    #            "edge": {
-    #                "curved": True,
-    #                "tension": 1.7,
-    #                "loop_tension": 5,
-    #            }
-    #        },
-    #    )
-
-    # @image_comparison(baseline_images=["graph_squares_directed"], remove_text=True)
-    # def test_mark_groups_squares(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5, directed=True)
-    #    fig, ax = plt.subplots(figsize=(3, 3))
-    #    ipx.plot(
-    #        g,
-    #        ax=ax,
-    #        layout=self.layout_small_ring,
-    #        style={
-    #            "vertex": {"marker": "s"},
-    #        },
-    #    )
-
-    # @image_comparison(baseline_images=["graph_edit_children"], remove_text=True)
-    # def test_edit_children(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(5)
-    #    fig, ax = plt.subplots(figsize=(4, 4))
-    #    ipx.plot(
-    #        g,
-    #        ax=ax,
-    #        style={"vertex": {"marker": "o"}},
-    #        layout=self.layout_small_ring,
-    #    )
-    #    graph_artist = ax.get_children()[0]
-
-    #    dots = graph_artist.get_vertices()
-    #    dots.set_facecolors(["blue"] + list(dots.get_facecolors()[1:]))
-    #    new_sizes = dots.get_sizes()
-    #    new_sizes[1] = 30
-    #    dots.set_sizes(new_sizes)
-
-    #    lines = graph_artist.get_edges()
-    #    lines.set_edgecolor("green")
-
-    # @pytest.mark.skip(reason="curved edges are currently a little off-center")
-    # @image_comparison(baseline_images=["graph_with_curved_edges"])
-    # def test_graph_with_curved_edges(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(24, directed=True, mutual=True)
-    #    fig, ax = plt.subplots()
-    #    lo = g.layout("circle")
-    #    lo.scale(3)
-    #    ipx.plot(
-    #        g,
-    #        ax=ax,
-    #        layout=lo,
-    #        style={
-    #            "vertex": {
-    #                "size": 15,
-    #            },
-    #            "edge": {
-    #                "offset": 8,
-    #                "curved": True,
-    #                "tension": 0.5,
-    #            },
-    #            "arrow": {
-    #                "height": 5,
-    #                "width": 5,
-    #            },
-    #        },
-    #    )
-    #    ax.set_aspect(1.0)
-
-    # @pytest.mark.skip(
-    #    reason="curved edges are currently a little off-center and not offset properly"
-    # )
-    # @image_comparison(baseline_images=["multigraph_with_curved_edges_undirected"])
-    # def test_graph_with_curved_edges(self):
-    #    plt.close("all")
-    #    g = ig.Graph.Ring(24, directed=False)
-    #    g.add_edges([(0, 1), (1, 2)])
-    #    fig, ax = plt.subplots()
-    #    lo = g.layout("circle")
-    #    lo.scale(3)
-    #    ipx.plot(
-    #        g,
-    #        ax=ax,
-    #        layout=lo,
-    #        style={
-    #            "vertex": {
-    #                "size": 15,
-    #            },
-    #            "edge": {
-    #                "offset": 8,
-    #                "curved": True,
-    #                "tension": 0.5,
-    #            },
-    #            "arrow": {
-    #                "height": 5,
-    #                "width": 5,
-    #            },
-    #        },
-    #    )
-    #    ax.set_aspect(1.0)
-
-    # @image_comparison(baseline_images=["graph_null"])
-    # def test_null_graph(self):
-    #    plt.close("all")
-    #    g = ig.Graph()
-    #    fig, ax = plt.subplots()
-    #    ipx.plot(g, ax=ax)
-    #    ax.set_aspect(1.0)
+        fig, ax = plt.subplots()
+        ipx.plot(
+            G,
+            ax=ax,
+            layout="pos",
+            edge_labels=True,
+            style={
+                "edge": {
+                    "curved": True,
+                    "tension": G.edges.data("tension"),
+                    "color": G.edges.data("w"),
+                    "cmap": mpl.colormaps["inferno"],
+                    "linewidth": 1,
+                    "loop_tension": 7.5,
+                    "label": {
+                        "color": "black",
+                        "bbox": {
+                            "facecolor": "none",
+                        },
+                    },
+                },
+            },
+        )
+        ax.margins(0.17)
 
 
 def suite():

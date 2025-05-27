@@ -126,6 +126,17 @@ def use(style: Union[str, dict, Sequence]):
     """
     global current
 
+    def _sanitize_leaves(style: dict):
+        for key, value in style.items():
+            if key in style_leaves:
+                if networkx is not None:
+                    if isinstance(value, networkx.classes.reportviews.NodeView):
+                        style[key] = dict(value)
+                    elif isinstance(value, networkx.classes.reportviews.EdgeViewABC):
+                        style[key] = [v for *e, v in value]
+            elif isinstance(value, dict):
+                _sanitize_leaves(value)
+
     def _update(style: dict, current: dict):
         for key, value in style.items():
             if key not in current:
@@ -140,19 +151,26 @@ def use(style: Union[str, dict, Sequence]):
             else:
                 current[key] = value
 
-    if isinstance(style, (dict, str)):
-        styles = [style]
-    else:
-        styles = style
+    old_style = deepcopy(current)
 
-    for style in styles:
-        if style == "default":
-            reset()
+    try:
+        if isinstance(style, (dict, str)):
+            styles = [style]
         else:
-            if isinstance(style, str):
-                current = get_style(style)
+            styles = style
+
+        for style in styles:
+            if style == "default":
+                reset()
             else:
-                _update(style, current)
+                if isinstance(style, str):
+                    current = get_style(style)
+                else:
+                    _sanitize_leaves(style)
+                    _update(style, current)
+    except:
+        current = old_style
+        raise
 
 
 def reset():
