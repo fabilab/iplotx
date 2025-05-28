@@ -21,6 +21,7 @@ def plot(
     edge_labels: Union[None, Sequence] = None,
     ax: Union[None, object] = None,
     style: Union[str, dict, Sequence[Union[str, dict]]] = (),
+    title: Union[None, str] = None,
 ):
     """Plot this network using the specified layout.
 
@@ -33,6 +34,7 @@ def plot(
         edge_labels (Union[None, Sequence], optional): The labels for the edges. If None, no edge labels will be drawn. Defaults to None.
         ax (Union[None, object], optional): The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
         style: Apply this style for the objects to plot. This can be a sequence (e.g. list) of styles and they will be applied in order.
+        title: If not None, set the axes title to this value.
 
     Returns:
         A NetworkArtist object.
@@ -76,6 +78,9 @@ def plot(
         # Postprocess for things that require an axis (transform, etc.)
         grpart._process()
         artists.append(grpart)
+
+    if title is not None:
+        ax.set_title(title)
 
     _postprocess_axis(ax, artists)
 
