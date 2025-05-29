@@ -16,6 +16,7 @@ readme = "README.md"
 dynamic = ["version"]
 dependencies = [
   "matplotlib>=2.0.0",
+  "numpy>=2.0.0",
   "pandas>=2.0.0",
 ]
 license = {text = "MIT"}

@@ -315,6 +315,7 @@ name = "iplotx"
 source = { editable = "." }
 dependencies = [
     { name = "matplotlib" },
+    { name = "numpy" },
     { name = "pandas" },
 ]
 
@@ -362,6 +363,7 @@ requires-dist = [
     { name = "igraph", marker = "extra == 'igraph'", specifier = ">=0.11.0" },
     { name = "matplotlib", specifier = ">=2.0.0" },
     { name = "networkx", marker = "extra == 'networkx'", specifier = ">=2.0.0" },
+    { name = "numpy", specifier = ">=2.2.6" },
     { name = "pandas", specifier = ">=2.0.0" },
 ]
 provides-extras = ["igraph", "networkx"]

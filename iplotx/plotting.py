@@ -1,4 +1,5 @@
-from typing import Union, Sequence
+from typing import Optional, Sequence
+from contextlib import nullcontext
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -14,77 +15,69 @@ from .styles import stylecontext
 
 
 def plot(
-    network: Union[GraphType, None] = None,
-    layout: Union[LayoutType, None] = None,
-    grouping: Union[None, GroupingType] = None,
-    vertex_labels: Union[None, list, dict, pd.Series] = None,
-    edge_labels: Union[None, Sequence] = None,
-    ax: Union[None, object] = None,
-    style: Union[str, dict, Sequence[Union[str, dict]]] = (),
-    title: Union[None, str] = None,
+    network: Optional[GraphType] = None,
+    layout: Optional[LayoutType] = None,
+    grouping: Optional[GroupingType] = None,
+    vertex_labels: Optional[list | dict | pd.Series] = None,
+    edge_labels: Optional[Sequence] = None,
+    ax: Optional[mpl.axes.Axes] = None,
+    style: str | dict | Sequence[str | dict] = (),
+    title: Optional[str] = None,
 ):
     """Plot this network using the specified layout.
 
-    Parameters:
-        network (GraphType): The network to plot. Can be a networkx or igraph graph.
-        layout (Union[LayoutType, None], optional): The layout to use for plotting. If None, a layout will be looked for in the network object and, if none is found, an exception is raised. Defaults to None.
-        vertex_labels (list, dict, pandas.Series, or bool): The labels for the vertices. If None or False, no vertex labels
+    Args:
+        network: The network to plot. Can be a networkx or igraph graph.
+        layout: The layout to use for plotting. If None, a layout will be looked for in the network object and, if none is found, an exception is raised. Defaults to None.
+        vertex_labels: The labels for the vertices. If None or False, no vertex labels
             will be drawn. If a list, the labels are taken from the list. If a dict, the keys
             should be the vertex IDs and the values should be the labels. If True (a single bool value), the vertex IDs will be used as labels.
-        edge_labels (Union[None, Sequence], optional): The labels for the edges. If None, no edge labels will be drawn. Defaults to None.
-        ax (Union[None, object], optional): The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
+        edge_labels: The labels for the edges. If None, no edge labels will be drawn. Defaults to None.
+        ax: The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
         style: Apply this style for the objects to plot. This can be a sequence (e.g. list) of styles and they will be applied in order.
         title: If not None, set the axes title to this value.
 
     Returns:
         A NetworkArtist object.
     """
-    if len(style) or isinstance(style, dict):
-        with stylecontext(style):
-            return plot(
-                network=network,
-                layout=layout,
-                grouping=grouping,
+    context = stylecontext(style) if style else nullcontext()
+
+    with context:
+        if (network is None) and (grouping is None):
+            raise ValueError("At least one of network or grouping must be provided.")
+
+        if ax is None:
+            fig, ax = plt.subplots()
+
+        artists = []
+        if network is not None:
+            nwkart = NetworkArtist(
+                network,
+                layout,
                 vertex_labels=vertex_labels,
                 edge_labels=edge_labels,
-                ax=ax,
             )
+            ax.add_artist(nwkart)
+            # Postprocess for things that require an axis (transform, etc.)
+            nwkart._process()
+            artists.append(nwkart)
 
-    if (network is None) and (grouping is None):
-        raise ValueError("At least one of network or grouping must be provided.")
+        if grouping is not None:
+            grpart = GroupingArtist(
+                grouping,
+                layout,
+            )
+            ax.add_artist(grpart)
+            # Postprocess for things that require an axis (transform, etc.)
+            grpart._process()
+            artists.append(grpart)
 
-    if ax is None:
-        fig, ax = plt.subplots()
+        if title is not None:
+            ax.set_title(title)
 
-    artists = []
-    if network is not None:
-        nwkart = NetworkArtist(
-            network,
-            layout,
-            vertex_labels=vertex_labels,
-            edge_labels=edge_labels,
-        )
-        ax.add_artist(nwkart)
-        # Postprocess for things that require an axis (transform, etc.)
-        nwkart._process()
-        artists.append(nwkart)
+        _postprocess_axis(ax, artists)
 
-    if grouping is not None:
-        grpart = GroupingArtist(
-            grouping,
-            layout,
-        )
-        ax.add_artist(grpart)
-        # Postprocess for things that require an axis (transform, etc.)
-        grpart._process()
-        artists.append(grpart)
-
-    if title is not None:
-        ax.set_title(title)
-
-    _postprocess_axis(ax, artists)
-
-    return artists
+        return artists
 
 
 # INTERNAL ROUTINES
