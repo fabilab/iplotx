@@ -9,7 +9,11 @@ from .typing import GraphType, GroupingType, LayoutType
 
 def network_library(
     network: GraphType,
+    data_providers: dict = None,
 ) -> str:
+    # NOTE: data_providers is not used yet, but it will be by external plugins. That will require
+    # changes to this function as well.
+
     if igraph is not None and isinstance(network, igraph.Graph):
         return "igraph"
     if networkx is not None:

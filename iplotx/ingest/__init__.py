@@ -46,7 +46,7 @@ def ingest_network_data(
     """Create internal data for the network."""
     _update_data_providers()
 
-    nl = network_library(network)
+    nl = network_library(network, data_providers=data_providers)
 
     if nl in data_providers:
         provider: NetworkDataProvider = data_providers[nl]
