@@ -166,6 +166,8 @@ def _compute_group_path_with_vertex_padding(
 
 def _build_cmap_fun(values, cmap):
     """Map colormap on top of numerical values."""
+    cmap = mpl.cm._ensure_cmap(cmap)
+
     if np.isscalar(values):
         values = [values]
 

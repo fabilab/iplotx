@@ -174,6 +174,13 @@ class NetworkArtist(mpl.artist.Artist):
     def _add_vertices(self):
         """Draw the vertices"""
         vertex_style = get_style(".vertex")
+        if "cmap" in vertex_style:
+            cmap_fun = _build_cmap_fun(
+                vertex_style["facecolor"],
+                vertex_style["cmap"],
+            )
+        else:
+            cmap_fun = None
 
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
@@ -189,6 +196,8 @@ class NetworkArtist(mpl.artist.Artist):
                 vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
 
         # FIXME:: this would be better off in the VertexCollection itself, like we do for groups
+        if "cmap" in vertex_style:
+            colorarray = []
         offsets = []
         patches = []
         for i, (vid, row) in enumerate(vertex_layout_df.iterrows()):
@@ -202,10 +211,21 @@ class NetworkArtist(mpl.artist.Artist):
                 )
 
             vertex_stylei = rotate_style(vertex_style, index=i, id=vid)
+            if cmap_fun is not None:
+                colorarray.append(vertex_style["facecolor"])
+                vertex_stylei["facecolor"] = cmap_fun(vertex_stylei["facecolor"])
 
             # Shape of the vertex (Patch)
             art = make_vertex_patch(**vertex_stylei)
             patches.append(art)
+
+        kwargs = {}
+        if "cmap" in vertex_style:
+            vmin = np.min(colorarray)
+            vmax = np.max(colorarray)
+            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+            kwargs["cmap"] = vertex_style["cmap"]
+            kwargs["norm"] = norm
 
         art = VertexCollection(
             patches,
@@ -213,6 +233,7 @@ class NetworkArtist(mpl.artist.Artist):
             offset_transform=self.axes.transData,
             transform=Affine2D(),
             match_original=True,
+            **kwargs,
         )
         self._vertices = art
 
@@ -292,7 +313,7 @@ class NetworkArtist(mpl.artist.Artist):
         )
 
         if "cmap" in edge_style:
-            edgearray = []
+            colorarray = []
         edgepatches = []
         arrowpatches = []
         adjacent_vertex_ids = []
@@ -310,7 +331,7 @@ class NetworkArtist(mpl.artist.Artist):
             # Prioritise network internal styles
             _update_from_internal(edge_stylei, edge_df.iloc[i], kind="edge")
             if cmap_fun is not None:
-                edgearray.append(edge_style["color"])
+                colorarray.append(edge_style["color"])
                 edge_stylei["color"] = cmap_fun(edge_stylei["color"])
 
             # These are not the actual edges drawn, only stubs to establish
@@ -340,8 +361,8 @@ class NetworkArtist(mpl.artist.Artist):
         # TODO:: deal with "ports" a la graphviz
 
         if "cmap" in edge_style:
-            vmin = np.min(edgearray)
-            vmax = np.max(edgearray)
+            vmin = np.min(colorarray)
+            vmax = np.max(colorarray)
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
 

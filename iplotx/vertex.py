@@ -87,7 +87,7 @@ class VertexCollection(PatchCollection):
 
 def make_patch(marker: str, size, **kwargs):
     """Make a patch of the given marker shape and size."""
-    forbidden_props = ["label"]
+    forbidden_props = ["label", "cmap", "norm"]
     for prop in forbidden_props:
         if prop in kwargs:
             kwargs.pop(prop)
