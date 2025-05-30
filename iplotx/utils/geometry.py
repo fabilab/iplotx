@@ -23,20 +23,29 @@ def _evaluate_cubic_bezier(points, t):
 
 def convex_hull(points):
     """Compute the convex hull of a set of 2D points."""
-    from ..importing import igraph
-
     points = np.asarray(points)
 
-    # igraph's should be faster in 2D
-    if igraph is not None:
-        hull_idx = igraph.convex_hull(list(points))
-    else:
-        try:
-            from scipy.spatial import ConvexHull
+    hull_idx = None
 
-            hull_idx = ConvexHull(points).vertices
-        except ImportError:
-            hull_idx = _convex_hull_Graham_scan(points)
+    # igraph's should be faster in 2D
+    try:
+        import igraph
+
+        hull_idx = igraph.convex_hull(list(points))
+    except ImportError:
+        pass
+
+    # Otherwise, try scipy
+    try:
+        from scipy.spatial import ConvexHull
+
+        hull_idx = ConvexHull(points).vertices
+    except ImportError:
+        pass
+
+    # Last resort: our own Graham scan
+    if hull_idx is None:
+        hull_idx = _convex_hull_Graham_scan(points)
 
     return hull_idx
 
