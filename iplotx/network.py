@@ -10,18 +10,9 @@ from .typing import (
     GraphType,
     LayoutType,
 )
-from .importing import (
-    igraph,
-    networkx,
-)
 from .styles import (
     get_style,
     rotate_style,
-)
-from .heuristics import (
-    network_library,
-    normalise_layout,
-    detect_directedness,
 )
 from .utils.matplotlib import (
     _stale_wrapper,

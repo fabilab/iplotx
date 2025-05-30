@@ -7,15 +7,15 @@ import warnings
 from typing import (
     Optional,
     Sequence,
-    Protocol,
     Hashable,
 )
 import numpy as np
 import pandas as pd
 
 from ..importing import igraph, networkx
-from ..network import network_library, detect_directedness
-from ..heuristics import normalise_layout
+from .heuristics import (
+    network_library,
+)
 from ..typing import (
     GraphType,
     LayoutType,

@@ -6,7 +6,7 @@ from typing import (
 import numpy as np
 import pandas as pd
 
-from ...heuristics import (
+from ..heuristics import (
     normalise_layout,
     detect_directedness,
 )

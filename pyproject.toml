@@ -11,7 +11,7 @@ authors = [
 maintainers = [
   {name = "Fabio Zanini", email = "fabio.zanini@unsw.edu.au"}
 ]
-requires-python = ">=3.10"
+requires-python = ">=3.11"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
@@ -24,10 +24,9 @@ license-files = ["LICEN[CS]E.*"]
 keywords = ["network", "graph", "visualisation", "plotting"]
 classifiers = [
   "Programming Language :: Python :: 3",
-  "Programming Language :: Python :: 3.8",
-  "Programming Language :: Python :: 3.9",
-  "Programming Language :: Python :: 3.10",
   "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
   "License :: OSI Approved :: MIT License",
   "Operating System :: OS Independent",
   ]

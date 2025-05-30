@@ -12,7 +12,10 @@ from .typing import (
     GroupingType,
     LayoutType,
 )
-from .heuristics import normalise_layout, normalise_grouping
+from .ingest.heuristics import (
+    normalise_layout,
+    normalise_grouping,
+)
 from .styles import get_style, rotate_style
 from .utils.geometry import (
     convex_hull,

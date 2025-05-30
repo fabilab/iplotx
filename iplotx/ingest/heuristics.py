@@ -3,8 +3,8 @@ from networkx import number_of_nodes
 import numpy as np
 import pandas as pd
 
-from .importing import igraph, networkx
-from .typing import GraphType, GroupingType, LayoutType
+from ..importing import igraph, networkx
+from ..typing import GraphType, GroupingType, LayoutType
 
 
 def network_library(
