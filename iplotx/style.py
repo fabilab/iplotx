@@ -188,7 +188,7 @@ def reset():
 
 
 @contextmanager
-def stylecontext(style: Optional[str | dict | Sequence] = None, **kwargs):
+def context(style: Optional[str | dict | Sequence] = None, **kwargs):
     current = get_style()
     try:
         use(style, **kwargs)

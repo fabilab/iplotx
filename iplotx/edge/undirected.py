@@ -9,7 +9,7 @@ from ..utils.matplotlib import (
     _compute_mid_coord_and_rot,
     _stale_wrapper,
 )
-from ..styles import (
+from ..style import (
     rotate_style,
 )
 

@@ -10,7 +10,7 @@ from .typing import (
     GraphType,
     LayoutType,
 )
-from .styles import (
+from .style import (
     get_style,
     rotate_style,
 )

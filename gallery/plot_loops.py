@@ -1,8 +1,8 @@
 """
-Loops
-=====
+Style specifications
+====================
 
-This minimal example shows how to style loops, edges that connect a node to itself.
+This minimal example shows how to style a plot in a few different ways.
 """
 
 import networkx as nx
@@ -21,7 +21,6 @@ G.add_edges_from(edgelist)
 
 # Style the edge lines
 linestyle = {e: "-" if e not in edgelist else "--" for e in G.edges()}
-
 
 ipx.plot(
     G,
@@ -46,3 +45,61 @@ ipx.plot(
         },
     },
 )
+
+# %%
+# In addition to fully structured styles in the form of nested dictionaries, `iplotx`
+# also accepts flat or semi-flat styles, with levels separated by underscores ("_").
+# The above is equivalent to:
+
+ipx.plot(
+    G,
+    layout=pos,
+    vertex_labels=True,
+    style=dict(
+        vertex_size=30,
+        vertex_facecolor="lightblue",
+        vertex_edgecolor="none",
+        vertex_label_color="black",
+        edge_linestyle=linestyle,
+        edge_offset=0,
+        edge_looptension=3.5,
+        arrow_marker="|>",
+    ),
+)
+
+# %%
+# The `**kwargs` flexible argument of `ipx.plotting` can be used for this purpose as well,
+# for increased readability:
+
+ipx.plot(
+    G,
+    layout=pos,
+    vertex_labels=True,
+    vertex_size=30,
+    vertex_facecolor="lightblue",
+    vertex_edgecolor="none",
+    vertex_label_color="black",
+    edge_linestyle=linestyle,
+    edge_offset=0,
+    edge_looptension=3.5,
+    arrow_marker="|>",
+)
+
+# %%
+# The same can be achieved also with a style **context**:
+
+with ipx.style.context(
+    vertex_size=30,
+    vertex_facecolor="lightblue",
+    vertex_edgecolor="none",
+    vertex_label_color="black",
+    edge_linestyle=linestyle,
+    edge_offset=0,
+    edge_looptension=3.5,
+    arrow_marker="|>",
+):
+    ipx.plot(
+        G,
+        layout=pos,
+        vertex_labels=True,
+    )

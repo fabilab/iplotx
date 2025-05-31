@@ -11,7 +11,7 @@ from .typing import (
 )
 from .network import NetworkArtist
 from .groups import GroupingArtist
-from .styles import stylecontext
+from .style import context
 
 
 def plot(
@@ -23,6 +23,7 @@ def plot(
     ax: Optional[mpl.axes.Axes] = None,
     style: str | dict | Sequence[str | dict] = (),
     title: Optional[str] = None,
+    **kwargs,
 ):
     """Plot this network using the specified layout.
 
@@ -36,13 +37,15 @@ def plot(
         ax: The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
         style: Apply this style for the objects to plot. This can be a sequence (e.g. list) of styles and they will be applied in order.
         title: If not None, set the axes title to this value.
+        **kwargs: Additional arguments are treated as an alternate way to specify style. If both "style" and additional **kwargs
+            are provided, they are both applied in that order (style, then **kwargs).
 
     Returns:
         A NetworkArtist object.
     """
-    context = stylecontext(style) if style else nullcontext()
+    stylecontext = context(style, **kwargs) if style or kwargs else nullcontext()
 
-    with context:
+    with stylecontext:
         if (network is None) and (grouping is None):
             raise ValueError("At least one of network or grouping must be provided.")
 

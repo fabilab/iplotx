@@ -9,19 +9,19 @@ import iplotx as ipx
 
 class StyleTestRunner(unittest.TestCase):
     def test_flat_style(self):
-        style = deepcopy(ipx.styles.current)
+        style = deepcopy(ipx.style.current)
 
-        with ipx.styles.stylecontext(
+        with ipx.style.context(
             dict(
                 vertex_size=80,
                 edge_label_bbox_facecolor="yellow",
             ),
         ):
-            current = ipx.styles.current
+            current = ipx.style.current
             self.assertEqual(current["vertex"]["size"], 80)
             self.assertEqual(current["edge"]["label"]["bbox"]["facecolor"], "yellow")
 
-            with ipx.styles.stylecontext(
+            with ipx.style.context(
                 vertex_size=70,
             ):
                 self.assertEqual(current["vertex"]["size"], 70)
@@ -31,16 +31,16 @@ class StyleTestRunner(unittest.TestCase):
 
     def test_generator(self):
         styles = iter([{"vertex_size": 80}, {"vertex_size": 70}])
-        with ipx.styles.stylecontext(
+        with ipx.style.context(
             styles,
         ):
-            self.assertEqual(ipx.styles.current["vertex"]["size"], 70)
+            self.assertEqual(ipx.style.current["vertex"]["size"], 70)
 
     def test_use(self):
-        style = deepcopy(ipx.styles.current)
-        ipx.styles.use("hollow")
-        ipx.styles.use("default")
-        self.assertEqual(style, ipx.styles.current)
+        style = deepcopy(ipx.style.current)
+        ipx.style.use("hollow")
+        ipx.style.use("default")
+        self.assertEqual(style, ipx.style.current)
 
 
 def suite():
