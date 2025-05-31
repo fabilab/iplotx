@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.989** total execution time for 20 files **from all galleries**:
+**00:00.300** total execution time for 22 files **from all galleries**:
 
 .. container::
 
@@ -32,13 +32,16 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
-     - 00:01.989
+   * - :ref:`sphx_glr_gallery_plot_dag.py` (``../../gallery/plot_dag.py``)
+     - 00:00.300
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
@@ -63,6 +66,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_minimum_spanning_trees.py` (``../../gallery/plot_minimum_spanning_trees.py``)

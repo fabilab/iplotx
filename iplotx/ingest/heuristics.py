@@ -56,7 +56,13 @@ def normalise_layout(layout, network=None):
         return None
     if (network is not None) and isinstance(layout, str):
         if network_library(network) == "igraph":
-            layout = network[layout]
+            if hasattr(network, layout):
+                layout = network[layout]
+            else:
+                layout = network.layout(layout)
+                # NOTE: This seems like a legit bug in igraph
+                # Sometimes (e.g. sugiyama) the layout has more vertices than the network (?)
+                layout = np.asarray(layout.coords)[: network.vcount()]
         if network_library(network) == "networkx":
             layout = dict(network.nodes.data(layout))
 

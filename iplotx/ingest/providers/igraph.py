@@ -44,11 +44,14 @@ class IGraphDataProvider(NetworkDataProvider):
 
         # Vertex labels
         if vertex_labels is not None:
-            if len(vertex_labels) != len(vertex_df):
+            if np.isscalar(vertex_labels):
+                vertex_df["label"] = vertex_df.index.astype(str)
+            elif len(vertex_labels) != len(vertex_df):
                 raise ValueError(
                     "Vertex labels must be the same length as the number of vertices."
                 )
-            vertex_df["label"] = vertex_labels
+            else:
+                vertex_df["label"] = vertex_labels
 
         # Edges are a list of tuples, because of multiedges
         tmp = []
