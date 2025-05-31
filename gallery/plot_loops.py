@@ -39,7 +39,7 @@ ipx.plot(
         "edge": {
             "linestyle": linestyle,
             "offset": 0,
-            "loop_tension": 3.5,
+            "looptension": 3.5,
         },
         "arrow": {
             "marker": "|>",

@@ -196,7 +196,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                         thetaj1,
                         thetaj2,
                         trans_inv,
-                        loop_tension=self._style.get("loop_tension", 2.5),
+                        looptension=self._style.get("looptension", 2.5),
                     )
                     paths[ldict["indices"][idx]] = path
                     idx += 1
@@ -238,15 +238,15 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         angle1,
         angle2,
         trans_inv,
-        loop_tension,
+        looptension,
     ):
         # Shorten at starting angle
         start = _get_shorter_edge_coords(vpath, angle1) + vcoord_fig
         # Shorten at end angle
         end = _get_shorter_edge_coords(vpath, angle2) + vcoord_fig
 
-        aux1 = (start - vcoord_fig) * loop_tension + vcoord_fig
-        aux2 = (end - vcoord_fig) * loop_tension + vcoord_fig
+        aux1 = (start - vcoord_fig) * looptension + vcoord_fig
+        aux2 = (end - vcoord_fig) * looptension + vcoord_fig
 
         vertices = np.vstack(
             [
@@ -420,7 +420,7 @@ def make_stub_patch(**kwargs):
     forbidden_props = [
         "curved",
         "tension",
-        "loop_tension",
+        "looptension",
         "offset",
         "label",
         "cmap",

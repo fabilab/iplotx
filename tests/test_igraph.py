@@ -103,7 +103,7 @@ class GraphTestRunner(unittest.TestCase):
                 "edge": {
                     "curved": True,
                     "tension": 1.7,
-                    "loop_tension": 5,
+                    "looptension": 5,
                 }
             },
         )

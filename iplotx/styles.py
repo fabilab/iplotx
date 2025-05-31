@@ -1,4 +1,4 @@
-from typing import Union, Sequence, Hashable
+from typing import Optional, Sequence, Hashable
 from copy import deepcopy
 from contextlib import contextmanager
 import numpy as np
@@ -18,7 +18,7 @@ style_leaves = (
     "alpha",
     "zorder",
     "tension",
-    "loop_tension",
+    "looptension",
     "rotate",
 )
 
@@ -43,6 +43,7 @@ default = {
         "curved": False,
         "offset": 3,
         "tension": 1,
+        "looptension": 4,
         "label": {
             "horizontalalignment": "center",
             "verticalalignment": "center",
@@ -112,7 +113,7 @@ def get_style(name: str = ""):
 
 # The following is inspired by matplotlib's style library
 # https://github.com/matplotlib/matplotlib/blob/v3.10.3/lib/matplotlib/style/core.py#L45
-def use(style: Union[str, dict, Sequence]):
+def use(style: Optional[str | dict | Sequence] = None, **kwargs):
     """Use iplotx style setting for a style specification.
 
     The style name of 'default' is reserved for reverting back to
@@ -123,6 +124,7 @@ def use(style: Union[str, dict, Sequence]):
             or a dict with specific parts of the style to override. The string
             "default" resets the style to the default one. If this is a sequence,
             each style is applied in order.
+        **kwargs: Additional style changes to be applied at the end of any style.
     """
     global current
 
@@ -154,10 +156,15 @@ def use(style: Union[str, dict, Sequence]):
     old_style = deepcopy(current)
 
     try:
-        if isinstance(style, (dict, str)):
+        if style is None:
+            styles = []
+        elif isinstance(style, (dict, str)):
             styles = [style]
         else:
-            styles = style
+            styles = list(style)
+
+        if kwargs:
+            styles.append(kwargs)
 
         for style in styles:
             if style == "default":
@@ -167,6 +174,7 @@ def use(style: Union[str, dict, Sequence]):
                     current = get_style(style)
                 else:
                     _sanitize_leaves(style)
+                    unflatten_style(style)
                     _update(style, current)
     except:
         current = old_style
@@ -180,19 +188,43 @@ def reset():
 
 
 @contextmanager
-def stylecontext(style: Union[str, dict, Sequence]):
+def stylecontext(style: Optional[str | dict | Sequence] = None, **kwargs):
     current = get_style()
     try:
-        use(style)
+        use(style, **kwargs)
         yield
     finally:
         use(["default", current])
 
 
+def unflatten_style(
+    style_flat: dict[str, str | dict | int | float],
+):
+    """Convert a flat or semi-flat style into a fully structured dict."""
+    keys = list(style_flat.keys())
+
+    for key in keys:
+        if "_" not in key:
+            continue
+
+        keyhead, keytail = key.split("_", 1)
+        value = style_flat.pop(key)
+        if keyhead not in style_flat:
+            style_flat[keyhead] = {
+                keytail: value,
+            }
+        else:
+            style_flat[keyhead][keytail] = value
+
+    for key, value in style_flat.items():
+        if isinstance(value, dict) and (value not in style_leaves):
+            unflatten_style(value)
+
+
 def rotate_style(
     style,
-    index: Union[int, None] = None,
-    id: Union[Hashable, None] = None,
+    index: Optional[int] = None,
+    id: Optional[Hashable] = None,
     props=style_leaves,
 ):
     if (index is None) and (id is None):

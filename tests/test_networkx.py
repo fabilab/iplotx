@@ -24,6 +24,10 @@ class GraphTestRunner(unittest.TestCase):
             raise unittest.SkipTest("networkx not found, skipping tests")
 
     @image_comparison(baseline_images=["simple_graph"], remove_text=True)
+    def test_flat_style(self):
+        plt.close("all")
+
+    @image_comparison(baseline_images=["simple_graph"], remove_text=True)
     def test_simple_graph(self):
         plt.close("all")
 
@@ -358,7 +362,7 @@ class GraphTestRunner(unittest.TestCase):
                     "color": G.edges.data("w"),
                     "cmap": mpl.colormaps["inferno"],
                     "linewidth": 1,
-                    "loop_tension": 7.5,
+                    "looptension": 7.5,
                     "label": {
                         "color": "black",
                         "bbox": {

@@ -38,7 +38,7 @@ ipx.plot(
             "color": G.edges.data("w"),
             "cmap": mpl.colormaps["inferno"],
             "linewidth": 1,
-            "loop_tension": 7.5,
+            "looptension": 7.5,
             "label": {
                 "color": "black",
                 "bbox": {
