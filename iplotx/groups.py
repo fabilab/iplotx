@@ -29,6 +29,7 @@ class GroupingArtist(PatchCollection):
         grouping: GroupingType,
         layout: LayoutType,
         vertexpadding: Union[None, int] = None,
+        npoints_per_vertex=30,
         *args,
         **kwargs,
     ):
@@ -63,6 +64,7 @@ class GroupingArtist(PatchCollection):
         style.update(kwargs)
 
         patches = []
+        coords_hulls = []
         for i, (name, vids) in enumerate(grouping.items()):
             if len(vids) == 0:
                 continue
@@ -70,6 +72,7 @@ class GroupingArtist(PatchCollection):
             coords = layout.loc[vids].values
             idx_hull = convex_hull(coords)
             coords_hull = coords[idx_hull]
+            self._coords_hulls.append(coords_hull)
 
             stylei = rotate_style(style, i)
 
@@ -85,13 +88,20 @@ class GroupingArtist(PatchCollection):
         return patches, grouping, layout
 
     def _compute_paths(self):
-        if self._vertexpadding > 0:
-            for i, path in enumerate(self._paths):
-                self._paths[i].vertices = _compute_group_path_with_vertex_padding(
-                    path.vertices,
-                    self.get_transform(),
-                    vertexpadding=self._vertexpadding,
-                )
+        if self._vertexpadding == 0:
+            for i, points in enumerate(self._coords_hulls):
+                for j, point in enumerate(points):
+                    self._paths[i].vertices[30 * j : 30 * (j + 1)] = point
+                    self._paths[i].vertices[-1] = self._paths[i].vertices[0]
+            return
+
+        for i, points in enumerate(self._coords_hulls):
+            self._paths[i].vertices = _compute_group_path_with_vertex_padding(
+                points,
+                self._paths[i].vertices,
+                self.get_transform(),
+                vertexpadding=self._vertexpadding,
+            )
 
     def _process(self):
         self.set_transform(self.axes.transData)
@@ -116,27 +126,14 @@ def _compute_group_patch_stub(
     # NOTE: Closing point: mpl is a bit quirky here
     vertices = []
     codes = []
-    if len(points) == 0:
-        vertices = np.zeros((0, 2))
-    elif len(points) == 1:
-        vertices = [points[0]] * 9
-        codes = ["MOVETO"] + ["CURVE3"] * 8
-    elif len(points) == 2:
-        vertices = [points[0]] * 5 + [points[1]] * 5 + [points[0]]
-        codes = ["MOVETO"] + ["CURVE3"] * 4 + ["LINETO"] + ["CURVE3"] * 4 + ["LINETO"]
-    else:
-        for point in points:
-            vertices.extend([point] * 3)
-            codes.extend(["LINETO", "CURVE3", "CURVE3"])
-        vertices.append(vertices[0])
-        codes.append("LINETO")
-        codes[0] = "MOVETO"
-
+    vertices = np.zeros(
+        (1 + 30 * len(points), 2),
+    )
     codes = [getattr(mpl.path.Path, x) for x in codes]
     patch = mpl.patches.PathPatch(
         mpl.path.Path(
             vertices,
-            codes=codes,
+            codes=["MOVETO"] + ["LINETO"] * (len(vertices) - 2) + ["CLOSEPOLY"],
         ),
         **kwargs,
     )

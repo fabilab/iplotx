@@ -3,7 +3,6 @@ import warnings
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
-from matplotlib.transforms import Affine2D
 from pandas._libs.lib import is_scalar
 
 from .typing import (
@@ -231,7 +230,7 @@ class NetworkArtist(mpl.artist.Artist):
             patches,
             offsets=offsets if offsets else None,
             offset_transform=self.axes.transData,
-            transform=Affine2D(),
+            transform=mpl.transforms.IdentityTransform(),
             match_original=True,
             **kwargs,
         )

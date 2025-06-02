@@ -145,6 +145,7 @@ def _convex_hull_Graham_scan(points):
 
 
 def _compute_group_path_with_vertex_padding(
+    hull,
     points,
     transform,
     vertexpadding=10,
@@ -161,28 +162,33 @@ def _compute_group_path_with_vertex_padding(
     trans_inv = transform.inverted().transform
     points = trans(points)
 
-    # Find the vertex centers, to recompute the offsets from scratch
-    # Independent whether this is a first call or a later draw,
-    # finding the vertex center can be done at once
-    # 0.         .->.vcenter
-    #  |         |  ^
-    #  |         |  |
-    # 1.--.2     .--.
-    # singleton group
-    s2 = 0.96
-    if len(points) == 9:
-        points[:] = 0.5 * (points[0] + points[4])
-        points[0] += np.array([0, -1]) * vertexpadding
-        points[1] += np.array([-s2, -s2]) * vertexpadding
-        points[2] += np.array([-1, 0]) * vertexpadding
-        points[3] += np.array([-s2, s2]) * vertexpadding
-        points[4] += np.array([0, 1]) * vertexpadding
-        points[5] += np.array([s2, s2]) * vertexpadding
-        points[6] += np.array([1, 0]) * vertexpadding
-        points[7] += np.array([s2, -s2]) * vertexpadding
-        points[8] += np.array([0, -1]) * vertexpadding
+    if len(hull) == 1:
+        # singleton group
+        thetas = np.linspace(
+            -np.pi,
+            np.pi,
+            31,
+        )
+        return trans_inv(
+            trans(hull[0])
+            + vertexpadding * np.vstack([np.cos(thetas), np.sin(thetas)]).T
+        )
+    elif len(hull) == 2:
+        # doublet group
+        dv = trans(hull[0] - hull[1])
+        dv = dv / np.sqrt((dv**2).sum())
+        angles = np.linspace(-0.5 * np.pi, 0.5 * np.pi, 30)
+        vs = np.array([np.cos(angles), -np.sin(angles), np.sin(angles), np.cos(angles)])
+        vs = vs.T.reshape((len(angles), 2, 2))
+        vs = np.matmul(dv, vs)
+        vs1 = hull[0] + vertexpadding * vs
+        vs2 = hull[1] + vertexpadding * np.matmul(vs, -np.diag((1, 1)))
+        points[:30] = vs1
+        points[30:60] = vs2
+        points[-1] = points[0]
+        return points
+
     else:
-        # doublet group are a bit different from triangles+
         if len(points) == 11:
             # points per vertex
             ppv = 5

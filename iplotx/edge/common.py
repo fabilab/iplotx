@@ -40,8 +40,3 @@ def _compute_loops_per_angle(nloops, angles):
             1,
         ),
     ]
-
-    ## TODO: we should greedily iterate from this
-    ## TODO: finish this
-    # dsplit_new = dsplit * nloops / (nloops - 1)
-    # dsplit2_new = deltas[idx_dsort[-2]]

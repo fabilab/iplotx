@@ -1,4 +1,5 @@
 import numpy as np
+from matplotlib import artist
 from matplotlib.transforms import IdentityTransform
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import (
@@ -20,14 +21,13 @@ class VertexCollection(PatchCollection):
         changed. Typically this redraws the edges.
     """
 
+    _factor = 1.0
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
+        self.set_sizes(self._get_sizes_from_paths())
 
-    def get_sizes(self):
-        """Same as get_size."""
-        return self.get_size()
-
-    def get_size(self):
+    def _get_sizes_from_paths(self):
         """Get vertex sizes.
 
         If width and height are unequal, get the largest of the two.
@@ -45,7 +45,10 @@ class VertexCollection(PatchCollection):
             sizes.append(size)
         return np.array(sizes)
 
-    def set_size(self, sizes):
+    def get_sizes(self):
+        return self._sizes
+
+    def set_sizes(self, sizes, dpi=72.0):
         """Set vertex sizes.
 
         This rescales the current vertex symbol/path linearly, using this
@@ -53,26 +56,31 @@ class VertexCollection(PatchCollection):
 
         @param sizes: A sequence of vertex sizes or a single size.
         """
-        paths = self._paths
-        try:
-            iter(sizes)
-        except TypeError:
-            sizes = [sizes] * len(paths)
-
-        sizes = list(sizes)
-        current_sizes = self.get_sizes()
-        for path, cursize in zip(paths, current_sizes):
-            # Circular use of sizes
-            size = sizes.pop(0)
-            sizes.append(size)
-            # Rescale the path for this vertex
-            path.vertices *= size / cursize
-
+        if sizes is None:
+            self._sizes = np.array([])
+            self._transforms = np.empty((0, 3, 3))
+        else:
+            self._sizes = np.asarray(sizes)
+            self._transforms = np.zeros((len(self._sizes), 3, 3))
+            # This is kinda funny: even though the scale is apparently
+            # applied linearly to each axis (dpi means "dots per inch",
+            # which is also a linear measurement), we still need to take
+            # the square root of the sizes for the **visual** size on screen
+            # (or on PNG) to scale **linearly**. It is more funny still
+            # because the scaling is not exact, there is about a factor
+            # ~1.2-1.5 difference between the scale one sets and the pixels on
+            # screen...
+            # But this does fix #5 in terms of storing the PNG with different
+            # dpi resolutions: they look the same. But relative scaling is
+            # all off LOL
+            scale = self._sizes**0.5 * dpi / 72.0 * self._factor
+            self._transforms[:, 0, 0] = scale
+            self._transforms[:, 1, 1] = scale
+            self._transforms[:, 2, 2] = 1.0
         self.stale = True
 
-    def set_sizes(self, sizes):
-        """Same as set_size."""
-        self.set_size(sizes)
+    get_size = get_sizes
+    set_size = set_sizes
 
     @property
     def stale(self):
@@ -83,6 +91,11 @@ class VertexCollection(PatchCollection):
         PatchCollection.stale.fset(self, val)
         if val and hasattr(self, "stale_callback_post"):
             self.stale_callback_post(self)
+
+    @artist.allow_rasterization
+    def draw(self, renderer):
+        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+        super().draw(renderer)
 
 
 def make_patch(marker: str, size, **kwargs):
