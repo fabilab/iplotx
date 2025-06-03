@@ -2,13 +2,118 @@ import numpy as np
 import matplotlib as mpl
 from matplotlib.patches import PathPatch
 
+from ..style import (
+    get_style,
+    rotate_style,
+)
+
 
 class EdgeArrowCollection(mpl.collections.PatchCollection):
     """Collection of arrow patches for plotting directed edgs."""
 
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
+    _factor = 1.0
+
+    def __init__(self, edge_collection, *args, **kwargs):
+
+        self._edge_collection = edge_collection
+        self._style = get_style(".arrow")
+        patches, sizes = self._create_artists()
+
+        if "cmap" in self._edge_collection._style:
+            kwargs["cmap"] = self._edge_collection._style["cmap"]
+            kwargs["norm"] = self._edge_collection._style["norm"]
+
+        super().__init__(
+            patches,
+            offsets=np.zeros((len(patches), 2)),
+            offset_transform=self.get_offset_transform(),
+            transform=mpl.transforms.IdentityTransform(),
+            match_original=True,
+            *args,
+            **kwargs,
+        )
         self._angles = np.zeros(len(self._paths))
+
+        # Compute _transforms like in _CollectionWithScales for dpi issues
+        self.set_sizes(sizes)
+
+    def get_sizes(self):
+        """Get vertex sizes (max of width and height), not scaled by dpi."""
+        return self._sizes
+
+    def get_sizes_dpi(self):
+        return self._transforms[:, 0, 0]
+
+    def set_sizes(self, sizes, dpi=72.0):
+        """Set vertex sizes.
+
+        This rescales the current vertex symbol/path linearly, using this
+        value as the largest of width and height.
+
+        @param sizes: A sequence of vertex sizes or a single size.
+        """
+        if sizes is None:
+            self._sizes = np.array([])
+            self._transforms = np.empty((0, 3, 3))
+        else:
+            self._sizes = np.asarray(sizes)
+            self._transforms = np.zeros((len(self._sizes), 3, 3))
+            scale = self._sizes * dpi / 72.0 * self._factor
+            self._transforms[:, 0, 0] = scale
+            self._transforms[:, 1, 1] = scale
+            self._transforms[:, 2, 2] = 1.0
+        self.stale = True
+
+    get_size = get_sizes
+    set_size = set_sizes
+
+    def get_offset_transform(self):
+        return self._edge_collection.get_transform()
+
+    def set_sizes(self, sizes, dpi=72.0):
+        """Set vertex sizes.
+
+        This rescales the current vertex symbol/path linearly, using this
+        value as the largest of width and height.
+
+        @param sizes: A sequence of vertex sizes or a single size.
+        """
+        if sizes is None:
+            self._sizes = np.array([])
+            self._transforms = np.empty((0, 3, 3))
+        else:
+            self._sizes = np.asarray(sizes)
+            self._transforms = np.zeros((len(self._sizes), 3, 3))
+            scale = self._sizes * dpi / 72.0 * self._factor
+            self._transforms[:, 0, 0] = scale
+            self._transforms[:, 1, 1] = scale
+            self._transforms[:, 2, 2] = 1.0
+        self.stale = True
+
+    get_size = get_sizes
+    set_size = set_sizes
+
+    def _create_artists(self):
+        style = self._style if self._style is not None else {}
+
+        patches = []
+        sizes = []
+        for i, (vid1, vid2) in enumerate(self._edge_collection._vertex_ids):
+            stylei = rotate_style(style, index=i)
+            if "color" not in stylei:
+                stylei["color"] = self._edge_collection.get_edgecolors()[i][:3]
+            if "alpha" not in stylei:
+                stylei["alpha"] = self._edge_collection.get_edgecolors()[i][3]
+            if "linewidth" not in stylei:
+                stylei["linewidth"] = self._edge_collection.get_linewidths()[i]
+
+            patch, size = make_arrow_patch(
+                **stylei,
+            )
+            patches.append(patch)
+            sizes.append(size)
+
+        return patches, sizes
 
     def set_array(self, array):
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
@@ -26,10 +131,22 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
         if val and hasattr(self, "stale_callback_post"):
             self.stale_callback_post(self)
 
+    @mpl.artist.allow_rasterization
+    def draw(self, renderer):
+        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+        super().draw(renderer)
+
 
 def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
     """Make a patch of the given marker shape and size."""
     height = kwargs.pop("height", width * 1.3)
+
+    # Normalise by the max size, this is taken care of in _transforms
+    # subsequently in a way that is nice to dpi scaling
+    size_max = max(width, height)
+    if size_max > 0:
+        height /= size_max
+        width /= size_max
 
     if marker == "|>":
         codes = ["MOVETO", "LINETO", "LINETO"]
@@ -141,4 +258,4 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
         path,
         **kwargs,
     )
-    return patch
+    return patch, size_max

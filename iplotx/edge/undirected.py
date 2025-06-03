@@ -1,6 +1,7 @@
 from math import atan2, tan, cos, pi, sin
 from collections import defaultdict
 import numpy as np
+import pandas as pd
 import matplotlib as mpl
 
 from .common import _compute_loops_per_angle
@@ -18,8 +19,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
     def __init__(self, *args, **kwargs):
         kwargs["match_original"] = True
         self._vertex_ids = kwargs.pop("vertex_ids", None)
-        self._vertex_centers = kwargs.pop("vertex_centers", None)
-        self._vertex_paths = kwargs.pop("vertex_paths", None)
+        self._vertex_collection = kwargs.pop("vertex_collection", None)
         self._style = kwargs.pop("style", None)
         self._labels = kwargs.pop("labels", None)
         if "cmap" in self._style:
@@ -39,18 +39,12 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         else:
             return None
 
-    @staticmethod
-    def _get_edge_vertex_sizes(edge_vertices):
-        sizes = []
-        for visual_vertex in edge_vertices:
-            if visual_vertex.size is not None:
-                sizes.append(visual_vertex.size)
-            else:
-                sizes.append(max(visual_vertex.width, visual_vertex.height))
-        return sizes
+    def get_mappable(self):
+        """Return mappable for colorbar."""
+        return self
 
     @staticmethod
-    def _compute_edge_angles(path, trans):
+    def _compute_edge_angles(path, size, trans):
         """Compute edge angles for both starting and ending vertices.
 
         NOTE: The domain of atan2 is (-pi, pi].
@@ -68,6 +62,39 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         angle2 = atan2(y2 - y1, x2 - x1)
         return (angle1, angle2)
 
+    def _get_adjacent_vertices_info(self):
+        index = self._vertex_collection.get_index()
+        index = pd.Series(
+            np.arange(len(index)),
+            index=index,
+        )
+
+        voffsets = []
+        vpaths = []
+        vsizes = []
+        for v1, v2 in self._vertex_ids:
+            offset1 = self._vertex_collection.get_offsets()[index[v1]]
+            offset2 = self._vertex_collection.get_offsets()[index[v2]]
+            voffsets.append((offset1, offset2))
+
+            path1 = self._vertex_collection.get_paths()[index[v1]]
+            path2 = self._vertex_collection.get_paths()[index[v1]]
+            vpaths.append((path1, path2))
+
+            # NOTE: This needs to be computed here because the
+            # VertexCollection._transforms are reset each draw in order to
+            # accomodate for DPI changes on the canvas
+            size1 = self._vertex_collection.get_sizes_dpi()[index[v1]]
+            size2 = self._vertex_collection.get_sizes_dpi()[index[v1]]
+            vsizes.append((size1, size2))
+
+        return {
+            "ids": self._vertex_ids,
+            "offsets": voffsets,
+            "paths": vpaths,
+            "sizes": vsizes,
+        }
+
     def _compute_paths(self, transform=None):
         """Compute paths for the edges.
 
@@ -78,9 +105,12 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
              for vertices with loops
         (iii) Plot each loop based on the recorded angles
         """
-        vids = self._vertex_ids
-        vpaths = self._vertex_paths
-        vcenters = self._vertex_centers
+        vinfo = self._get_adjacent_vertices_info()
+        vids = vinfo["ids"]
+        vcenters = vinfo["offsets"]
+        vpaths = vinfo["paths"]
+        vsizes = vinfo["sizes"]
+
         if transform is None:
             transform = self.get_transform()
         trans = transform.transform
@@ -119,11 +149,15 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             # Vertex paths in figure (default) coords
             vpath_fig = vpaths[i]
 
+            # Vertex size
+            vsize_fig = vsizes[i]
+
             # Shorten edge
             if not self._style.get("curved", False):
                 path = self._shorten_path_undirected_straight(
                     vcoord_fig,
                     vpath_fig,
+                    vsize_fig,
                     trans_inv,
                 )
             else:
@@ -132,6 +166,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                 path = self._shorten_path_undirected_curved(
                     vcoord_fig,
                     vpath_fig,
+                    vsize_fig,
                     trans_inv,
                     tension,
                 )
@@ -140,6 +175,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             if (v1 in loop_vertex_dict) or (v2 in loop_vertex_dict):
                 angles = self._compute_edge_angles(
                     path,
+                    vsize_fig,
                     trans,
                 )
                 if v1 in loop_vertex_dict:
@@ -176,6 +212,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         # 3. Deal with loops at the end
         for vid, ldict in loop_vertex_dict.items():
             vpath = vpaths[ldict["indices"][0]][0]
+            vsize = vsizes[ldict["indices"][0]][0]
             vcoord_fig = trans(vcenters[ldict["indices"][0]][0])
             nloops = len(ldict["indices"])
             edge_angles = ldict["edge_angles"]
@@ -199,6 +236,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                     path = self._compute_loop_path(
                         vcoord_fig,
                         vpath,
+                        vsize,
                         thetaj1,
                         thetaj2,
                         trans_inv,
@@ -241,15 +279,16 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         self,
         vcoord_fig,
         vpath,
+        vsize,
         angle1,
         angle2,
         trans_inv,
         looptension,
     ):
         # Shorten at starting angle
-        start = _get_shorter_edge_coords(vpath, angle1) + vcoord_fig
+        start = _get_shorter_edge_coords(vpath, vsize, angle1) + vcoord_fig
         # Shorten at end angle
-        end = _get_shorter_edge_coords(vpath, angle2) + vcoord_fig
+        end = _get_shorter_edge_coords(vpath, vsize, angle2) + vcoord_fig
 
         aux1 = (start - vcoord_fig) * looptension + vcoord_fig
         aux2 = (end - vcoord_fig) * looptension + vcoord_fig
@@ -277,6 +316,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         self,
         vcoord_fig,
         vpath_fig,
+        vsize_fig,
         trans_inv,
     ):
         # Straight SVG instructions
@@ -289,11 +329,14 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
 
         # Shorten at starting vertex
-        vs = _get_shorter_edge_coords(vpath_fig[0], theta) + vcoord_fig[0]
+        vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta) + vcoord_fig[0]
         path["vertices"].append(vs)
 
         # Shorten at end vertex
-        ve = _get_shorter_edge_coords(vpath_fig[1], theta + pi) + vcoord_fig[1]
+        ve = (
+            _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi)
+            + vcoord_fig[1]
+        )
         path["vertices"].append(ve)
 
         path = mpl.path.Path(
@@ -307,6 +350,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         self,
         vcoord_fig,
         vpath_fig,
+        vsize_fig,
         trans_inv,
         tension,
     ):
@@ -314,10 +358,13 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
 
         # Shorten at starting vertex
-        vs = _get_shorter_edge_coords(vpath_fig[0], theta) + vcoord_fig[0]
+        vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig, theta) + vcoord_fig[0]
 
         # Shorten at end vertex
-        ve = _get_shorter_edge_coords(vpath_fig[1], theta + pi) + vcoord_fig[1]
+        ve = (
+            _get_shorter_edge_coords(vpath_fig[1], vsize_fig, theta + pi)
+            + vcoord_fig[1]
+        )
 
         edge_straight_length = np.sqrt(((ve - vs) ** 2).sum())
 
@@ -396,7 +443,7 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
 
     @_stale_wrapper
     def draw(self, renderer, *args, **kwds):
-        if self._vertex_paths is not None:
+        if self._vertex_collection is not None:
             self._paths = self._compute_paths()
             if self._labels is not None:
                 self._compute_labels()
@@ -445,13 +492,13 @@ def make_stub_patch(**kwargs):
     return art
 
 
-def _get_shorter_edge_coords(vpath, theta):
+def _get_shorter_edge_coords(vpath, vsize, theta):
     # Bound theta from -pi to pi (why is that not guaranteed?)
     theta = (theta + pi) % (2 * pi) - pi
 
     # Size zero vertices need no shortening
-    if np.abs(vpath.vertices).max() < 0.1:
-        return vpath.vertices[0]
+    if vsize == 0:
+        return np.array([0, 0])
 
     for i in range(len(vpath)):
         v1 = vpath.vertices[i]
@@ -483,4 +530,4 @@ def _get_shorter_edge_coords(vpath, theta):
         xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
     ye = mtheta * xe
     ve = np.array([xe, ye])
-    return ve
+    return ve * vsize

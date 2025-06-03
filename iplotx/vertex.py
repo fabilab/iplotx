@@ -36,13 +36,14 @@ class VertexCollection(PatchCollection):
 
     def __init__(self, *args, **kwargs):
 
-        layout = kwargs.pop("layout")
+        layout_df = kwargs.pop("layout")
+        self._index = layout_df.index
         self._style = kwargs.pop("style", None)
         self._labels = kwargs.pop("labels", None)
 
         # Create patches from structured data
         patches, offsets, sizes, kwargs2 = self._create_artists(
-            layout,
+            layout_df,
         )
         kwargs.update(kwargs2)
         kwargs["offsets"] = offsets
@@ -54,8 +55,19 @@ class VertexCollection(PatchCollection):
         # Compute _transforms like in _CollectionWithScales for dpi issues
         self.set_sizes(sizes)
 
+    def get_index(self):
+        """Get the vertex index."""
+        return self._index
+
+    def get_vertex_id(self, index):
+        return self._index[index]
+
     def get_sizes(self):
+        """Get vertex sizes (max of width and height), not scaled by dpi."""
         return self._sizes
+
+    def get_sizes_dpi(self):
+        return self._transforms[:, 0, 0]
 
     def set_sizes(self, sizes, dpi=72.0):
         """Set vertex sizes.
@@ -71,17 +83,6 @@ class VertexCollection(PatchCollection):
         else:
             self._sizes = np.asarray(sizes)
             self._transforms = np.zeros((len(self._sizes), 3, 3))
-            # This is kinda funny: even though the scale is apparently
-            # applied linearly to each axis (dpi means "dots per inch",
-            # which is also a linear measurement), we still need to take
-            # the square root of the sizes for the **visual** size on screen
-            # (or on PNG) to scale **linearly**. It is more funny still
-            # because the scaling is not exact, there is about a factor
-            # ~1.2-1.5 difference between the scale one sets and the pixels on
-            # screen...
-            # But this does fix #5 in terms of storing the PNG with different
-            # dpi resolutions: they look the same. But relative scaling is
-            # all off LOL
             scale = self._sizes * dpi / 72.0 * self._factor
             self._transforms[:, 0, 0] = scale
             self._transforms[:, 1, 1] = scale
@@ -207,8 +208,11 @@ class VertexCollection(PatchCollection):
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
         if self._labels is not None:
             self._compute_labels()
-        super().draw(renderer)
 
+        # NOTE: This draws the vertices first, then the labels.
+        # The correct order would be vertex1->label1->vertex2->label2, etc.
+        # We might fix if we manage to find a way to do it.
+        super().draw(renderer)
         for child in self.get_children():
             child.draw(renderer)
 
@@ -229,7 +233,8 @@ def make_patch(marker: str, size, **kwargs):
     # If you check in get_sizes, you will see that rescaling also happens with the max of width and height.
     size = np.asarray(size, dtype=float)
     size_max = size.max()
-    size /= size_max
+    if size_max > 0:
+        size /= size_max
 
     if marker in ("o", "circle"):
         art = Circle((0, 0), size[0] / 2, **kwargs)

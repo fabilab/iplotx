@@ -2,7 +2,6 @@ from copy import deepcopy
 from math import atan2, tan, cos, pi, sin
 import numpy as np
 import matplotlib as mpl
-from matplotlib.transforms import Affine2D
 
 from .common import _compute_loops_per_angle
 from .undirected import UndirectedEdgeCollection
@@ -29,20 +28,13 @@ from ..utils.matplotlib import (
     )
 )
 class DirectedEdgeCollection(mpl.artist.Artist):
-    def __init__(self, edges, arrows, labels=None, **kwargs):
+    def __init__(self, edges, labels=None, **kwargs):
         super().__init__()
 
         self._edges = UndirectedEdgeCollection(edges, labels=labels, **kwargs)
 
-        # NOTE: offsets are a placeholder for later
         self._arrows = EdgeArrowCollection(
-            arrows,
-            offsets=np.zeros((len(arrows), 2)),
-            offset_transform=kwargs["transform"],
-            transform=Affine2D(),
-            match_original=True,
-            cmap=self._edges.get_cmap(),
-            norm=self._edges.norm,
+            self._edges,
         )
         self._processed = False
 
@@ -52,6 +44,10 @@ class DirectedEdgeCollection(mpl.artist.Artist):
 
     def get_array(self):
         return self._edges.get_array()
+
+    def get_mappable(self):
+        """Return mappable for colorbar."""
+        return self._edges.get_mappable()
 
     def get_children(self):
         artists = []

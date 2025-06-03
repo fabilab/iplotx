@@ -82,6 +82,7 @@ class NetworkArtist(mpl.artist.Artist):
     def _clear_state(self):
         self._vertices = None
         self._edges = None
+        self._groups = None
 
     def get_children(self):
         artists = []
@@ -141,19 +142,19 @@ class NetworkArtist(mpl.artist.Artist):
             trans = transData.transform
             trans_inv = transData.inverted().transform
             verts = self._vertices
-            for path, offset in zip(verts.get_paths(), verts._offsets):
+            for size, offset in zip(verts.get_sizes(), verts.get_offsets()):
+                imax = trans_inv(trans(offset) + size)
+                imin = trans_inv(trans(offset) - size)
+                mins = np.minimum(mins, imin)
+                maxs = np.maximum(maxs, imax)
+
+        if self._edges is not None:
+            for path in self._edges.get_paths():
                 bbox = path.get_extents()
-                mins = np.minimum(mins, trans_inv(bbox.min + trans(offset)))
-                maxs = np.maximum(maxs, trans_inv(bbox.max + trans(offset)))
+                mins = np.minimum(mins, bbox.min)
+                maxs = np.maximum(maxs, bbox.max)
 
-        ## FIXME: edge extents are currently broken
-        # if self._edges is not None:
-        #    for path in self._edges.get_paths():
-        #        bbox = path.get_extents()
-        #        mins = np.minimum(mins, bbox.min)
-        #        maxs = np.maximum(maxs, bbox.max)
-
-        if hasattr(self, "_groups") and self._groups is not None:
+        if self._groups is not None:
             for path in self._groups.get_paths():
                 bbox = path.get_extents()
                 mins = np.minimum(mins, bbox.min)
@@ -166,27 +167,29 @@ class NetworkArtist(mpl.artist.Artist):
 
         return mpl.transforms.Bbox([mins, maxs])
 
-    def _add_vertices(self):
-        """Draw the vertices"""
-        vertex_style = get_style(".vertex")
+    def _get_layout_dataframe(self):
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
         ]
         vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
+        return vertex_layout_df
 
-        if "label" in self._ipx_internal_data["vertex_df"].columns:
-            labels = self._ipx_internal_data["vertex_df"]["label"]
+    def _get_label_series(self, kind):
+        if "label" in self._ipx_internal_data[f"{kind}_df"].columns:
+            labels = self._ipx_internal_data[f"{kind}_df"]["label"]
         else:
-            labels = None
+            return None
 
-        art = VertexCollection(
-            layout=vertex_layout_df,
+    def _add_vertices(self):
+        """Draw the vertices"""
+
+        self._vertices = VertexCollection(
+            layout=self._get_layout_dataframe(),
             offset_transform=self.axes.transData,
             transform=mpl.transforms.IdentityTransform(),
-            style=vertex_style,
-            labels=labels,
+            style=get_style(".vertex"),
+            labels=self._get_label_series("vertex"),
         )
-        self._vertices = art
 
     def _add_edges(self):
         """Draw the edges.
@@ -198,11 +201,8 @@ class NetworkArtist(mpl.artist.Artist):
         but mostly niche at this stage. Therefore we sidestep the whole cmap thing
         here.
         """
-        if "label" in self._ipx_internal_data["edge_df"].columns:
-            labels = self._ipx_internal_data["edge_df"]["label"]
-        else:
-            labels = None
 
+        labels = self._get_label_series("edge")
         edge_style = get_style(".edge")
         if "cmap" in edge_style:
             cmap_fun = _build_cmap_fun(
@@ -226,35 +226,17 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _add_directed_edges(self, edge_style, labels=None, cmap_fun=None):
         """Draw directed edges."""
-        arrow_style = get_style(".arrow")
-
-        layout_columns = [
-            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
-        ]
-        vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
+        vertex_layout_df = self._get_layout_dataframe()
         edge_df = self._ipx_internal_data["edge_df"].set_index(
             ["_ipx_source", "_ipx_target"]
-        )
-
-        # This contains the patches for vertices, for edge shortening and such
-        vertex_paths = self._vertices._paths
-        vertex_indices = pd.Series(
-            np.arange(len(vertex_layout_df)), index=vertex_layout_df.index
         )
 
         if "cmap" in edge_style:
             colorarray = []
         edgepatches = []
-        arrowpatches = []
         adjacent_vertex_ids = []
-        adjecent_vertex_centers = []
-        adjecent_vertex_paths = []
         for i, (vid1, vid2) in enumerate(edge_df.index):
             # Get the vertices for this edge
-            vcenter1 = vertex_layout_df.loc[vid1, layout_columns].values
-            vcenter2 = vertex_layout_df.loc[vid2, layout_columns].values
-            vpath1 = vertex_paths[vertex_indices[vid1]]
-            vpath2 = vertex_paths[vertex_indices[vid2]]
 
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
             # NOTE: Not sure this is the best way but can't think of another one
@@ -272,21 +254,6 @@ class NetworkArtist(mpl.artist.Artist):
             )
             edgepatches.append(patch)
             adjacent_vertex_ids.append((vid1, vid2))
-            adjecent_vertex_centers.append((vcenter1, vcenter2))
-            adjecent_vertex_paths.append((vpath1, vpath2))
-
-            arrow_style["color"] = edge_stylei.get("color", "black")
-            if "alpha" in edge_stylei:
-                arrow_style["alpha"] = edge_stylei["alpha"]
-            if "linewidth" in edge_stylei:
-                arrow_style["linewidth"] = edge_stylei["linewidth"]
-            arrow_patch = make_arrow_patch(
-                **arrow_style,
-            )
-            arrowpatches.append(arrow_patch)
-
-        adjecent_vertex_centers = np.array(adjecent_vertex_centers)
-        # NOTE: the paths might have different number of sides, so it cannot be recast
 
         # TODO:: deal with "ports" a la graphviz
 
@@ -296,46 +263,27 @@ class NetworkArtist(mpl.artist.Artist):
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
 
-        art = DirectedEdgeCollection(
+        self._edges = DirectedEdgeCollection(
             edges=edgepatches,
-            arrows=arrowpatches,
             labels=labels,
             vertex_ids=adjacent_vertex_ids,
-            vertex_paths=adjecent_vertex_paths,
-            vertex_centers=adjecent_vertex_centers,
+            vertex_collection=self._vertices,
             transform=self.axes.transData,
             style=edge_style,
         )
-        self._edges = art
 
     def _add_undirected_edges(self, edge_style, labels=None, cmap_fun=None):
         """Draw undirected edges."""
 
-        layout_columns = [
-            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
-        ]
-        vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
+        vertex_layout_df = self._get_layout_dataframe()
         edge_df = self._ipx_internal_data["edge_df"].set_index(
             ["_ipx_source", "_ipx_target"]
         )
 
-        # This contains the patches for vertices, for edge shortening and such
-        vertex_paths = self._vertices._paths
-        vertex_indices = pd.Series(
-            np.arange(len(vertex_layout_df)), index=vertex_layout_df.index
-        )
-
         edgepatches = []
         adjacent_vertex_ids = []
-        adjecent_vertex_centers = []
-        adjecent_vertex_paths = []
         for i, (vid1, vid2) in enumerate(edge_df.index):
             # Get the vertices for this edge
-            vcenter1 = vertex_layout_df.loc[vid1, layout_columns].values
-            vcenter2 = vertex_layout_df.loc[vid2, layout_columns].values
-            vpath1 = vertex_paths[vertex_indices[vid1]]
-            vpath2 = vertex_paths[vertex_indices[vid2]]
-
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
             # NOTE: Not sure this is the best way but can't think of another one
             # Prioritise network internal styles
@@ -352,24 +300,17 @@ class NetworkArtist(mpl.artist.Artist):
             )
             edgepatches.append(patch)
             adjacent_vertex_ids.append((vid1, vid2))
-            adjecent_vertex_centers.append((vcenter1, vcenter2))
-            adjecent_vertex_paths.append((vpath1, vpath2))
-
-        adjecent_vertex_centers = np.array(adjecent_vertex_centers)
-        # NOTE: the paths might have different number of sides, so it cannot be recast
 
         # TODO:: deal with "ports" a la graphviz
 
-        art = UndirectedEdgeCollection(
-            edgepatches,
+        self._edges = UndirectedEdgeCollection(
+            patches=edgepatches,
             labels=labels,
             vertex_ids=adjacent_vertex_ids,
-            vertex_paths=adjecent_vertex_paths,
-            vertex_centers=adjecent_vertex_centers,
+            vertex_collection=self._vertices,
             transform=self.axes.transData,
             style=edge_style,
         )
-        self._edges = art
 
     def _process(self):
         self._clear_state()

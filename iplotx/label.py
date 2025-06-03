@@ -29,8 +29,8 @@ class LabelCollection(mpl.artist.Artist):
         arts = []
         for i, label in enumerate(self._labels):
             art = mpl.text.Text(
-                self._offsets[i, 0],
-                self._offsets[i, 1],
+                self._offsets[i][0],
+                self._offsets[i][1],
                 label,
                 transform=self.get_transform(),
                 **style,
