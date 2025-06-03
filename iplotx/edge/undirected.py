@@ -4,7 +4,7 @@ import numpy as np
 import matplotlib as mpl
 
 from .common import _compute_loops_per_angle
-from .label import LabelCollection
+from ..label import LabelCollection
 from ..utils.matplotlib import (
     _compute_mid_coord_and_rot,
     _stale_wrapper,
@@ -32,6 +32,12 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         fcs = self.get_facecolors()
         super().set_array(array)
         self.set_facecolors(fcs)
+
+    def get_labels(self):
+        if hasattr(self, "_label_collection"):
+            return self._label_collection
+        else:
+            return None
 
     @staticmethod
     def _get_edge_vertex_sizes(edge_vertices):
@@ -360,6 +366,8 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
             self._label_collection = LabelCollection(
                 self._labels,
                 style=style,
+                offsets=offsets,
+                transform=self.axes.transData,
             )
 
             # Forward a bunch of mpl settings that are needed
@@ -375,8 +383,8 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
                 self._label_collection.set_clip_path(clip_path)
 
             # Finally make the patches
-            self._label_collection._create_labels()
-        self._label_collection.set_offsets(offsets)
+            self._label_collection._create_artists()
+
         if not style.get("rotate", True):
             self._label_collection.set_rotations(rotations)
 

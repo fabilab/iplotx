@@ -82,8 +82,6 @@ class NetworkArtist(mpl.artist.Artist):
     def _clear_state(self):
         self._vertices = None
         self._edges = None
-        self._vertex_labels = []
-        self._edge_labels = []
 
     def get_children(self):
         artists = []
@@ -93,8 +91,6 @@ class NetworkArtist(mpl.artist.Artist):
             artists.append(self._edges)
         if self._vertices is not None:
             artists.append(self._vertices)
-        artists.extend(self._edge_labels)
-        artists.extend(self._vertex_labels)
         return tuple(artists)
 
     def get_vertices(self):
@@ -107,11 +103,11 @@ class NetworkArtist(mpl.artist.Artist):
 
     def get_vertex_labels(self):
         """Get list of vertex label artists."""
-        return self._vertex_labels
+        return self._vertices.get_labels()
 
     def get_edge_labels(self):
         """Get list of edge label artists."""
-        return self._edge_labels
+        return self._edges.get_labels()
 
     def get_datalim(self, transData, pad=0.05):
         """Get limits on x/y axes based on the graph layout data.
@@ -173,89 +169,24 @@ class NetworkArtist(mpl.artist.Artist):
     def _add_vertices(self):
         """Draw the vertices"""
         vertex_style = get_style(".vertex")
-        if "cmap" in vertex_style:
-            cmap_fun = _build_cmap_fun(
-                vertex_style["facecolor"],
-                vertex_style["cmap"],
-            )
-        else:
-            cmap_fun = None
-
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
         ]
         vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
-        if vertex_style.get("size") == "label":
-            if "label" not in self._ipx_internal_data["vertex_df"].columns:
-                warnings.warn(
-                    "No labels found, cannot resize vertices based on labels."
-                )
-                vertex_style["size"] = get_style("default.vertex")["size"]
-            else:
-                vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
 
-        # FIXME:: this would be better off in the VertexCollection itself, like we do for groups
-        if "cmap" in vertex_style:
-            colorarray = []
-        offsets = []
-        patches = []
-        for i, (vid, row) in enumerate(vertex_layout_df.iterrows()):
-            # Centre of the vertex
-            offsets.append(list(row[layout_columns].values))
-
-            if vertex_style.get("size") == "label":
-                # NOTE: it's ok to overwrite the dict here
-                vertex_style["size"] = _get_label_width_height(
-                    str(vertex_labels[vid]), **vertex_style.get("label", {})
-                )
-
-            vertex_stylei = rotate_style(vertex_style, index=i, id=vid)
-            if cmap_fun is not None:
-                colorarray.append(vertex_style["facecolor"])
-                vertex_stylei["facecolor"] = cmap_fun(vertex_stylei["facecolor"])
-
-            # Shape of the vertex (Patch)
-            art = make_vertex_patch(**vertex_stylei)
-            patches.append(art)
-
-        kwargs = {}
-        if "cmap" in vertex_style:
-            vmin = np.min(colorarray)
-            vmax = np.max(colorarray)
-            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
-            kwargs["cmap"] = vertex_style["cmap"]
-            kwargs["norm"] = norm
+        if "label" in self._ipx_internal_data["vertex_df"].columns:
+            labels = self._ipx_internal_data["vertex_df"]["label"]
+        else:
+            labels = None
 
         art = VertexCollection(
-            patches,
-            offsets=offsets if offsets else None,
+            layout=vertex_layout_df,
             offset_transform=self.axes.transData,
             transform=mpl.transforms.IdentityTransform(),
-            match_original=True,
-            **kwargs,
+            style=vertex_style,
+            labels=labels,
         )
         self._vertices = art
-
-    def _add_vertex_labels(self):
-        """Draw vertex labels."""
-        label_style = get_style(".vertex.label")
-        forbidden_props = ["hpadding", "vpadding"]
-        for prop in forbidden_props:
-            if prop in label_style:
-                del label_style[prop]
-
-        texts = []
-        vertex_labels = self._ipx_internal_data["vertex_df"]["label"]
-        for offset, label in zip(self._vertices._offsets, vertex_labels):
-            text = mpl.text.Text(
-                offset[0],
-                offset[1],
-                label,
-                transform=self.axes.transData,
-                **label_style,
-            )
-            texts.append(text)
-        self._vertex_labels = texts
 
     def _add_edges(self):
         """Draw the edges.
@@ -451,8 +382,6 @@ class NetworkArtist(mpl.artist.Artist):
         # in that order will get drawn on top (vis-a-vis zorder).
         self._add_vertices()
         self._add_edges()
-        if "label" in self._ipx_internal_data["vertex_df"].columns:
-            self._add_vertex_labels()
 
         # TODO: callbacks for stale vertices/edges
 

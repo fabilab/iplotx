@@ -2,7 +2,7 @@ from copy import deepcopy
 import numpy as np
 import matplotlib as mpl
 
-from ..utils.matplotlib import (
+from .utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
     _additional_set_methods,
@@ -10,12 +10,15 @@ from ..utils.matplotlib import (
 
 
 class LabelCollection(mpl.artist.Artist):
-    def __init__(self, labels, style=None):
+    def __init__(self, labels, style=None, offsets=None, transform=None):
         self._labels = labels
+        self._offsets = offsets if offsets is not None else np.zeros((len(labels), 2))
         self._style = style
         super().__init__()
+        if transform is not None:
+            self.set_transform(transform)
 
-    def _create_labels(self):
+    def _create_artists(self):
         style = deepcopy(self._style) if self._style is not None else {}
 
         forbidden_props = ["rotate"]
@@ -26,10 +29,10 @@ class LabelCollection(mpl.artist.Artist):
         arts = []
         for i, label in enumerate(self._labels):
             art = mpl.text.Text(
-                0,
-                0,
+                self._offsets[i, 0],
+                self._offsets[i, 1],
                 label,
-                transform=self.axes.transData,
+                transform=self.get_transform(),
                 **style,
             )
             art.set_figure(self.figure)

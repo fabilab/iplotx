@@ -1,3 +1,4 @@
+from copy import deepcopy
 import numpy as np
 from matplotlib import artist
 from matplotlib.transforms import IdentityTransform
@@ -8,6 +9,16 @@ from matplotlib.patches import (
     RegularPolygon,
     Rectangle,
 )
+
+from .style import (
+    get_style,
+    rotate_style,
+)
+from .utils.matplotlib import (
+    _get_label_width_height,
+    _build_cmap_fun,
+)
+from .label import LabelCollection
 
 
 class VertexCollection(PatchCollection):
@@ -24,26 +35,24 @@ class VertexCollection(PatchCollection):
     _factor = 1.0
 
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.set_sizes(self._get_sizes_from_paths())
 
-    def _get_sizes_from_paths(self):
-        """Get vertex sizes.
+        layout = kwargs.pop("layout")
+        self._style = kwargs.pop("style", None)
+        self._labels = kwargs.pop("labels", None)
 
-        If width and height are unequal, get the largest of the two.
+        # Create patches from structured data
+        patches, offsets, sizes, kwargs2 = self._create_artists(
+            layout,
+        )
+        kwargs.update(kwargs2)
+        kwargs["offsets"] = offsets
+        kwargs["match_original"] = True
 
-        @return: An array of vertex sizes.
-        """
-        import numpy as np
+        # Pass to PatchCollection constructor
+        super().__init__(patches, *args, **kwargs)
 
-        sizes = []
-        for path in self.get_paths():
-            bbox = path.get_extents()
-            mins, maxs = bbox.min, bbox.max
-            width, height = maxs - mins
-            size = max(width, height)
-            sizes.append(size)
-        return np.array(sizes)
+        # Compute _transforms like in _CollectionWithScales for dpi issues
+        self.set_sizes(sizes)
 
     def get_sizes(self):
         return self._sizes
@@ -73,7 +82,7 @@ class VertexCollection(PatchCollection):
             # But this does fix #5 in terms of storing the PNG with different
             # dpi resolutions: they look the same. But relative scaling is
             # all off LOL
-            scale = self._sizes**0.5 * dpi / 72.0 * self._factor
+            scale = self._sizes * dpi / 72.0 * self._factor
             self._transforms[:, 0, 0] = scale
             self._transforms[:, 1, 1] = scale
             self._transforms[:, 2, 2] = 1.0
@@ -81,6 +90,107 @@ class VertexCollection(PatchCollection):
 
     get_size = get_sizes
     set_size = set_sizes
+
+    def _create_artists(self, vertex_layout_df):
+        style = self._style or {}
+        if "cmap" in style:
+            cmap_fun = _build_cmap_fun(
+                style["facecolor"],
+                style["cmap"],
+            )
+        else:
+            cmap_fun = None
+
+        if style.get("size", 20) == "label":
+            if self._labels is None:
+                warnings.warn(
+                    "No labels found, cannot resize vertices based on labels."
+                )
+                style["size"] = get_style("default.vertex")["size"]
+            else:
+                vertex_labels = self._labels
+
+        if "cmap" in style:
+            colorarray = []
+        patches = []
+        offsets = []
+        sizes = []
+        for i, (vid, row) in enumerate(vertex_layout_df.iterrows()):
+            # Centre of the vertex
+            offsets.append(list(row.values))
+
+            if style.get("size") == "label":
+                # NOTE: it's ok to overwrite the dict here
+                style["size"] = _get_label_width_height(
+                    str(vertex_labels[vid]), **style.get("label", {})
+                )
+
+            stylei = rotate_style(style, index=i, id=vid)
+            if cmap_fun is not None:
+                colorarray.append(style["facecolor"])
+                stylei["facecolor"] = cmap_fun(stylei["facecolor"])
+
+            # Shape of the vertex (Patch)
+            art, size = make_patch(**stylei)
+            patches.append(art)
+            sizes.append(size)
+
+        kwargs = {}
+        if "cmap" in style:
+            vmin = np.min(colorarray)
+            vmax = np.max(colorarray)
+            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+            kwargs["cmap"] = style["cmap"]
+            kwargs["norm"] = norm
+
+        return patches, offsets, sizes, kwargs
+
+    def _compute_labels(self):
+        transform = self.get_offset_transform()
+        trans = transform.transform
+
+        style = (
+            deepcopy(self._style.get("label", None)) if self._style is not None else {}
+        )
+        forbidden_props = ["hpadding", "vpadding"]
+        for prop in forbidden_props:
+            if prop in style:
+                del style[prop]
+
+        if not hasattr(self, "_label_collection"):
+            self._label_collection = LabelCollection(
+                self._labels,
+                style=style,
+                offsets=self._offsets,
+                transform=transform,
+            )
+
+            # Forward a bunch of mpl settings that are needed
+            self._label_collection.set_figure(self.figure)
+            self._label_collection.axes = self.axes
+            # forward the clippath/box to the children need this logic
+            # because mpl exposes some fast-path logic
+            clip_path = self.get_clip_path()
+            if clip_path is None:
+                clip_box = self.get_clip_box()
+                self._label_collection.set_clip_box(clip_box)
+            else:
+                self._label_collection.set_clip_path(clip_path)
+
+            # Finally make the patches
+            self._label_collection._create_artists()
+
+    def get_labels(self):
+        if hasattr(self, "_label_collection"):
+            return self._label_collection
+        else:
+            return None
+
+    def get_children(self):
+        children = []
+        if hasattr(self, "_label_collection"):
+            children.append(self._label_collection)
+        return children
 
     @property
     def stale(self):
@@ -95,7 +205,12 @@ class VertexCollection(PatchCollection):
     @artist.allow_rasterization
     def draw(self, renderer):
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+        if self._labels is not None:
+            self._compute_labels()
         super().draw(renderer)
+
+        for child in self.get_children():
+            child.draw(renderer)
 
 
 def make_patch(marker: str, size, **kwargs):
@@ -109,18 +224,28 @@ def make_patch(marker: str, size, **kwargs):
         size = float(size)
         size = (size, size)
 
+    # Size of vertices is determined in self._transforms, which scales with dpi, rather than here,
+    # so normalise by the average dimension (btw x and y) to keep the ratio of the marker.
+    # If you check in get_sizes, you will see that rescaling also happens with the max of width and height.
+    size = np.asarray(size, dtype=float)
+    size_max = size.max()
+    size /= size_max
+
     if marker in ("o", "circle"):
-        return Circle((0, 0), size[0] / 2, **kwargs)
+        art = Circle((0, 0), size[0] / 2, **kwargs)
     elif marker in ("s", "square", "r", "rectangle"):
-        return Rectangle((-size[0] / 2, -size[1] / 2), size[0], size[1], **kwargs)
+        art = Rectangle((-size[0] / 2, -size[1] / 2), size[0], size[1], **kwargs)
     elif marker in ("^", "triangle"):
-        return RegularPolygon((0, 0), numVertices=3, radius=size[0] / 2, **kwargs)
+        art = RegularPolygon((0, 0), numVertices=3, radius=size[0] / 2, **kwargs)
     elif marker in ("d", "diamond"):
-        return make_patch("s", size[0], angle=45, **kwargs)
+        art = make_patch("s", size[0], angle=45, **kwargs)
     elif marker in ("v", "triangle_down"):
-        return RegularPolygon(
+        art = RegularPolygon(
             (0, 0), numVertices=3, radius=size[0] / 2, orientation=np.pi, **kwargs
         )
     elif marker in ("e", "ellipse"):
-        return Ellipse((0, 0), size[0] / 2, size[1] / 2, **kwargs)
-    raise KeyError(f"Unknown marker: {marker}")
+        art = Ellipse((0, 0), size[0] / 2, size[1] / 2, **kwargs)
+    else:
+        raise KeyError(f"Unknown marker: {marker}")
+
+    return art, size_max
