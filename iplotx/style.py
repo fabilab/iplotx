@@ -65,7 +65,7 @@ default = {
         "edgecolor": "black",
         "linewidth": 1.5,
         "alpha": 0.5,
-        "vertexpadding": 25,
+        "vertexpadding": 5,
     },
 }
 

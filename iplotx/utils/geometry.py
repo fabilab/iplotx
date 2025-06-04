@@ -191,7 +191,7 @@ def _compute_group_path_with_vertex_padding(
     if len(hull) == 2:
 
         # Unit vector connecting the two points
-        dv = trans(hull[0] - hull[1])
+        dv = trans(hull[0]) - trans(hull[1])
         dv = dv / np.sqrt((dv**2).sum())
 
         # Draw a semicircle
@@ -220,28 +220,25 @@ def _compute_group_path_with_vertex_padding(
 
         # NOTE: this can be optimised by computing things once
         # unit vector to previous point
-        dv0 = trans(point0 - point1)
+        dv0 = trans(point1) - trans(point0)
         dv0 = dv0 / np.sqrt((dv0**2).sum())
 
         # unit vector to next point
-        dv2 = trans(point2 - point1)
+        dv2 = trans(point2) - trans(point1)
         dv2 = dv2 / np.sqrt((dv2**2).sum())
 
         # span the angles
         theta0 = atan2(dv0[1], dv0[0])
         theta2 = atan2(dv2[1], dv2[0])
-        if theta2 < theta0:
-            theta2 += 2 * np.pi
 
+        # The worst that can happen is that we go exactly backwards, i.e. theta2 == theta0 + np.pi
+        # if it's more than that, we are on the inside of the convex hull due to the periodicity of atan2
         if theta2 - theta0 > np.pi:
-            # angles is from the point of view of the first vector, dv0
-            angles = np.linspace(np.pi / 2, theta2 - theta0 - np.pi, ppv)
-        else:
-            angles = np.linspace(-np.pi / 2, -np.pi - (theta2 - theta0), ppv)
+            theta2 -= 2 * np.pi
 
-        vs = np.array([np.cos(angles), -np.sin(angles), np.sin(angles), np.cos(angles)])
-        vs = vs.T.reshape((len(angles), 2, 2))
-        vs = np.matmul(dv0, vs)
+        # angles is from the point of view of the first vector, dv0
+        angles = np.linspace(theta0 + np.pi / 2, theta2 + np.pi / 2, ppv)
+        vs = np.array([np.cos(angles), np.sin(angles)]).T
 
         # NOTE: dpi scaling might need to happen here
         chunkcircle = vertexpadding * vs

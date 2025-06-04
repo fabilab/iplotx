@@ -4,26 +4,17 @@ Cliques
 
 This example from `igraph` shows how to compute and visualize cliques and highlight them.
 
-.. warning::
-    Groupings are currently broken in `iplotx`. Hopefully this will be fixed soon!
 """
 
 import igraph as ig
 import matplotlib.pyplot as plt
 import iplotx as ipx
 
-# %%
-# First, let's create a graph, for instance the famous karate club graph:
 g = ig.Graph.Famous("Zachary")
 layout = g.layout("auto")
 
-# %%
-# Computing cliques can be done as follows:
 cliques = g.cliques(4, 4)
 
-# %%
-# We can plot the result of the computation. To make things a little more
-# interesting, we plot each clique highlighted in a separate axes:
 fig, axs = plt.subplots(3, 4)
 axs = axs.ravel()
 for clique, ax in zip(cliques, axs):
@@ -40,7 +31,6 @@ for clique, ax in zip(cliques, axs):
                 "linewidth": 0.5,
             },
             "grouping": {
-                # "color": ig.RainbowPalette(),
                 "facecolor": "yellow",
             },
         },
@@ -85,8 +75,8 @@ for clique, ax in zip(cliques, axs):
                 "color": g.es["color"],
             },
             "grouping": {
-                # "color": ig.RainbowPalette(),
                 "facecolor": "red",
+                "vertexpadding": 3,
             },
         },
     )
