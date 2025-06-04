@@ -149,6 +149,9 @@ def _compute_group_path_with_vertex_padding(
     points,
     transform,
     vertexpadding=10,
+    points_per_vertex=30,
+    # TODO: check how dpi affects this
+    dpi=72.0,
 ):
     """Offset path for a group based on vertex padding.
 
@@ -156,87 +159,95 @@ def _compute_group_path_with_vertex_padding(
 
     # NOTE: this would look better as a cubic Bezier, but ok for now.
     """
+    # Short form
+    ppv = points_per_vertex
+
+    # No padding, set degenerte path
+    if vertexpadding == 0:
+        for j, point in enumerate(hull):
+            points[ppv * j : ppv * (j + 1)] = point
+        points[-1] = points[0]
+        return points
 
     # Transform into figure coordinates
     trans = transform.transform
     trans_inv = transform.inverted().transform
     points = trans(points)
 
+    # Singleton: draw a circle around it
     if len(hull) == 1:
-        # singleton group
+
+        # NOTE: linspace is double inclusive, which covers CLOSEPOLY
         thetas = np.linspace(
             -np.pi,
             np.pi,
-            31,
+            len(points),
         )
-        return trans_inv(
-            trans(hull[0])
-            + vertexpadding * np.vstack([np.cos(thetas), np.sin(thetas)]).T
-        )
-    elif len(hull) == 2:
-        # doublet group
+        # NOTE: dpi scaling might need to happen here
+        perimeter = vertexpadding * np.vstack([np.cos(thetas), np.sin(thetas)]).T
+        return trans_inv(trans(hull[0]) + perimeter)
+
+    # Doublet: draw two semicircles
+    if len(hull) == 2:
+
+        # Unit vector connecting the two points
         dv = trans(hull[0] - hull[1])
         dv = dv / np.sqrt((dv**2).sum())
+
+        # Draw a semicircle
         angles = np.linspace(-0.5 * np.pi, 0.5 * np.pi, 30)
         vs = np.array([np.cos(angles), -np.sin(angles), np.sin(angles), np.cos(angles)])
         vs = vs.T.reshape((len(angles), 2, 2))
         vs = np.matmul(dv, vs)
-        vs1 = hull[0] + vertexpadding * vs
-        vs2 = hull[1] + vertexpadding * np.matmul(vs, -np.diag((1, 1)))
-        points[:30] = vs1
-        points[30:60] = vs2
+
+        # NOTE: dpi scaling might need to happen here
+        semicircle1 = vertexpadding * vs
+        semicircle2 = vertexpadding * np.matmul(vs, -np.diag((1, 1)))
+
+        # Put it together
+        vs1 = trans_inv(trans(hull[0]) + semicircle1)
+        vs2 = trans_inv(trans(hull[1]) + semicircle2)
+        points[:ppv] = vs1
+        points[ppv:-1] = vs2
         points[-1] = points[0]
         return points
 
-    else:
-        if len(points) == 11:
-            # points per vertex
-            ppv = 5
-            points[:-1:ppv] = 0.5 * (points[:-1:ppv] + points[ppv - 1 : -1 : ppv])
+    # At least three points, i.e. a nondegenerate convex hull
+    nsides = len(hull)
+    for i, point1 in enumerate(hull):
+        point0 = hull[i - 1]
+        point2 = hull[(i + 1) % nsides]
+
+        # NOTE: this can be optimised by computing things once
+        # unit vector to previous point
+        dv0 = trans(point0 - point1)
+        dv0 = dv0 / np.sqrt((dv0**2).sum())
+
+        # unit vector to next point
+        dv2 = trans(point2 - point1)
+        dv2 = dv2 / np.sqrt((dv2**2).sum())
+
+        # span the angles
+        theta0 = atan2(dv0[1], dv0[0])
+        theta2 = atan2(dv2[1], dv2[0])
+        if theta2 < theta0:
+            theta2 += 2 * np.pi
+
+        if theta2 - theta0 > np.pi:
+            # angles is from the point of view of the first vector, dv0
+            angles = np.linspace(np.pi / 2, theta2 - theta0 - np.pi, ppv)
         else:
-            ppv = 3
-            points[:-1:ppv] = (
-                points[:-1:ppv] + points[ppv - 1 : -1 : ppv] - points[1:-1:ppv]
-            )
-        for j in range(1, ppv):
-            points[j:-1:ppv] = points[:-1:ppv]
-        points[-1] = points[0]
+            angles = np.linspace(-np.pi / 2, -np.pi - (theta2 - theta0), ppv)
 
-        # Compute all shift vectors by diff, arctan2, then add 90 degrees, tan, norm
-        # This maintains chirality
-        # NOTE: the last point is just going back to the beginning, this
-        # is a quirk or how mpl's closed paths work
+        vs = np.array([np.cos(angles), -np.sin(angles), np.sin(angles), np.cos(angles)])
+        vs = vs.T.reshape((len(angles), 2, 2))
+        vs = np.matmul(dv0, vs)
 
-        # Normalised diff
-        vpoints = points[:-1:ppv].copy()
-        vpoints[0] -= points[-2]
-        vpoints[1:] -= points[:-1:ppv][:-1]
-        vpoints = (vpoints.T / np.sqrt((vpoints**2).sum(axis=1))).T
+        # NOTE: dpi scaling might need to happen here
+        chunkcircle = vertexpadding * vs
 
-        # Rotate by 90 degrees
-        vpads = vpoints @ np.array([[0, 1], [-1, 0]])
+        vs1 = trans_inv(trans(point1) + chunkcircle)
+        points[i * ppv : (i + 1) * ppv] = vs1
 
-        # Permute diff for the end
-        vpads_perm = np.zeros_like(vpads)
-        vpads_perm[:-1] = vpads[1:]
-        vpads_perm[-1] = vpads[0]
-
-        # Shift the points
-        if ppv == 3:
-            points[:-1:ppv] += vpads * vertexpadding
-            points[1:-1:ppv] += (vpads + vpads_perm) * vertexpadding
-            points[2:-1:ppv] += vpads_perm * vertexpadding
-        else:
-            points[:-1:ppv] += vpads * vertexpadding
-            points[1:-1:ppv] += (vpads + vpoints) * vertexpadding
-            points[2:-1:ppv] += vpoints * vertexpadding
-            points[3:-1:ppv] += (vpads_perm + vpoints) * vertexpadding
-            points[4:-1:ppv] += vpads_perm * vertexpadding
-
-    # mpl's quirky closed-path thing
     points[-1] = points[0]
-
-    # Transform back to data coordinates
-    points = trans_inv(points)
-
     return points

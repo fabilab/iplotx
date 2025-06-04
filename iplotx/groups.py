@@ -48,9 +48,11 @@ class GroupingArtist(PatchCollection):
         else:
             style = get_style(".grouping")
             self._vertexpadding = style.get("vertexpadding", 10)
-        patches, grouping, layout = self._create_patches(grouping, layout, **kwargs)
+        patches, grouping, coords_hulls = self._create_patches(
+            grouping, layout, **kwargs
+        )
         self._grouping = grouping
-        self._layout = layout
+        self._coords_hulls = coords_hulls
         kwargs["match_original"] = True
 
         super().__init__(patches, *args, **kwargs)
@@ -85,22 +87,18 @@ class GroupingArtist(PatchCollection):
             )
 
             patches.append(patch)
-        return patches, grouping, layout
+        return patches, grouping, coords_hulls
 
-    def _compute_paths(self):
-        if self._vertexpadding == 0:
-            for i, points in enumerate(self._coords_hulls):
-                for j, point in enumerate(points):
-                    self._paths[i].vertices[30 * j : 30 * (j + 1)] = point
-                    self._paths[i].vertices[-1] = self._paths[i].vertices[0]
-            return
-
-        for i, points in enumerate(self._coords_hulls):
+    def _compute_paths(self, points_per_vertex=30):
+        # Short form
+        ppv = points_per_vertex
+        for i, hull in enumerate(self._coords_hulls):
             self._paths[i].vertices = _compute_group_path_with_vertex_padding(
-                points,
+                hull,
                 self._paths[i].vertices,
                 self.get_transform(),
                 vertexpadding=self._vertexpadding,
+                points_per_vertex=ppv,
             )
 
     def _process(self):
@@ -124,16 +122,15 @@ def _compute_group_patch_stub(
         )
 
     # NOTE: Closing point: mpl is a bit quirky here
-    vertices = []
-    codes = []
     vertices = np.zeros(
         (1 + 30 * len(points), 2),
     )
+    codes = ["MOVETO"] + ["LINETO"] * (len(vertices) - 2) + ["CLOSEPOLY"]
     codes = [getattr(mpl.path.Path, x) for x in codes]
     patch = mpl.patches.PathPatch(
         mpl.path.Path(
             vertices,
-            codes=["MOVETO"] + ["LINETO"] * (len(vertices) - 2) + ["CLOSEPOLY"],
+            codes=codes,
         ),
         **kwargs,
     )
