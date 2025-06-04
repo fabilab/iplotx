@@ -17,6 +17,13 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
         self._edge_collection = edge_collection
         self._style = get_style(".arrow")
+
+        # Arrow color defaults to the edges for consistency
+        if ("facecolor" not in self._style) and ("color" not in self._style):
+            self._style["facecolor"] = self._edge_collection.get_edgecolors()
+        if ("edgecolor" not in self._style) and ("color" not in self._style):
+            self._style["edgecolor"] = self._edge_collection.get_edgecolors()
+
         patches, sizes = self._create_artists()
 
         if "cmap" in self._edge_collection._style:

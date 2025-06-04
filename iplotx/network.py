@@ -1,4 +1,4 @@
-from typing import Union, Sequence
+from typing import Optional, Sequence
 import warnings
 import numpy as np
 import pandas as pd
@@ -48,23 +48,27 @@ class NetworkArtist(mpl.artist.Artist):
     def __init__(
         self,
         network: GraphType,
-        layout: LayoutType = None,
-        vertex_labels: Union[None, list, dict, pd.Series] = None,
-        edge_labels: Union[None, Sequence] = None,
+        layout: Optional[LayoutType] = None,
+        vertex_labels: Optional[list | dict | pd.Series] = None,
+        edge_labels: Optional[Sequence] = None,
     ):
         """Network container artist that groups all plotting elements.
 
         Parameters:
-            network (networkx.Graph or igraph.Graph): The network to plot.
-            layout (array-like): The layout of the network. If None, this function will attempt to
+            network: The network to plot.
+            layout: The layout of the network. If None, this function will attempt to
                 infer the layout from the network metadata, using heuristics. If that fails, an
                 exception will be raised.
-            vertex_labels (list, dict, or pandas.Series): The labels for the vertices. If None, no vertex labels
+            vertex_labels: The labels for the vertices. If None, no vertex labels
                 will be drawn. If a list, the labels are taken from the list. If a dict, the keys
                 should be the vertex IDs and the values should be the labels.
-            elge_labels (sequence): The labels for the edges. If None, no edge labels will be drawn.
+            edge_labels: The labels for the edges. If None, no edge labels will be drawn.
+
         """
         super().__init__()
+
+        zorder = get_style(".network").get("zorder", 1)
+        self.set_zorder(zorder)
 
         self.network = network
         self._ipx_internal_data = ingest_network_data(
@@ -163,7 +167,7 @@ class NetworkArtist(mpl.artist.Artist):
 
         return mpl.transforms.Bbox([mins, maxs])
 
-    def _get_layout_dataframe(self):
+    def get_layout(self):
         layout_columns = [
             f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
         ]
@@ -172,7 +176,7 @@ class NetworkArtist(mpl.artist.Artist):
 
     def _get_label_series(self, kind):
         if "label" in self._ipx_internal_data[f"{kind}_df"].columns:
-            labels = self._ipx_internal_data[f"{kind}_df"]["label"]
+            return self._ipx_internal_data[f"{kind}_df"]["label"]
         else:
             return None
 
@@ -180,7 +184,7 @@ class NetworkArtist(mpl.artist.Artist):
         """Draw the vertices"""
 
         self._vertices = VertexCollection(
-            layout=self._get_layout_dataframe(),
+            layout=self.get_layout(),
             offset_transform=self.axes.transData,
             transform=mpl.transforms.IdentityTransform(),
             style=get_style(".vertex"),
@@ -201,7 +205,7 @@ class NetworkArtist(mpl.artist.Artist):
         labels = self._get_label_series("edge")
         edge_style = get_style(".edge")
 
-        vertex_layout_df = self._get_layout_dataframe()
+        vertex_layout_df = self.get_layout()
 
         if "cmap" in edge_style:
             cmap_fun = _build_cmap_fun(

@@ -38,10 +38,10 @@ class LabelCollection(mpl.artist.Artist):
             art.set_figure(self.figure)
             art.axes = self.axes
             arts.append(art)
-        self._labels = arts
+        self._labelartists = arts
 
     def get_children(self):
-        return self._labels
+        return self._labelartists
 
     def set_offsets(self, offsets):
         for art, offset in zip(self._labels, offsets):
@@ -49,7 +49,7 @@ class LabelCollection(mpl.artist.Artist):
         stale = True
 
     def set_rotations(self, rotations):
-        for art, rotation in zip(self._labels, rotations):
+        for art, rotation in zip(self._labelartists, rotations):
             rot_deg = 180.0 / np.pi * rotation
             # Force the font size to be upwards
             rot_deg = ((rot_deg + 90) % 180) - 90

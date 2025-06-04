@@ -24,6 +24,9 @@ from .utils.geometry import (
 
 
 class GroupingArtist(PatchCollection):
+
+    _factor = 1.0
+
     def __init__(
         self,
         grouping: GroupingType,
@@ -48,17 +51,32 @@ class GroupingArtist(PatchCollection):
         else:
             style = get_style(".grouping")
             self._vertexpadding = style.get("vertexpadding", 10)
+
+        network = kwargs.pop("network", None)
         patches, grouping, coords_hulls = self._create_patches(
-            grouping, layout, **kwargs
+            grouping, layout, network, **kwargs
         )
+        if "network" in kwargs:
+            del kwargs["network"]
         self._grouping = grouping
         self._coords_hulls = coords_hulls
         kwargs["match_original"] = True
 
         super().__init__(patches, *args, **kwargs)
 
-    def _create_patches(self, grouping, layout, **kwargs):
-        layout = normalise_layout(layout)
+        zorder = get_style(".grouping").get("zorder", 1)
+        self.set_zorder(zorder)
+
+    def get_vertexpadding(self):
+        """Get the vertex padding of each group."""
+        return self._vertexpadding
+
+    def get_vertexpadding_dpi(self, dpi=72.0):
+        """Get vertex padding of each group, scaled by dpi of the figure."""
+        return self.get_vertexpadding() * dpi / 72.0 * self._factor
+
+    def _create_patches(self, grouping, layout, network, **kwargs):
+        layout = normalise_layout(layout, network=network)
         grouping = normalise_grouping(grouping, layout)
         style = get_style(".grouping")
         style.pop("vertexpadding", None)
@@ -89,7 +107,7 @@ class GroupingArtist(PatchCollection):
             patches.append(patch)
         return patches, grouping, coords_hulls
 
-    def _compute_paths(self, points_per_vertex=30):
+    def _compute_paths(self, dpi=72.0, points_per_vertex=30):
         # Short form
         ppv = points_per_vertex
         for i, hull in enumerate(self._coords_hulls):
@@ -97,7 +115,7 @@ class GroupingArtist(PatchCollection):
                 hull,
                 self._paths[i].vertices,
                 self.get_transform(),
-                vertexpadding=self._vertexpadding,
+                vertexpadding=self.get_vertexpadding_dpi(dpi),
                 points_per_vertex=ppv,
             )
 
@@ -106,7 +124,13 @@ class GroupingArtist(PatchCollection):
         self._compute_paths()
 
     def draw(self, renderer):
-        self._compute_paths()
+        # FIXME: this kind of breaks everything since the vertices' magical "_transforms" does not really
+        # scale from 72 pixels but rather from the screen's or something. Conclusion: using this keeps
+        # consistency across dpis but breaks proportionality of vertexpadding and vertex_size (for now).
+        # NOTE: this might be less bad than initially thought in the sense that even perfect scaling
+        # does not seem to align the center of the perimeter of the group with the center of the perimeter
+        # of the vertex when of the same exact size. So we are probably ok winging it as users will adapt.
+        self._compute_paths(self.get_figure(root=True).dpi)
         super().draw(renderer)
 
 

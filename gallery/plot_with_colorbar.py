@@ -21,7 +21,7 @@ cmap = plt.cm.plasma
 
 fig, ax = plt.subplots(figsize=(6, 4))
 
-arts = ipx.plot(
+network_artist = ipx.plot(
     network=G,
     ax=ax,
     layout=pos,
@@ -43,8 +43,77 @@ arts = ipx.plot(
             "width": 5,
         },
     },
-)
+)[0]
 fig.colorbar(
-    arts[0].get_edges().get_edges(),
+    network_artist.get_edges(),
+    ax=ax,
+)
+
+# %%
+# The arrow colors can be specified explicitely, in which case it overrides the edge color:
+
+fig, ax = plt.subplots(figsize=(6, 4))
+
+network_artist = ipx.plot(
+    network=G,
+    ax=ax,
+    layout=pos,
+    style={
+        "vertex": {
+            "size": node_sizes,
+            "facecolor": "indigo",
+            "edgecolor": "none",
+        },
+        "edge": {
+            "color": edge_colors,
+            "alpha": edge_alphas,
+            "cmap": cmap,
+            "linewidth": 2,
+            "offset": 0,
+        },
+        "arrow": {
+            "marker": ">",
+            "width": 5,
+            "color": "black",  # Make arrows black
+        },
+    },
+)[0]
+fig.colorbar(
+    network_artist.get_edges(),
+    ax=ax,
+)
+
+# %%
+# The transparency (alpha) of the arrows is still determined by the edges unless specified:
+
+fig, ax = plt.subplots(figsize=(6, 4))
+
+network_artist = ipx.plot(
+    network=G,
+    ax=ax,
+    layout=pos,
+    style={
+        "vertex": {
+            "size": node_sizes,
+            "facecolor": "indigo",
+            "edgecolor": "none",
+        },
+        "edge": {
+            "color": edge_colors,
+            "alpha": edge_alphas,
+            "cmap": cmap,
+            "linewidth": 2,
+            "offset": 0,
+        },
+        "arrow": {
+            "marker": ">",
+            "width": 5,
+            "color": "black",  # Make arrows black
+            "alpha": 1.0,  # Set 100% opacity for arrows
+        },
+    },
+)[0]
+fig.colorbar(
+    network_artist.get_edges(),
     ax=ax,
 )

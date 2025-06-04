@@ -61,7 +61,7 @@ ipx.plot(
             "linewidth": 3,
         },
         "vertex": {
-            "size": 30,
+            "size": 20,
             "facecolor": "steelblue",
             "edgecolor": "none",
             "label": {

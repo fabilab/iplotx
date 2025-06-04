@@ -65,10 +65,14 @@ def plot(
             nwkart._process()
             artists.append(nwkart)
 
+            # Set normailsed layout since we have it by now
+            layout = nwkart.get_layout()
+
         if grouping is not None:
             grpart = GroupingArtist(
                 grouping,
                 layout,
+                network=network,
             )
             ax.add_artist(grpart)
             # Postprocess for things that require an axis (transform, etc.)

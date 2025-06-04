@@ -31,7 +31,7 @@ ipx.plot(
             "edgecolor": "black",
             "linewidth": 5,
             "label": {
-                "size": 36,
+                "size": 26,
                 "color": "black",
             },
         },

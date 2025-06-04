@@ -58,14 +58,13 @@ default = {
     "arrow": {
         "marker": "|>",
         "width": 8,
-        "color": "black",
     },
     "grouping": {
         "facecolor": ["grey", "steelblue", "tomato"],
         "edgecolor": "black",
         "linewidth": 1.5,
         "alpha": 0.5,
-        "vertexpadding": 5,
+        "vertexpadding": 18,
     },
 }
 
@@ -102,9 +101,14 @@ def get_style(name: str = ""):
         if (i == 0) and (namei == ""):
             style = current
         else:
-            try:
+            if namei in style:
                 style = style[namei]
-            except KeyError:
+            # NOTE: if asking for a nonexistent, non-leaf style
+            # give the benefit of the doubt and set an empty dict
+            # which will not fail unless the uder tries to enter it
+            elif namei not in style_leaves:
+                style = {}
+            else:
                 raise KeyError(f"Style not found: {name}")
 
     style = deepcopy(style)
@@ -201,24 +205,35 @@ def unflatten_style(
     style_flat: dict[str, str | dict | int | float],
 ):
     """Convert a flat or semi-flat style into a fully structured dict."""
-    keys = list(style_flat.keys())
 
-    for key in keys:
-        if "_" not in key:
-            continue
+    def _inner(style_flat: dict):
+        keys = list(style_flat.keys())
 
-        keyhead, keytail = key.split("_", 1)
-        value = style_flat.pop(key)
-        if keyhead not in style_flat:
-            style_flat[keyhead] = {
-                keytail: value,
-            }
-        else:
-            style_flat[keyhead][keytail] = value
+        for key in keys:
+            if "_" not in key:
+                continue
 
-    for key, value in style_flat.items():
-        if isinstance(value, dict) and (value not in style_leaves):
-            unflatten_style(value)
+            keyhead, keytail = key.split("_", 1)
+            value = style_flat.pop(key)
+            if keyhead not in style_flat:
+                style_flat[keyhead] = {
+                    keytail: value,
+                }
+            else:
+                style_flat[keyhead][keytail] = value
+
+        for key, value in style_flat.items():
+            if isinstance(value, dict) and (value not in style_leaves):
+                _inner(value)
+
+    # top-level adjustments
+    if "zorder" in style_flat:
+        style_flat["network_zorder"] = style_flat["grouping_zorder"] = style_flat.pop(
+            "zorder"
+        )
+
+    # Begin recursion
+    _inner(style_flat)
 
 
 def rotate_style(

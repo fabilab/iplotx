@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.631** total execution time for 22 files **from all galleries**:
+**00:00.168** total execution time for 23 files **from all galleries**:
 
 .. container::
 
@@ -32,13 +32,16 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
-     - 00:00.631
+   * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)
+     - 00:00.168
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
@@ -54,6 +57,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_grouping.py` (``../../gallery/plot_grouping.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_house.py` (``../../gallery/plot_house.py``)
@@ -81,9 +87,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_simple_path.py` (``../../gallery/plot_simple_path.py``)
