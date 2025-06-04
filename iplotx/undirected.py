@@ -9,29 +9,51 @@ from ..label import LabelCollection
 from ..utils.matplotlib import (
     _compute_mid_coord_and_rot,
     _stale_wrapper,
+    _forwarder,
 )
 from ..style import (
     rotate_style,
 )
+from .arrow import (
+    EdgeArrowCollection,
+)
 
 
-class UndirectedEdgeCollection(mpl.collections.PatchCollection):
+@_forwarder(
+    (
+        "set_clip_path",
+        "set_clip_box",
+        "set_snap",
+        "set_sketch_params",
+        "set_figure",
+        "set_animated",
+        "set_picker",
+    )
+)
+class EdgeCollection(mpl.collections.PatchCollection):
     def __init__(self, *args, **kwargs):
         kwargs["match_original"] = True
         self._vertex_ids = kwargs.pop("vertex_ids", None)
         self._vertex_collection = kwargs.pop("vertex_collection", None)
         self._style = kwargs.pop("style", None)
         self._labels = kwargs.pop("labels", None)
+        self.directed = kwargs.pop("directed", False)
         if "cmap" in self._style:
             kwargs["cmap"] = self._style["cmap"]
             kwargs["norm"] = self._style["norm"]
         super().__init__(*args, **kwargs)
 
+        if self.directed:
+            self._arrows = EdgeArrowCollection(self)
+        else:
+            self._arrows = None
+        self._processed = False
+
     def set_array(self, array):
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
-        fcs = self.get_facecolors()
         super().set_array(array)
-        self.set_facecolors(fcs)
+        if self._arrows is not None:
+            self._arrows.set_array(array)
 
     def get_labels(self):
         if hasattr(self, "_label_collection"):
@@ -435,19 +457,82 @@ class UndirectedEdgeCollection(mpl.collections.PatchCollection):
         if not style.get("rotate", True):
             self._label_collection.set_rotations(rotations)
 
+    def _process(self):
+        # Forward mpl properties to children
+        # TODO sort out all of the things that need to be forwarded
+        for child in self.get_children():
+            # set the figure & axes on child, this ensures each artist
+            # down the hierarchy knows where to draw
+            if hasattr(child, "set_figure"):
+                child.set_figure(self.figure)
+            child.axes = self.axes
+
+            # forward the clippath/box to the children need this logic
+            # because mpl exposes some fast-path logic
+            clip_path = self.get_clip_path()
+            if clip_path is None:
+                clip_box = self.get_clip_box()
+                child.set_clip_box(clip_box)
+            else:
+                child.set_clip_path(clip_path)
+
+        self._processed = True
+
+    def _set_edge_info_for_arrows(
+        self,
+        which="end",
+        transform=None,
+    ):
+        """Extract the start and/or end angles of the paths to compute arrows."""
+        if transform is None:
+            transform = self.get_transform()
+        trans = transform.transform
+        trans_inv = transform.inverted().transform
+
+        arrow_offsets = self._arrows._offsets
+        for i, epath in enumerate(self.get_paths()):
+            # Offset the arrow to point to the end of the edge
+            self._arrows._offsets[i] = epath.vertices[-1]
+
+            # Rotate the arrow to point in the direction of the edge
+            apath = self._arrows._paths[i]
+            # NOTE: because the tip of the arrow is at (0, 0) in patch space,
+            # in theory it will rotate around that point already
+            v2 = trans(epath.vertices[-1])
+            v1 = trans(epath.vertices[-2])
+            dv = v2 - v1
+            theta = atan2(*(dv[::-1]))
+            theta_old = self._arrows._angles[i]
+            dtheta = theta - theta_old
+            mrot = np.array([[cos(dtheta), sin(dtheta)], [-sin(dtheta), cos(dtheta)]])
+            apath.vertices = apath.vertices @ mrot
+            self._arrows._angles[i] = theta
+
     def get_children(self):
         children = []
+        if self._arrows is not None:
+            children.append(self._arrows)
         if hasattr(self, "_label_collection"):
             children.append(self._label_collection)
         return children
 
     @_stale_wrapper
     def draw(self, renderer, *args, **kwds):
+        # Visibility of the edges affects also the children
+        if not self.get_visible():
+            return
+
+        if not self._processed:
+            self._process()
+
         if self._vertex_collection is not None:
             self._paths = self._compute_paths()
             if self._labels is not None:
                 self._compute_labels()
+
         super().draw(renderer)
+        if self._arrows is not None:
+            self._set_edge_info_for_arrows(which="end")
 
         for child in self.get_children():
             child.draw(renderer, *args, **kwds)

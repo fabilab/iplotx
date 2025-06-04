@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.318** total execution time for 22 files **from all galleries**:
+**00:00.261** total execution time for 22 files **from all galleries**:
 
 .. container::
 
@@ -32,16 +32,13 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
-     - 00:00.318
+   * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
+     - 00:00.261
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
@@ -66,6 +63,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_labels_and_colors.py` (``../../gallery/plot_labels_and_colors.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)

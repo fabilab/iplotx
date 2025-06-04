@@ -72,7 +72,7 @@ class GroupingArtist(PatchCollection):
             coords = layout.loc[vids].values
             idx_hull = convex_hull(coords)
             coords_hull = coords[idx_hull]
-            self._coords_hulls.append(coords_hull)
+            coords_hulls.append(coords_hull)
 
             stylei = rotate_style(style, i)
 

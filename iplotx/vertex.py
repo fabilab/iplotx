@@ -1,6 +1,6 @@
 from copy import deepcopy
 import numpy as np
-from matplotlib import artist
+import matplotlib as mpl
 from matplotlib.transforms import IdentityTransform
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import (
@@ -203,7 +203,7 @@ class VertexCollection(PatchCollection):
         if val and hasattr(self, "stale_callback_post"):
             self.stale_callback_post(self)
 
-    @artist.allow_rasterization
+    @mpl.artist.allow_rasterization
     def draw(self, renderer):
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
         if self._labels is not None:

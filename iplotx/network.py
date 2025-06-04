@@ -26,13 +26,9 @@ from .vertex import (
     VertexCollection,
     make_patch as make_vertex_patch,
 )
-from .edge.undirected import (
-    UndirectedEdgeCollection,
+from .edge import (
+    EdgeCollection,
     make_stub_patch as make_undirected_edge_patch,
-)
-from .edge.directed import (
-    DirectedEdgeCollection,
-    make_arrow_patch,
 )
 
 
@@ -204,6 +200,9 @@ class NetworkArtist(mpl.artist.Artist):
 
         labels = self._get_label_series("edge")
         edge_style = get_style(".edge")
+
+        vertex_layout_df = self._get_layout_dataframe()
+
         if "cmap" in edge_style:
             cmap_fun = _build_cmap_fun(
                 edge_style["color"],
@@ -212,21 +211,6 @@ class NetworkArtist(mpl.artist.Artist):
         else:
             cmap_fun = None
 
-        if self._ipx_internal_data["directed"]:
-            return self._add_directed_edges(
-                labels=labels,
-                edge_style=edge_style,
-                cmap_fun=cmap_fun,
-            )
-        return self._add_undirected_edges(
-            labels=labels,
-            edge_style=edge_style,
-            cmap_fun=cmap_fun,
-        )
-
-    def _add_directed_edges(self, edge_style, labels=None, cmap_fun=None):
-        """Draw directed edges."""
-        vertex_layout_df = self._get_layout_dataframe()
         edge_df = self._ipx_internal_data["edge_df"].set_index(
             ["_ipx_source", "_ipx_target"]
         )
@@ -239,9 +223,21 @@ class NetworkArtist(mpl.artist.Artist):
             # Get the vertices for this edge
 
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
-            # NOTE: Not sure this is the best way but can't think of another one
-            # Prioritise network internal styles
+
+            # FIXME:: Improve this logic. We have three layers of priority:
+            # 1. Explicitely set in the style of "plot"
+            # 2. Internal through network attributes
+            # 3. Default styles
+            # Because 1 and 3 are merged as a style context on the way in,
+            # it's hard to squeeze 2 in the middle. For now, we will assume
+            # the priority order is 2-1-3 instead (internal property is
+            # highest priority).
+            # This is also why we cannot shift this logic further into the
+            # EdgeCollection class, which is oblivious of NetworkArtist's
+            # internal data. In fact, one would argue this needs to be
+            # pushed outwards to deal with the wrong ordering.
             _update_from_internal(edge_stylei, edge_df.iloc[i], kind="edge")
+
             if cmap_fun is not None:
                 colorarray.append(edge_style["color"])
                 edge_stylei["color"] = cmap_fun(edge_stylei["color"])
@@ -263,53 +259,14 @@ class NetworkArtist(mpl.artist.Artist):
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
 
-        self._edges = DirectedEdgeCollection(
-            edges=edgepatches,
+        self._edges = EdgeCollection(
+            edgepatches,
             labels=labels,
             vertex_ids=adjacent_vertex_ids,
             vertex_collection=self._vertices,
             transform=self.axes.transData,
             style=edge_style,
-        )
-
-    def _add_undirected_edges(self, edge_style, labels=None, cmap_fun=None):
-        """Draw undirected edges."""
-
-        vertex_layout_df = self._get_layout_dataframe()
-        edge_df = self._ipx_internal_data["edge_df"].set_index(
-            ["_ipx_source", "_ipx_target"]
-        )
-
-        edgepatches = []
-        adjacent_vertex_ids = []
-        for i, (vid1, vid2) in enumerate(edge_df.index):
-            # Get the vertices for this edge
-            edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
-            # NOTE: Not sure this is the best way but can't think of another one
-            # Prioritise network internal styles
-            _update_from_internal(edge_stylei, edge_df.iloc[i], kind="edge")
-
-            if cmap_fun is not None:
-                edge_stylei["color"] = cmap_fun(edge_stylei["color"])
-
-            # These are not the actual edges drawn, only stubs to establish
-            # the styles which are then fed into the dynamic, optimised
-            # factory (the collection) below
-            patch = make_undirected_edge_patch(
-                **edge_stylei,
-            )
-            edgepatches.append(patch)
-            adjacent_vertex_ids.append((vid1, vid2))
-
-        # TODO:: deal with "ports" a la graphviz
-
-        self._edges = UndirectedEdgeCollection(
-            patches=edgepatches,
-            labels=labels,
-            vertex_ids=adjacent_vertex_ids,
-            vertex_collection=self._vertices,
-            transform=self.axes.transData,
-            style=edge_style,
+            directed=self._ipx_internal_data["directed"],
         )
 
     def _process(self):
