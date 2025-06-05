@@ -98,14 +98,14 @@ class EdgeCollection(mpl.collections.PatchCollection):
             voffsets.append((offset1, offset2))
 
             path1 = self._vertex_collection.get_paths()[index[v1]]
-            path2 = self._vertex_collection.get_paths()[index[v1]]
+            path2 = self._vertex_collection.get_paths()[index[v2]]
             vpaths.append((path1, path2))
 
             # NOTE: This needs to be computed here because the
             # VertexCollection._transforms are reset each draw in order to
             # accomodate for DPI changes on the canvas
             size1 = self._vertex_collection.get_sizes_dpi()[index[v1]]
-            size2 = self._vertex_collection.get_sizes_dpi()[index[v1]]
+            size2 = self._vertex_collection.get_sizes_dpi()[index[v2]]
             vsizes.append((size1, size2))
 
         return {
