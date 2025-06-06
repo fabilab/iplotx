@@ -17,10 +17,21 @@ from .style import (
 from .utils.matplotlib import (
     _get_label_width_height,
     _build_cmap_fun,
+    _forwarder,
 )
 from .label import LabelCollection
 
 
+@_forwarder(
+    (
+        "set_clip_path",
+        "set_clip_box",
+        "set_snap",
+        "set_sketch_params",
+        "set_animated",
+        "set_picker",
+    )
+)
 class VertexCollection(PatchCollection):
     """Collection of vertex patches for plotting.
 
@@ -42,7 +53,7 @@ class VertexCollection(PatchCollection):
         self._labels = kwargs.pop("labels", None)
 
         # Create patches from structured data
-        patches, offsets, sizes, kwargs2 = self._create_artists(
+        patches, offsets, sizes, kwargs2 = self._init_vertex_patches(
             layout_df,
         )
         kwargs.update(kwargs2)
@@ -54,6 +65,19 @@ class VertexCollection(PatchCollection):
 
         # Compute _transforms like in _CollectionWithScales for dpi issues
         self.set_sizes(sizes)
+
+    def get_children(self):
+        children = []
+        if hasattr(self, "_label_collection"):
+            children.append(self._label_collection)
+        return tuple(children)
+
+    def set_figure(self, figure):
+        ret = super().set_figure(figure)
+        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+        for child in self.get_children():
+            child.set_figure(figure)
+        return ret
 
     def get_index(self):
         """Get the vertex index."""
@@ -92,7 +116,7 @@ class VertexCollection(PatchCollection):
     get_size = get_sizes
     set_size = set_sizes
 
-    def _create_artists(self, vertex_layout_df):
+    def _init_vertex_patches(self, vertex_layout_df):
         style = self._style or {}
         if "cmap" in style:
             cmap_fun = _build_cmap_fun(
@@ -146,7 +170,7 @@ class VertexCollection(PatchCollection):
 
         return patches, offsets, sizes, kwargs
 
-    def _compute_labels(self):
+    def _compute_label_collection(self):
         transform = self.get_offset_transform()
         trans = transform.transform
 
@@ -158,40 +182,33 @@ class VertexCollection(PatchCollection):
             if prop in style:
                 del style[prop]
 
-        if not hasattr(self, "_label_collection"):
-            self._label_collection = LabelCollection(
-                self._labels,
-                style=style,
-                offsets=self._offsets,
-                transform=transform,
-            )
+        self._label_collection = LabelCollection(
+            self._labels,
+            style=style,
+            offsets=self._offsets,
+            transform=transform,
+        )
 
-            # Forward a bunch of mpl settings that are needed
-            self._label_collection.set_figure(self.figure)
-            self._label_collection.axes = self.axes
-            # forward the clippath/box to the children need this logic
-            # because mpl exposes some fast-path logic
-            clip_path = self.get_clip_path()
-            if clip_path is None:
-                clip_box = self.get_clip_box()
-                self._label_collection.set_clip_box(clip_box)
-            else:
-                self._label_collection.set_clip_path(clip_path)
+        # Forward a bunch of mpl settings that are needed
+        self._label_collection.set_figure(self.figure)
+        self._label_collection.axes = self.axes
+        # forward the clippath/box to the children need this logic
+        # because mpl exposes some fast-path logic
+        clip_path = self.get_clip_path()
+        if clip_path is None:
+            clip_box = self.get_clip_box()
+            self._label_collection.set_clip_box(clip_box)
+        else:
+            self._label_collection.set_clip_path(clip_path)
 
-            # Finally make the patches
-            self._label_collection._create_artists()
+        # Finally make the patches
+        self._label_collection._create_artists()
 
     def get_labels(self):
         if hasattr(self, "_label_collection"):
             return self._label_collection
         else:
             return None
-
-    def get_children(self):
-        children = []
-        if hasattr(self, "_label_collection"):
-            children.append(self._label_collection)
-        return children
 
     @property
     def stale(self):
@@ -206,8 +223,8 @@ class VertexCollection(PatchCollection):
     @mpl.artist.allow_rasterization
     def draw(self, renderer):
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
-        if self._labels is not None:
-            self._compute_labels()
+        if (self._labels is not None) and (not hasattr(self, "_label_collection")):
+            self._compute_label_collection()
 
         # NOTE: This draws the vertices first, then the labels.
         # The correct order would be vertex1->label1->vertex2->label2, etc.

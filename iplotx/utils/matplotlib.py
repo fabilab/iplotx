@@ -30,6 +30,7 @@ def _forwarder(forwards, cls=None):
 
     def make_forward(name):
         def method(self, *args, **kwargs):
+            """Each decorated method is called on the decorated class and then, nonrecursively, on all children."""
             ret = getattr(cls.mro()[1], name)(self, *args, **kwargs)
             for c in self.get_children():
                 getattr(c, name)(*args, **kwargs)
@@ -47,7 +48,13 @@ def _forwarder(forwards, cls=None):
 
 
 def _additional_set_methods(attributes, cls=None):
-    """Decorator to add specific set methods for children properties."""
+    """Decorator to add specific set methods for children properties.
+
+    This is useful to autogenerate methods a la set_<key>(value), for
+    instance set_alpha(value). It works by delegating to set(alpha=value).
+
+    Overall, this is a minor tweak compared to the previous decorator.
+    """
     if cls is None:
         return partial(_additional_set_methods, attributes)
 

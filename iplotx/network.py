@@ -36,10 +36,8 @@ from .edge import (
     (
         "set_clip_path",
         "set_clip_box",
-        "set_transform",
         "set_snap",
         "set_sketch_params",
-        "set_figure",
         "set_animated",
         "set_picker",
     )
@@ -51,6 +49,8 @@ class NetworkArtist(mpl.artist.Artist):
         layout: Optional[LayoutType] = None,
         vertex_labels: Optional[list | dict | pd.Series] = None,
         edge_labels: Optional[Sequence] = None,
+        transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
+        offset_transform: Optional[mpl.transforms.Transform] = None,
     ):
         """Network container artist that groups all plotting elements.
 
@@ -65,11 +65,6 @@ class NetworkArtist(mpl.artist.Artist):
             edge_labels: The labels for the edges. If None, no edge labels will be drawn.
 
         """
-        super().__init__()
-
-        zorder = get_style(".network").get("zorder", 1)
-        self.set_zorder(zorder)
-
         self.network = network
         self._ipx_internal_data = ingest_network_data(
             network,
@@ -77,22 +72,40 @@ class NetworkArtist(mpl.artist.Artist):
             vertex_labels=vertex_labels,
             edge_labels=edge_labels,
         )
-        self._clear_state()
 
-    def _clear_state(self):
-        self._vertices = None
-        self._edges = None
-        self._groups = None
+        super().__init__()
+
+        # This is usually the identity (which scales poorly with dpi)
+        self.set_transform(transform)
+
+        # This is usually transData
+        self.set_offset_transform(offset_transform)
+
+        zorder = get_style(".network").get("zorder", 1)
+        self.set_zorder(zorder)
+
+        # We add the children here, before the axis is set
+        # When the figure is set, by virtue of the "forwarded" decorator,
+        # the figure is also set on the children. At that point it is possible
+        # to compute the data extent for edges, which depends on dpi.
+        self._add_vertices()
+        self._add_edges()
 
     def get_children(self):
-        artists = []
-        # Collect edges first. This way vertices are on top of edges,
-        # since vertices are drawn later. That is what most people expect.
-        if self._edges is not None:
-            artists.append(self._edges)
-        if self._vertices is not None:
-            artists.append(self._vertices)
-        return tuple(artists)
+        return (self._vertices, self._edges)
+
+    def set_figure(self, figure):
+        super().set_figure(figure)
+        for child in self.get_children():
+            child.set_figure(figure)
+
+    def get_offset_transform(self):
+        """Get the offset transform (for vertices/edges)."""
+        return self._offset_transform
+
+    def set_offset_transform(self, offset_transform):
+        """Set the offset transform (for vertices/edges)."""
+        self._offset_transform = offset_transform
 
     def get_vertices(self):
         """Get VertexCollection artist."""
@@ -118,7 +131,6 @@ class NetworkArtist(mpl.artist.Artist):
             pad (float): Padding to add to the limits. Default is 0.05.
                 Units are a fraction of total axis range before padding.
         """
-        # FIXME: transData works here, but it's probably kind of broken in general
         import numpy as np
 
         layout_columns = [
@@ -127,45 +139,23 @@ class NetworkArtist(mpl.artist.Artist):
         layout = self._ipx_internal_data["vertex_df"][layout_columns].values
 
         if len(layout) == 0:
-            mins = np.array([0, 0])
-            maxs = np.array([1, 1])
-            return mpl.transforms.Bbox([mins, maxs])
+            return mpl.transforms.Bbox([[0, 0], [1, 1]])
 
-        # Use the layout as a base, and expand using bboxes from other artists
-        mins = np.min(layout, axis=0).astype(float)
-        maxs = np.max(layout, axis=0).astype(float)
-
-        # NOTE: unlike other Collections, the vertices are basically a
-        # PatchCollection with an offset transform using transData. Therefore,
-        # care should be taken if one wants to include it here
         if self._vertices is not None:
-            trans = transData.transform
-            trans_inv = transData.inverted().transform
-            verts = self._vertices
-            for size, offset in zip(verts.get_sizes(), verts.get_offsets()):
-                imax = trans_inv(trans(offset) + size)
-                imin = trans_inv(trans(offset) - size)
-                mins = np.minimum(mins, imin)
-                maxs = np.maximum(maxs, imax)
+            bbox = self._vertices.get_datalim(transData)
 
         if self._edges is not None:
-            for path in self._edges.get_paths():
-                bbox = path.get_extents()
-                mins = np.minimum(mins, bbox.min)
-                maxs = np.maximum(maxs, bbox.max)
+            edge_bbox = self._edges.get_datalim(transData)
+            bbox = mpl.transforms.Bbox.union([bbox, edge_bbox])
 
-        if self._groups is not None:
-            for path in self._groups.get_paths():
-                bbox = path.get_extents()
-                mins = np.minimum(mins, bbox.min)
-                maxs = np.maximum(maxs, bbox.max)
+        bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
+        return bbox
 
-        # 5% padding, on each side
-        pad = (maxs - mins) * pad
-        mins -= pad
-        maxs += pad
-
-        return mpl.transforms.Bbox([mins, maxs])
+    def autoscale_view(self, tight=False):
+        """Recompute data limits from this artist and set autoscale based on them."""
+        bbox = self.get_datalim(self.axes.transData)
+        self.axes.update_datalim(bbox)
+        self.axes.autoscale_view(tight=tight)
 
     def get_layout(self):
         layout_columns = [
@@ -185,8 +175,8 @@ class NetworkArtist(mpl.artist.Artist):
 
         self._vertices = VertexCollection(
             layout=self.get_layout(),
-            offset_transform=self.axes.transData,
-            transform=mpl.transforms.IdentityTransform(),
+            offset_transform=self.get_offset_transform(),
+            transform=self.get_transform(),
             style=get_style(".vertex"),
             labels=self._get_label_series("vertex"),
         )
@@ -268,58 +258,29 @@ class NetworkArtist(mpl.artist.Artist):
             labels=labels,
             vertex_ids=adjacent_vertex_ids,
             vertex_collection=self._vertices,
-            transform=self.axes.transData,
+            transform=self.get_offset_transform(),
             style=edge_style,
             directed=self._ipx_internal_data["directed"],
         )
 
-    def _process(self):
-        self._clear_state()
-
-        # TODO: some more things might be plotted before this
-
-        # NOTE: we plot vertices first to get size etc. for edge shortening
-        # but when the mpl engine runs down all children artists for actual
-        # drawing it uses get_children() to get the order. Whatever is last
-        # in that order will get drawn on top (vis-a-vis zorder).
-        self._add_vertices()
-        self._add_edges()
-
-        # TODO: callbacks for stale vertices/edges
-
-        # Forward mpl properties to children
-        # TODO sort out all of the things that need to be forwarded
-        for child in self.get_children():
-            # set the figure & axes on child, this ensures each artist
-            # down the hierarchy knows where to draw
-            if hasattr(child, "set_figure"):
-                child.set_figure(self.figure)
-            child.axes = self.axes
-
-            # forward the clippath/box to the children need this logic
-            # because mpl exposes some fast-path logic
-            clip_path = self.get_clip_path()
-            if clip_path is None:
-                clip_box = self.get_clip_box()
-                child.set_clip_box(clip_box)
-            else:
-                child.set_clip_path(clip_path)
-
     @_stale_wrapper
-    def draw(self, renderer, *args, **kwds):
+    def draw(self, renderer):
         """Draw each of the children, with some buffering mechanism."""
+        if not self.get_children():
+            self._add_vertices()
+            self._add_edges()
+
         if not self.get_visible():
             return
 
-        if not self.get_children():
-            self._process()
+        # FIXME: Callbacks on stale vertices/edges??
 
         # NOTE: looks like we have to manage the zorder ourselves
         # this is kind of funny actually
         children = list(self.get_children())
         children.sort(key=lambda x: x.zorder)
         for art in children:
-            art.draw(renderer, *args, **kwds)
+            art.draw(renderer)
 
 
 def _update_from_internal(style, row, kind):

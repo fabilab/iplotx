@@ -13,7 +13,13 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
     _factor = 1.0
 
-    def __init__(self, edge_collection, *args, **kwargs):
+    def __init__(
+        self,
+        edge_collection,
+        transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
+        *args,
+        **kwargs,
+    ):
 
         self._edge_collection = edge_collection
         self._style = get_style(".arrow")
@@ -34,7 +40,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
             patches,
             offsets=np.zeros((len(patches), 2)),
             offset_transform=self.get_offset_transform(),
-            transform=mpl.transforms.IdentityTransform(),
+            transform=transform,
             match_original=True,
             *args,
             **kwargs,

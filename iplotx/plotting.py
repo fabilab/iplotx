@@ -59,10 +59,15 @@ def plot(
                 layout,
                 vertex_labels=vertex_labels,
                 edge_labels=edge_labels,
+                transform=mpl.transforms.IdentityTransform(),
+                offset_transform=ax.transData,
             )
             ax.add_artist(nwkart)
-            # Postprocess for things that require an axis (transform, etc.)
-            nwkart._process()
+
+            # Set the figure, which itself sets the dpi scale for vertices, edges,
+            # arrows, etc. Now data limits can be computed correctly
+            nwkart.set_figure(ax.figure)
+
             artists.append(nwkart)
 
             # Set normailsed layout since we have it by now
@@ -105,7 +110,11 @@ def _postprocess_axis(ax, artists):
     bboxes = []
     for art in artists:
         bboxes.append(art.get_datalim(ax.transData))
-    ax.update_datalim(mpl.transforms.Bbox.union(bboxes))
+    bbox = mpl.transforms.Bbox.union(bboxes)
+    # FIXME: this is broken because dataLim for edges
+    # is incorrect before the first "draw" call. Not sure
+    # how to fix this quite yet
+    ax.update_datalim(bbox)
 
     # Autoscale for x/y axis limits
     ax.autoscale_view()

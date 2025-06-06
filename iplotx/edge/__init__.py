@@ -4,7 +4,10 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
-from .common import _compute_loops_per_angle
+from .common import (
+    _compute_loops_per_angle,
+    _get_shorter_edge_coords,
+)
 from ..utils.matplotlib import (
     _compute_mid_coord_and_rot,
     _stale_wrapper,
@@ -23,13 +26,19 @@ from .arrow import EdgeArrowCollection
         "set_clip_box",
         "set_snap",
         "set_sketch_params",
-        "set_figure",
         "set_animated",
         "set_picker",
     )
 )
 class EdgeCollection(mpl.collections.PatchCollection):
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        patches,
+        transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
+        arrow_transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
+        *args,
+        **kwargs,
+    ):
         kwargs["match_original"] = True
         self._vertex_ids = kwargs.pop("vertex_ids", None)
         self._vertex_collection = kwargs.pop("vertex_collection", None)
@@ -39,13 +48,44 @@ class EdgeCollection(mpl.collections.PatchCollection):
         if "cmap" in self._style:
             kwargs["cmap"] = self._style["cmap"]
             kwargs["norm"] = self._style["norm"]
-        super().__init__(*args, **kwargs)
+
+        # NOTE: This should also set the transform
+        super().__init__(patches, transform=transform, *args, **kwargs)
 
         if self.directed:
-            self._arrows = EdgeArrowCollection(self)
-        else:
-            self._arrows = None
-        self._processed = False
+            self._arrows = EdgeArrowCollection(
+                self,
+                transform=arrow_transform,
+            )
+        if self._labels is not None:
+            style = self._style.get("label", None) if self._style is not None else {}
+            transform = self.get_transform()
+            self._label_collection = LabelCollection(
+                self._labels,
+                style=style,
+                transform=transform,
+            )
+            self._label_collection._create_artists()
+
+    def get_children(self):
+        children = []
+        if hasattr(self, "_arrows"):
+            children.append(self._arrows)
+        if hasattr(self, "_label_collection"):
+            children.append(self._label_collection)
+        return children
+
+    def set_figure(self, figure):
+        ret = super().set_figure(figure)
+        for child in self.get_children():
+            child.set_figure(figure)
+        self._update_paths()
+        self._update_children()
+        return ret
+
+    def _update_children(self):
+        self._update_arrows()
+        self._update_labels()
 
     def set_array(self, array):
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
@@ -115,7 +155,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
             "sizes": vsizes,
         }
 
-    def _compute_paths(self, transform=None):
+    def _update_paths(self, transform=None):
         """Compute paths for the edges.
 
         Loops split the largest wedge left open by other
@@ -265,7 +305,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                     paths[ldict["indices"][idx]] = path
                     idx += 1
 
-        return paths
+        self._paths = paths
 
     def _fix_parallel_edges_straight(
         self,
@@ -415,11 +455,18 @@ class EdgeCollection(mpl.collections.PatchCollection):
         path.vertices = trans_inv(path.vertices)
         return path
 
-    def _compute_labels(self):
+    def _update_arrows(self):
+        # TODO: update the arrow locations/sizes based on dpi etc without drawing
+        pass
+
+    def _update_labels(self):
+        if self._labels is None:
+            return
+
+        style = self._style.get("label", None) if self._style is not None else {}
         transform = self.get_transform()
         trans = transform.transform
 
-        style = self._style.get("label", None) if self._style is not None else {}
         offsets = []
         if not style.get("rotate", True):
             rotations = []
@@ -429,52 +476,9 @@ class EdgeCollection(mpl.collections.PatchCollection):
             if not style.get("rotate", True):
                 rotations.append(rotation)
 
-        if not hasattr(self, "_label_collection"):
-            self._label_collection = LabelCollection(
-                self._labels,
-                style=style,
-                offsets=offsets,
-                transform=self.axes.transData,
-            )
-
-            # Forward a bunch of mpl settings that are needed
-            self._label_collection.set_figure(self.figure)
-            self._label_collection.axes = self.axes
-            # forward the clippath/box to the children need this logic
-            # because mpl exposes some fast-path logic
-            clip_path = self.get_clip_path()
-            if clip_path is None:
-                clip_box = self.get_clip_box()
-                self._label_collection.set_clip_box(clip_box)
-            else:
-                self._label_collection.set_clip_path(clip_path)
-
-            # Finally make the patches
-            self._label_collection._create_artists()
-
+        self._label_collection.set_offsets(offsets)
         if not style.get("rotate", True):
             self._label_collection.set_rotations(rotations)
-
-    def _process(self):
-        # Forward mpl properties to children
-        # TODO sort out all of the things that need to be forwarded
-        for child in self.get_children():
-            # set the figure & axes on child, this ensures each artist
-            # down the hierarchy knows where to draw
-            if hasattr(child, "set_figure"):
-                child.set_figure(self.figure)
-            child.axes = self.axes
-
-            # forward the clippath/box to the children need this logic
-            # because mpl exposes some fast-path logic
-            clip_path = self.get_clip_path()
-            if clip_path is None:
-                clip_box = self.get_clip_box()
-                child.set_clip_box(clip_box)
-            else:
-                child.set_clip_path(clip_path)
-
-        self._processed = True
 
     def _set_edge_info_for_arrows(
         self,
@@ -506,30 +510,17 @@ class EdgeCollection(mpl.collections.PatchCollection):
             apath.vertices = apath.vertices @ mrot
             self._arrows._angles[i] = theta
 
-    def get_children(self):
-        children = []
-        if self._arrows is not None:
-            children.append(self._arrows)
-        if hasattr(self, "_label_collection"):
-            children.append(self._label_collection)
-        return children
-
     @_stale_wrapper
-    def draw(self, renderer, *args, **kwds):
+    def draw(self, renderer):
         # Visibility of the edges affects also the children
         if not self.get_visible():
             return
 
-        if not self._processed:
-            self._process()
-
-        if self._vertex_collection is not None:
-            self._paths = self._compute_paths()
-            if self._labels is not None:
-                self._compute_labels()
+        self._update_paths()
+        self._update_labels()
 
         super().draw(renderer)
-        if self._arrows is not None:
+        if hasattr(self, "_arrows"):
             self._set_edge_info_for_arrows(which="end")
 
         for child in self.get_children():
@@ -573,44 +564,3 @@ def make_stub_patch(**kwargs):
         **kwargs,
     )
     return art
-
-
-def _get_shorter_edge_coords(vpath, vsize, theta):
-    # Bound theta from -pi to pi (why is that not guaranteed?)
-    theta = (theta + pi) % (2 * pi) - pi
-
-    # Size zero vertices need no shortening
-    if vsize == 0:
-        return np.array([0, 0])
-
-    for i in range(len(vpath)):
-        v1 = vpath.vertices[i]
-        v2 = vpath.vertices[(i + 1) % len(vpath)]
-        theta1 = atan2(*((v1)[::-1]))
-        theta2 = atan2(*((v2)[::-1]))
-
-        # atan2 ranges ]-3.14, 3.14]
-        # so it can be that theta1 is -3 and theta2 is +3
-        # therefore we need two separate cases, one that cuts at pi and one at 0
-        cond1 = theta1 <= theta <= theta2
-        cond2 = (
-            (theta1 + 2 * pi) % (2 * pi)
-            <= (theta + 2 * pi) % (2 * pi)
-            <= (theta2 + 2 * pi) % (2 * pi)
-        )
-        if cond1 or cond2:
-            break
-    else:
-        raise ValueError("Angle for patch not found")
-
-    # The edge meets the patch of the vertex on the v1-v2 size,
-    # at angle theta from the center
-    mtheta = tan(theta)
-    if v2[0] == v1[0]:
-        xe = v1[0]
-    else:
-        m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
-        xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
-    ye = mtheta * xe
-    ve = np.array([xe, ye])
-    return ve * vsize

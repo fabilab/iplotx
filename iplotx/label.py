@@ -10,13 +10,19 @@ from .utils.matplotlib import (
 
 
 class LabelCollection(mpl.artist.Artist):
-    def __init__(self, labels, style=None, offsets=None, transform=None):
+    def __init__(
+        self,
+        labels,
+        style=None,
+        offsets=None,
+        transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
+    ):
         self._labels = labels
         self._offsets = offsets if offsets is not None else np.zeros((len(labels), 2))
         self._style = style
         super().__init__()
-        if transform is not None:
-            self.set_transform(transform)
+
+        self.set_transform(transform)
 
     def _create_artists(self):
         style = deepcopy(self._style) if self._style is not None else {}
