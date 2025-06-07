@@ -21,6 +21,22 @@ def _evaluate_cubic_bezier(points, t):
     )
 
 
+def _evaluate_cubic_bezier_derivative(points, t):
+    """Evaluate the derivative of a cubic Bezier curve at t."""
+    p0, p1, p2, p3 = points
+    # (dx / dt, dy / dt) is the parametric gradient
+    # to get the angle from this, one can just atanh(dy/dt, dx/dt)
+    # This is equivalent to computing the actual bezier curve
+    # at low t, of course, which is the geometric interpretation
+    # (obviously, division by t is irrelenant)
+    return (
+        3 * p0 * (1 - t) ** 2
+        + 3 * p1 * (1 - t) * (-3 * t + 1)
+        + 3 * p2 * t * (2 - 3 * t)
+        + 3 * p3 * t**2
+    )
+
+
 def convex_hull(points):
     """Compute the convex hull of a set of 2D points."""
     points = np.asarray(points)

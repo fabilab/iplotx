@@ -253,7 +253,7 @@ def make_patch(marker: str, size, **kwargs):
     if size_max > 0:
         size /= size_max
 
-    if marker in ("o", "circle"):
+    if marker in ("o", "c", "circle"):
         art = Circle((0, 0), size[0] / 2, **kwargs)
     elif marker in ("s", "square", "r", "rectangle"):
         art = Rectangle((-size[0] / 2, -size[1] / 2), size[0], size[1], **kwargs)

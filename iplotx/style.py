@@ -19,7 +19,9 @@ style_leaves = (
     "zorder",
     "tension",
     "looptension",
+    "lloopmaxangle",
     "rotate",
+    "marker",
 )
 
 
@@ -44,6 +46,7 @@ default = {
         "offset": 3,
         "tension": 1,
         "looptension": 4,
+        "loopmaxangle": 60,
         "label": {
             "horizontalalignment": "center",
             "verticalalignment": "center",

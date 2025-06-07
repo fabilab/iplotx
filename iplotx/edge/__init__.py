@@ -13,6 +13,9 @@ from ..utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
 )
+from ..utils.geometry import (
+    _evaluate_cubic_bezier_derivative,
+)
 from ..style import (
     rotate_style,
 )
@@ -170,6 +173,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         vcenters = vinfo["offsets"]
         vpaths = vinfo["paths"]
         vsizes = vinfo["sizes"]
+        loopmaxangle = pi / 180.0 * self._style.get("loopmaxangle", pi / 3)
 
         if transform is None:
             transform = self.get_transform()
@@ -177,22 +181,15 @@ class EdgeCollection(mpl.collections.PatchCollection):
         trans_inv = transform.inverted().transform
 
         # 1. Make a list of vertices with loops, and store them for later
-        loop_vertex_dict = {}
+        loop_vertex_dict = defaultdict(lambda: dict(indices=[], edge_angles=[]))
         for i, (v1, v2) in enumerate(vids):
-            if v1 != v2:
-                continue
-            if v1 not in loop_vertex_dict:
-                loop_vertex_dict[v1] = {
-                    "indices": [],
-                    "edge_angles": [],
-                }
-            loop_vertex_dict[v1]["indices"].append(i)
+            # Postpone loops (step 3)
+            if v1 == v2:
+                loop_vertex_dict[v1]["indices"].append(i)
 
         # 2. Make paths for non-loop edges
         # NOTE: keep track of parallel edges to offset them
         parallel_edges = defaultdict(list)
-
-        # Get actual coordinates of the vertex border
         paths = []
         for i, (v1, v2) in enumerate(vids):
             # Postpone loops (step 3)
@@ -213,35 +210,25 @@ class EdgeCollection(mpl.collections.PatchCollection):
             vsize_fig = vsizes[i]
 
             # Shorten edge
-            if not self._style.get("curved", False):
-                path = self._shorten_path_undirected_straight(
-                    vcoord_fig,
-                    vpath_fig,
-                    vsize_fig,
-                    trans_inv,
-                )
-            else:
-                edge_stylei = rotate_style(self._style, index=i, id=(v1, v2))
-                tension = edge_stylei.get("tension", 1.5)
-                path = self._shorten_path_undirected_curved(
-                    vcoord_fig,
-                    vpath_fig,
-                    vsize_fig,
-                    trans_inv,
-                    tension,
-                )
+            edge_stylei = rotate_style(self._style, index=i, id=(v1, v2))
+            tension = (
+                0
+                if not self._style.get("curved", False)
+                else edge_stylei.get("tension", 5)
+            )
+            path, angles = self._compute_edge_path(
+                tension,
+                vcoord_fig,
+                vpath_fig,
+                vsize_fig,
+                trans_inv,
+            )
 
             # Collect angles for this vertex, to be used for loops plotting below
-            if (v1 in loop_vertex_dict) or (v2 in loop_vertex_dict):
-                angles = self._compute_edge_angles(
-                    path,
-                    vsize_fig,
-                    trans,
-                )
-                if v1 in loop_vertex_dict:
-                    loop_vertex_dict[v1]["edge_angles"].append(angles[0])
-                if v2 in loop_vertex_dict:
-                    loop_vertex_dict[v2]["edge_angles"].append(angles[1])
+            if v1 in loop_vertex_dict:
+                loop_vertex_dict[v1]["edge_angles"].append(angles[0])
+            if v2 in loop_vertex_dict:
+                loop_vertex_dict[v2]["edge_angles"].append(angles[1])
 
             # Add the path for this non-loop edge
             paths.append(path)
@@ -288,9 +275,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
                 # Iterate over individual loops
                 for j in range(nloops):
-                    thetaj1 = theta1 + j * delta
-                    # Use 60 degrees as the largest possible loop wedge
-                    thetaj2 = thetaj1 + min(delta, pi / 3)
+                    thetaj1 = theta1 + j * delta + max(delta - loopmaxangle, 0) / 2
+                    thetaj2 = thetaj1 + min(delta, loopmaxangle)
 
                     # Get the path for this loop
                     path = self._compute_loop_path(
@@ -372,7 +358,16 @@ class EdgeCollection(mpl.collections.PatchCollection):
         )
         return path
 
-    def _shorten_path_undirected_straight(
+    def _compute_edge_path(
+        self,
+        tension,
+        *args,
+    ):
+        if tension == 0:
+            return self._compute_edge_path_straight(*args)
+        return self._compute_edge_path_curved(tension, *args)
+
+    def _compute_edge_path_straight(
         self,
         vcoord_fig,
         vpath_fig,
@@ -404,46 +399,75 @@ class EdgeCollection(mpl.collections.PatchCollection):
             codes=[getattr(mpl.path.Path, x) for x in path["codes"]],
         )
         path.vertices = trans_inv(path.vertices)
-        return path
+        return path, (theta, theta + np.pi)
 
-    def _shorten_path_undirected_curved(
+    def _compute_edge_path_curved(
         self,
+        tension,
         vcoord_fig,
         vpath_fig,
         vsize_fig,
         trans_inv,
-        tension,
+        ports=(None, None),
     ):
-        # Angle of the straight line
-        theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
+        """Shorten the edge path along a cubic Bezier between the vertex centres.
 
-        # Shorten at starting vertex
-        vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig, theta) + vcoord_fig[0]
+        The most important part is that the derivative of the Bezier at the start
+        and end point towards the vertex centres: people notice if they do not.
+        """
+        dv = vcoord_fig[1] - vcoord_fig[0]
+        edge_straight_length = np.sqrt((dv**2).sum())
 
-        # Shorten at end vertex
-        ve = (
-            _get_shorter_edge_coords(vpath_fig[1], vsize_fig, theta + pi)
-            + vcoord_fig[1]
-        )
+        auxs = [None, None]
+        for i in range(2):
+            if ports[i] is not None:
+                der = _get_port_unit_vector(ports[i])
+                auxs[i] = der * edge_straight_length * tension + vcoord_fig[i]
 
-        edge_straight_length = np.sqrt(((ve - vs) ** 2).sum())
+        # Both ports defined, just use them and hope for the best
+        # Obviously, if the user specifies ports that make no sense,
+        # this is going to be a (technically valid) mess.
+        if all(aux is not None for aux in auxs):
+            pass
 
-        aux1 = vs + 0.33 * (ve - vs)
-        aux2 = vs + 0.67 * (ve - vs)
+        # If no ports are specified (the most common case), compute
+        # the Bezier and shorten it
+        elif all(aux is None for aux in auxs):
+            # Put auxs along the way
+            auxs = np.array(
+                [
+                    vcoord_fig[0] + 0.33 * dv,
+                    vcoord_fig[1] - 0.33 * dv,
+                ]
+            )
+            # Right rotation from the straight edge
+            dv_rot = -0.1 * dv @ np.array([[0, 1], [-1, 0]])
+            # Shift the auxs orthogonal to the straight edge
+            auxs += dv_rot * tension
 
-        # Move Bezier points orthogonal to the line
-        fracs = (
-            (vs - ve) / np.sqrt(((vs - ve) ** 2).sum()) @ np.array([[0, 1], [-1, 0]])
-        )
-        aux1 += 0.1 * fracs * tension * edge_straight_length
-        aux2 += 0.1 * fracs * tension * edge_straight_length
+        # First port is defined
+        elif (auxs[0] is not None) and (auxs[1] is None):
+            auxs[1] = auxs[0]
+
+        # Second port is defined
+        else:
+            auxs[0] = auxs[1]
+
+        vs = [None, None]
+        thetas = [None, None]
+        for i in range(2):
+            thetas[i] = atan2(*((auxs[i] - vcoord_fig[i])[::-1]))
+            vs[i] = (
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i])
+                + vcoord_fig[i]
+            )
 
         path = {
             "vertices": [
-                vs,
-                aux1,
-                aux2,
-                ve,
+                vs[0],
+                auxs[0],
+                auxs[1],
+                vs[1],
             ],
             "codes": ["MOVETO"] + ["CURVE4"] * 3,
         }
@@ -452,8 +476,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
             path["vertices"],
             codes=[getattr(mpl.path.Path, x) for x in path["codes"]],
         )
+
+        # Return to data transform
         path.vertices = trans_inv(path.vertices)
-        return path
+        return path, tuple(thetas)
 
     def _update_arrows(self):
         # TODO: update the arrow locations/sizes based on dpi etc without drawing
@@ -524,7 +550,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
             self._set_edge_info_for_arrows(which="end")
 
         for child in self.get_children():
-            child.draw(renderer, *args, **kwds)
+            child.draw(renderer)
 
     @property
     def stale(self):
@@ -550,6 +576,7 @@ def make_stub_patch(**kwargs):
         "curved",
         "tension",
         "looptension",
+        "loopmaxangle",
         "offset",
         "label",
         "cmap",
