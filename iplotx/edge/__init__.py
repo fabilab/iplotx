@@ -4,17 +4,10 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
-from .common import (
-    _compute_loops_per_angle,
-    _get_shorter_edge_coords,
-)
 from ..utils.matplotlib import (
     _compute_mid_coord_and_rot,
     _stale_wrapper,
     _forwarder,
-)
-from ..utils.geometry import (
-    _evaluate_cubic_bezier_derivative,
 )
 from ..style import (
     rotate_style,
@@ -266,7 +259,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
             # The space between the existing angles is where we can fit the loops
             # One loop we can fit in the largest wedge, multiple loops we need
-            nloops_per_angle = _compute_loops_per_angle(nloops, edge_angles)
+            nloops_per_angle = self._compute_loops_per_angle(nloops, edge_angles)
 
             idx = 0
             for theta1, theta2, nloops in nloops_per_angle:
@@ -332,9 +325,9 @@ class EdgeCollection(mpl.collections.PatchCollection):
         looptension,
     ):
         # Shorten at starting angle
-        start = _get_shorter_edge_coords(vpath, vsize, angle1) + vcoord_fig
+        start = self._get_shorter_edge_coords(vpath, vsize, angle1) + vcoord_fig
         # Shorten at end angle
-        end = _get_shorter_edge_coords(vpath, vsize, angle2) + vcoord_fig
+        end = self._get_shorter_edge_coords(vpath, vsize, angle2) + vcoord_fig
 
         aux1 = (start - vcoord_fig) * looptension + vcoord_fig
         aux2 = (end - vcoord_fig) * looptension + vcoord_fig
@@ -362,10 +355,11 @@ class EdgeCollection(mpl.collections.PatchCollection):
         self,
         tension,
         *args,
+        **kwargs,
     ):
         if tension == 0:
-            return self._compute_edge_path_straight(*args)
-        return self._compute_edge_path_curved(tension, *args)
+            return self._compute_edge_path_straight(*args, **kwargs)
+        return self._compute_edge_path_curved(tension, *args, **kwargs)
 
     def _compute_edge_path_straight(
         self,
@@ -373,6 +367,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         vpath_fig,
         vsize_fig,
         trans_inv,
+        **kwargs,
     ):
         # Straight SVG instructions
         path = {
@@ -384,12 +379,15 @@ class EdgeCollection(mpl.collections.PatchCollection):
         theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
 
         # Shorten at starting vertex
-        vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta) + vcoord_fig[0]
+        vs = (
+            self._get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta)
+            + vcoord_fig[0]
+        )
         path["vertices"].append(vs)
 
         # Shorten at end vertex
         ve = (
-            _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi)
+            self._get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi)
             + vcoord_fig[1]
         )
         path["vertices"].append(ve)
@@ -458,7 +456,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         for i in range(2):
             thetas[i] = atan2(*((auxs[i] - vcoord_fig[i])[::-1]))
             vs[i] = (
-                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i])
+                self._get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i])
                 + vcoord_fig[i]
             )
 
@@ -561,6 +559,95 @@ class EdgeCollection(mpl.collections.PatchCollection):
         mpl.collections.PatchCollection.stale.fset(self, val)
         if val and hasattr(self, "stale_callback_post"):
             self.stale_callback_post(self)
+
+    @staticmethod
+    def _compute_loops_per_angle(nloops, angles):
+        if len(angles) == 0:
+            return [(0, 2 * pi, nloops)]
+
+        angles_sorted_closed = list(sorted(angles))
+        angles_sorted_closed.append(angles_sorted_closed[0] + 2 * pi)
+        deltas = np.diff(angles_sorted_closed)
+
+        # Now we have the deltas and the total number of loops
+        # 1. Assign all loops to the largest wedge
+        idx_dmax = deltas.argmax()
+        if nloops == 1:
+            return [
+                (
+                    angles_sorted_closed[idx_dmax],
+                    angles_sorted_closed[idx_dmax + 1],
+                    nloops,
+                )
+            ]
+
+        # 2. Check if any other wedges are larger than this
+        # If not, we are done (this is the algo in igraph)
+        dsplit = deltas[idx_dmax] / nloops
+        if (deltas > dsplit).sum() < 2:
+            return [
+                (
+                    angles_sorted_closed[idx_dmax],
+                    angles_sorted_closed[idx_dmax + 1],
+                    nloops,
+                )
+            ]
+
+            # 3. Check how small the second-largest wedge would become
+        idx_dsort = np.argsort(deltas)
+        return [
+            (
+                angles_sorted_closed[idx_dmax],
+                angles_sorted_closed[idx_dmax + 1],
+                nloops - 1,
+            ),
+            (
+                angles_sorted_closed[idx_dsort[-2]],
+                angles_sorted_closed[idx_dsort[-2] + 1],
+                1,
+            ),
+        ]
+
+    @staticmethod
+    def _get_shorter_edge_coords(vpath, vsize, theta):
+        # Bound theta from -pi to pi (why is that not guaranteed?)
+        theta = (theta + pi) % (2 * pi) - pi
+
+        # Size zero vertices need no shortening
+        if vsize == 0:
+            return np.array([0, 0])
+
+        for i in range(len(vpath)):
+            v1 = vpath.vertices[i]
+            v2 = vpath.vertices[(i + 1) % len(vpath)]
+            theta1 = atan2(*((v1)[::-1]))
+            theta2 = atan2(*((v2)[::-1]))
+
+            # atan2 ranges ]-3.14, 3.14]
+            # so it can be that theta1 is -3 and theta2 is +3
+            # therefore we need two separate cases, one that cuts at pi and one at 0
+            cond1 = theta1 <= theta <= theta2
+            cond2 = (
+                (theta1 + 2 * pi) % (2 * pi)
+                <= (theta + 2 * pi) % (2 * pi)
+                <= (theta2 + 2 * pi) % (2 * pi)
+            )
+            if cond1 or cond2:
+                break
+        else:
+            raise ValueError("Angle for patch not found")
+
+        # The edge meets the patch of the vertex on the v1-v2 size,
+        # at angle theta from the center
+        mtheta = tan(theta)
+        if v2[0] == v1[0]:
+            xe = v1[0]
+        else:
+            m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
+            xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
+        ye = mtheta * xe
+        ve = np.array([xe, ye])
+        return ve * vsize
 
 
 def make_stub_patch(**kwargs):

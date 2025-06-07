@@ -24,12 +24,6 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
         self._edge_collection = edge_collection
         self._style = get_style(".arrow")
 
-        # Arrow color defaults to the edges for consistency
-        if ("facecolor" not in self._style) and ("color" not in self._style):
-            self._style["facecolor"] = self._edge_collection.get_edgecolors()
-        if ("edgecolor" not in self._style) and ("color" not in self._style):
-            self._style["edgecolor"] = self._edge_collection.get_edgecolors()
-
         patches, sizes = self._create_artists()
 
         if "cmap" in self._edge_collection._style:
@@ -113,8 +107,10 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
         sizes = []
         for i, (vid1, vid2) in enumerate(self._edge_collection._vertex_ids):
             stylei = rotate_style(style, index=i)
-            if "color" not in stylei:
-                stylei["color"] = self._edge_collection.get_edgecolors()[i][:3]
+            if ("facecolor" not in stylei) and ("color" not in stylei):
+                stylei["facecolor"] = self._edge_collection.get_edgecolors()[i][:3]
+            if ("edgecolor" not in stylei) and ("color" not in stylei):
+                stylei["edgecolor"] = self._edge_collection.get_edgecolors()[i][:3]
             if "alpha" not in stylei:
                 stylei["alpha"] = self._edge_collection.get_edgecolors()[i][3]
             if "linewidth" not in stylei:
@@ -162,11 +158,18 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
         width /= size_max
 
     if marker == "|>":
-        codes = ["MOVETO", "LINETO", "LINETO"]
+        codes = ["MOVETO", "LINETO", "LINETO", "CLOSEPOLY"]
         if "color" in kwargs:
             kwargs["facecolor"] = kwargs["edgecolor"] = kwargs.pop("color")
         path = mpl.path.Path(
-            np.array([[-height, width * 0.5], [-height, -width * 0.5], [0, 0]]),
+            np.array(
+                [
+                    [-height, width * 0.5],
+                    [-height, -width * 0.5],
+                    [0, 0],
+                    [-height, width * 0.5],
+                ]
+            ),
             codes=[getattr(mpl.path.Path, x) for x in codes],
             closed=True,
         )
@@ -181,8 +184,10 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
             closed=False,
         )
     elif marker == ">>":
+        if "color" in kwargs:
+            kwargs["facecolor"] = kwargs["edgecolor"] = kwargs.pop("color")
         overhang = kwargs.pop("overhang", 0.25)
-        codes = ["MOVETO", "LINETO", "LINETO", "LINETO"]
+        codes = ["MOVETO", "LINETO", "LINETO", "LINETO", "CLOSEPOLY"]
         path = mpl.path.Path(
             np.array(
                 [
@@ -190,14 +195,17 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
                     [-height, -width * 0.5],
                     [-height * (1.0 - overhang), 0],
                     [-height, width * 0.5],
+                    [0, 0],
                 ]
             ),
             codes=[getattr(mpl.path.Path, x) for x in codes],
             closed=True,
         )
     elif marker == ")>":
+        if "color" in kwargs:
+            kwargs["facecolor"] = kwargs["edgecolor"] = kwargs.pop("color")
         overhang = kwargs.pop("overhang", 0.25)
-        codes = ["MOVETO", "LINETO", "CURVE3", "CURVE3"]
+        codes = ["MOVETO", "LINETO", "CURVE3", "CURVE3", "CLOSEPOLY"]
         path = mpl.path.Path(
             np.array(
                 [
@@ -205,6 +213,7 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
                     [-height, -width * 0.5],
                     [-height * (1.0 - overhang), 0],
                     [-height, width * 0.5],
+                    [0, 0],
                 ]
             ),
             codes=[getattr(mpl.path.Path, x) for x in codes],
@@ -226,8 +235,37 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
             codes=[getattr(mpl.path.Path, x) for x in codes],
             closed=False,
         )
+    elif marker == "|":
+        kwargs["facecolor"] = "none"
+        if "color" in kwargs:
+            kwargs["edgecolor"] = kwargs.pop("color")
+        codes = ["MOVETO", "LINETO"]
+        path = mpl.path.Path(
+            np.array([[-height, width * 0.5], [-height, -width * 0.5]]),
+            codes=[getattr(mpl.path.Path, x) for x in codes],
+            closed=False,
+        )
+    elif marker == "s":
+        if "color" in kwargs:
+            kwargs["facecolor"] = kwargs["edgecolor"] = kwargs.pop("color")
+        codes = ["MOVETO", "LINETO", "LINETO", "LINETO", "CLOSEPOLY"]
+        path = mpl.path.Path(
+            np.array(
+                [
+                    [-height, width * 0.5],
+                    [-height, -width * 0.5],
+                    [0, -width * 0.5],
+                    [0, width * 0.5],
+                    [-height, width * 0.5],
+                ]
+            ),
+            codes=[getattr(mpl.path.Path, x) for x in codes],
+            closed=True,
+        )
     elif marker == "d":
-        codes = ["MOVETO", "LINETO", "LINETO", "LINETO"]
+        if "color" in kwargs:
+            kwargs["facecolor"] = kwargs["edgecolor"] = kwargs.pop("color")
+        codes = ["MOVETO", "LINETO", "LINETO", "LINETO", "CLOSEPOLY"]
         path = mpl.path.Path(
             np.array(
                 [
@@ -235,13 +273,16 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
                     [-height, 0],
                     [-height * 0.5, -width * 0.5],
                     [0, 0],
+                    [-height * 0.5, width * 0.5],
                 ]
             ),
             codes=[getattr(mpl.path.Path, x) for x in codes],
             closed=True,
         )
     elif marker == "p":
-        codes = ["MOVETO", "LINETO", "LINETO", "LINETO"]
+        if "color" in kwargs:
+            kwargs["facecolor"] = kwargs["edgecolor"] = kwargs.pop("color")
+        codes = ["MOVETO", "LINETO", "LINETO", "LINETO", "CLOSEPOLY"]
         path = mpl.path.Path(
             np.array(
                 [
@@ -249,13 +290,16 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
                     [0, 0],
                     [0, -width],
                     [-height, -width],
+                    [-height, 0],
                 ]
             ),
             codes=[getattr(mpl.path.Path, x) for x in codes],
             closed=True,
         )
     elif marker == "q":
-        codes = ["MOVETO", "LINETO", "LINETO", "LINETO"]
+        if "color" in kwargs:
+            kwargs["facecolor"] = kwargs["edgecolor"] = kwargs.pop("color")
+        codes = ["MOVETO", "LINETO", "LINETO", "LINETO", "CLOSEPOLY"]
         path = mpl.path.Path(
             np.array(
                 [
@@ -263,11 +307,27 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
                     [0, 0],
                     [0, width],
                     [-height, width],
+                    [-height, 0],
                 ]
             ),
             codes=[getattr(mpl.path.Path, x) for x in codes],
             closed=True,
         )
+    elif marker == "none":
+        if "color" in kwargs:
+            kwargs["facecolor"] = kwargs["edgecolor"] = kwargs.pop("color")
+        codes = ["MOVETO"]
+        path = mpl.path.Path(
+            np.array(
+                [
+                    [0, 0],
+                ]
+            ),
+            codes=[getattr(mpl.path.Path, x) for x in codes],
+            closed=True,
+        )
+    else:
+        raise ValueError(f"Arrow marker not found: {marker}.")
 
     patch = PathPatch(
         path,

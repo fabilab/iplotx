@@ -23,6 +23,7 @@ def plot(
     ax: Optional[mpl.axes.Axes] = None,
     style: str | dict | Sequence[str | dict] = (),
     title: Optional[str] = None,
+    aspect: Optional[str | float] = None,
     **kwargs,
 ):
     """Plot this network using the specified layout.
@@ -37,6 +38,7 @@ def plot(
         ax: The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
         style: Apply this style for the objects to plot. This can be a sequence (e.g. list) of styles and they will be applied in order.
         title: If not None, set the axes title to this value.
+        aspect: If not None, set the aspect ratio of the axis to this value. The most common value is 1.0, which proportionates x- and y-axes.
         **kwargs: Additional arguments are treated as an alternate way to specify style. If both "style" and additional **kwargs
             are provided, they are both applied in that order (style, then **kwargs).
 
@@ -86,6 +88,9 @@ def plot(
 
         if title is not None:
             ax.set_title(title)
+
+        if aspect is not None:
+            ax.set_aspect(aspect)
 
         _postprocess_axis(ax, artists)
 
