@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.210** total execution time for 24 files **from all galleries**:
+**00:00.339** total execution time for 24 files **from all galleries**:
 
 .. container::
 
@@ -32,10 +32,19 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_big_curves.py` (``../../gallery/plot_big_curves.py``)
-     - 00:00.210
+   * - :ref:`sphx_glr_gallery_plot_complex.py` (``../../gallery/plot_complex.py``)
+     - 00:00.228
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_minimum_spanning_trees.py` (``../../gallery/plot_minimum_spanning_trees.py``)
+     - 00:00.083
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
+     - 00:00.029
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_big_curves.py` (``../../gallery/plot_big_curves.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
@@ -45,9 +54,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_complex.py` (``../../gallery/plot_complex.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_dag.py` (``../../gallery/plot_dag.py``)
@@ -77,16 +83,10 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_minimum_spanning_trees.py` (``../../gallery/plot_minimum_spanning_trees.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_gallery_plot_multipartite_layout.py` (``../../gallery/plot_multipartite_layout.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)

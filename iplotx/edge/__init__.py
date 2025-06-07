@@ -61,7 +61,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 style=style,
                 transform=transform,
             )
-            self._label_collection._create_artists()
 
     def get_children(self):
         children = []

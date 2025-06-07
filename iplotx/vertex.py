@@ -201,9 +201,6 @@ class VertexCollection(PatchCollection):
         else:
             self._label_collection.set_clip_path(clip_path)
 
-        # Finally make the patches
-        self._label_collection._create_artists()
-
     def get_labels(self):
         if hasattr(self, "_label_collection"):
             return self._label_collection

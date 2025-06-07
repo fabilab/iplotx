@@ -48,4 +48,10 @@ nx.set_edge_attributes(
 )
 
 fig, ax = plt.subplots()
-ipx.plot(G, ax=ax, layout="pos", vertex_labels=True, edge_labels=True)
+ipx.plot(
+    G,
+    ax=ax,
+    layout="pos",
+    vertex_labels=True,
+    edge_labels=True,
+)

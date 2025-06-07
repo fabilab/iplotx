@@ -23,6 +23,15 @@ class LabelCollection(mpl.artist.Artist):
         super().__init__()
 
         self.set_transform(transform)
+        self._create_artists()
+
+    def get_children(self):
+        return self._labelartists
+
+    def set_figure(self, figure):
+        super().set_figure(figure)
+        for child in self.get_children():
+            child.set_figure(figure)
 
     def _create_artists(self):
         style = deepcopy(self._style) if self._style is not None else {}
@@ -41,16 +50,11 @@ class LabelCollection(mpl.artist.Artist):
                 transform=self.get_transform(),
                 **style,
             )
-            art.set_figure(self.figure)
-            art.axes = self.axes
             arts.append(art)
         self._labelartists = arts
 
-    def get_children(self):
-        return self._labelartists
-
     def set_offsets(self, offsets):
-        for art, offset in zip(self._labels, offsets):
+        for art, offset in zip(self._labelartists, offsets):
             art.set_position((offset[0], offset[1]))
         stale = True
 
