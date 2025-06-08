@@ -23,9 +23,31 @@ class GraphTestRunner(unittest.TestCase):
         if nx is None:
             raise unittest.SkipTest("networkx not found, skipping tests")
 
-    @image_comparison(baseline_images=["simple_graph"], remove_text=True)
+    @image_comparison(baseline_images=["flat_style"], remove_text=True)
     def test_flat_style(self):
         plt.close("all")
+
+        G = nx.Graph(
+            [
+                (4, 1),
+                (1, 2),
+                (5, 3),
+                (1, 3),
+            ]
+        )
+        pos = {1: (0, 0), 2: (-1, 0.3), 3: (2, 0.17), 4: (4, 0.255), 5: (5, 0.03)}
+        ipx.plot(
+            G,
+            layout=pos,
+            vertex_labels=False,
+            vertex_size=5,
+            vertex_facecolor="white",
+            vertex_edgecolor="black",
+            vertex_linewidth=3,
+            edge_linewidth=3,
+            edge_color=["grey", "black"],
+            margins=0.1,
+        )
 
     @image_comparison(baseline_images=["simple_graph"], remove_text=True)
     def test_simple_graph(self):
@@ -61,11 +83,8 @@ class GraphTestRunner(unittest.TestCase):
                     "linewidth": 5,
                 },
             },
+            margins=0.2,
         )
-
-        # Set margins for the axes so that nodes aren't clipped
-        ax = plt.gca()
-        ax.margins(0.20)
 
     @image_comparison(baseline_images=["cluster-layout"], remove_text=True)
     def test_cluster_layout(self):
@@ -124,7 +143,7 @@ class GraphTestRunner(unittest.TestCase):
                 "vertex": {
                     "facecolor": node_color,
                     "linewidth": 0,
-                    "size": 25,
+                    "size": 21,
                 }
             },
             ax=ax,
@@ -172,7 +191,7 @@ class GraphTestRunner(unittest.TestCase):
             },
         )
         fig.colorbar(
-            arts[0].get_edges().get_edges(),
+            arts[0].get_edges(),
             ax=ax,
         )
 
@@ -229,7 +248,7 @@ class GraphTestRunner(unittest.TestCase):
     @image_comparison(baseline_images=["house_with_colors"], remove_text=True)
     def test_display_house_with_colors(self):
         G = nx.house_graph()
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(4, 4))
         nx.set_node_attributes(
             G, {0: (0, 0), 1: (1, 0), 2: (0, 1), 3: (1, 1), 4: (0.5, 2.0)}, "pos"
         )
@@ -237,7 +256,7 @@ class GraphTestRunner(unittest.TestCase):
             G,
             {
                 n: {
-                    "size": 60 if n != 4 else 40,
+                    "size": 40 if n != 4 else 30,
                     "color": "tab:blue" if n != 4 else "tab:orange",
                 }
                 for n in G.nodes()
@@ -258,8 +277,8 @@ class GraphTestRunner(unittest.TestCase):
                     "edgecolor": "k",
                 },
             },
+            margins=0.1,
         )
-        ax.margins(0.17)
         plt.tight_layout()
 
     @image_comparison(baseline_images=["labels_and_colors"], remove_text=True)
@@ -301,7 +320,7 @@ class GraphTestRunner(unittest.TestCase):
                 "vertex": {
                     "facecolor": G.nodes.data("color"),
                     "alpha": G.nodes.data("alpha"),
-                    "size": 40,
+                    "size": 30,
                     "label": {"size": 22, "color": "whitesmoke"},
                     "zorder": 7,
                 },
@@ -324,10 +343,11 @@ class GraphTestRunner(unittest.TestCase):
                         "zorder": 0,
                     },
                     "vertex": {
-                        "size": 35,
+                        "size": 25,
                         "alpha": 0,
                     },
                 },
+                margins=0.1,
             )
         plt.tight_layout()
 
@@ -372,7 +392,6 @@ class GraphTestRunner(unittest.TestCase):
                 },
             },
         )
-        ax.margins(0.17)
 
 
 def suite():

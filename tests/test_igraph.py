@@ -59,7 +59,7 @@ class GraphTestRunner(unittest.TestCase):
             vertex_labels=["1", "2", "3", "4", "5"],
             style={
                 "vertex": {
-                    "size": 30,
+                    "size": 20,
                     "label": {
                         "color": "white",
                         "size": 10,
@@ -84,7 +84,6 @@ class GraphTestRunner(unittest.TestCase):
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plot(g, layout="layout", ax=ax)
 
-    @pytest.mark.skip(reason="curved edges are currently a little off-center")
     @image_comparison(baseline_images=["graph_directed_curved_loops"], remove_text=True)
     def test_directed_curved_loops(self):
         plt.close("all")
@@ -93,8 +92,8 @@ class GraphTestRunner(unittest.TestCase):
         g.add_edge(0, 0)
         g.add_edge(2, 2)
         fig, ax = plt.subplots(figsize=(4, 4))
-        ax.set_xlim(-1.2, 1.2)
-        ax.set_ylim(-1.2, 1.2)
+        # ax.set_xlim(-1.2, 1.2)
+        # ax.set_ylim(-1.2, 1.2)
         ipx.plot(
             g,
             ax=ax,
@@ -106,6 +105,7 @@ class GraphTestRunner(unittest.TestCase):
                     "looptension": 5,
                 }
             },
+            margins=0.05,
         )
 
     @image_comparison(baseline_images=["graph_squares_directed"], remove_text=True)
@@ -144,7 +144,6 @@ class GraphTestRunner(unittest.TestCase):
         lines = graph_artist.get_edges()
         lines.set_edgecolor("green")
 
-    @pytest.mark.skip(reason="curved edges are currently a little off-center")
     @image_comparison(baseline_images=["graph_with_curved_edges"])
     def test_graph_with_curved_edges(self):
         plt.close("all")
@@ -173,9 +172,6 @@ class GraphTestRunner(unittest.TestCase):
         )
         ax.set_aspect(1.0)
 
-    @pytest.mark.skip(
-        reason="curved edges are currently a little off-center and not offset properly"
-    )
     @image_comparison(baseline_images=["multigraph_with_curved_edges_undirected"])
     def test_graph_with_curved_edges(self):
         plt.close("all")
@@ -286,7 +282,6 @@ class ClusteringTestRunner(unittest.TestCase):
         ]
         return coords
 
-    @pytest.mark.skip(reason="grouping roundings have the wrong derivatives")
     @image_comparison(baseline_images=["clustering_directed"], remove_text=True)
     def test_clustering_directed_small(self):
         plt.close("all")
@@ -295,7 +290,6 @@ class ClusteringTestRunner(unittest.TestCase):
         fig, ax = plt.subplots()
         ipx.plot(g, grouping=clu, ax=ax, layout=self.layout_small_ring)
 
-    @pytest.mark.skip(reason="grouping roundings have the wrong derivatives")
     @image_comparison(baseline_images=["clustering_directed_large"], remove_text=True)
     def test_clustering_directed_large(self):
         plt.close("all")
@@ -307,15 +301,19 @@ class ClusteringTestRunner(unittest.TestCase):
             grouping=clu,
             style={
                 "vertex": {
-                    "size": 17,
+                    "size": 15,
                 },
                 "arrow": {
                     "width": 5,
-                    "length": 5,
+                    "height": 5,
+                },
+                "grouping": {
+                    "vertexpadding": 9,
                 },
             },
             layout=self.layout_large_ring,
             ax=ax,
+            aspect=1.0,
         )
 
 

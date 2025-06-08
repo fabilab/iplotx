@@ -1,5 +1,6 @@
 from typing import Optional, Sequence
 from contextlib import nullcontext
+import numpy as np
 import pandas as pd
 import matplotlib as mpl
 import matplotlib.pyplot as plt
@@ -24,6 +25,7 @@ def plot(
     style: str | dict | Sequence[str | dict] = (),
     title: Optional[str] = None,
     aspect: Optional[str | float] = None,
+    margins: float | tuple[float, float] = 0,
     **kwargs,
 ):
     """Plot this network using the specified layout.
@@ -39,6 +41,8 @@ def plot(
         style: Apply this style for the objects to plot. This can be a sequence (e.g. list) of styles and they will be applied in order.
         title: If not None, set the axes title to this value.
         aspect: If not None, set the aspect ratio of the axis to this value. The most common value is 1.0, which proportionates x- and y-axes.
+        margins: How much margin to leave around the plot. A higher value (e.g. 0.1) can be used as a quick fix when some vertex shapes reach beyond
+            the plot edge. This is a fraction of the data limits, so 0.1 means 10% of the data limits will be left as margin.
         **kwargs: Additional arguments are treated as an alternate way to specify style. If both "style" and additional **kwargs
             are provided, they are both applied in that order (style, then **kwargs).
 
@@ -80,10 +84,11 @@ def plot(
                 grouping,
                 layout,
                 network=network,
+                transform=ax.transData,
             )
             ax.add_artist(grpart)
-            # Postprocess for things that require an axis (transform, etc.)
-            grpart._process()
+
+            grpart.set_figure(ax.figure)
             artists.append(grpart)
 
         if title is not None:
@@ -93,6 +98,11 @@ def plot(
             ax.set_aspect(aspect)
 
         _postprocess_axis(ax, artists)
+
+        if np.isscalar(margins):
+            margins = (margins, margins)
+        if (margins[0] != 0) or (margins[1] != 0):
+            ax.margins(*margins)
 
         return artists
 
@@ -116,9 +126,6 @@ def _postprocess_axis(ax, artists):
     for art in artists:
         bboxes.append(art.get_datalim(ax.transData))
     bbox = mpl.transforms.Bbox.union(bboxes)
-    # FIXME: this is broken because dataLim for edges
-    # is incorrect before the first "draw" call. Not sure
-    # how to fix this quite yet
     ax.update_datalim(bbox)
 
     # Autoscale for x/y axis limits

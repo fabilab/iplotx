@@ -56,6 +56,7 @@ class VertexCollection(PatchCollection):
         patches, offsets, sizes, kwargs2 = self._init_vertex_patches(
             layout_df,
         )
+
         kwargs.update(kwargs2)
         kwargs["offsets"] = offsets
         kwargs["match_original"] = True
@@ -219,6 +220,14 @@ class VertexCollection(PatchCollection):
 
     @mpl.artist.allow_rasterization
     def draw(self, renderer):
+        if not self.get_visible():
+            return
+
+        # null graph, no need to draw anything
+        # NOTE: I would expect this to be already a clause in the superclass by oh well
+        if len(self.get_paths()) == 0:
+            return
+
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
         if (self._labels is not None) and (not hasattr(self, "_label_collection")):
             self._compute_label_collection()

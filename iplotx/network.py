@@ -123,7 +123,7 @@ class NetworkArtist(mpl.artist.Artist):
         """Get list of edge label artists."""
         return self._edges.get_labels()
 
-    def get_datalim(self, transData, pad=0.05):
+    def get_datalim(self, transData, pad=0.15):
         """Get limits on x/y axes based on the graph layout data.
 
         Parameters:

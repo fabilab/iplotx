@@ -33,6 +33,7 @@ class GroupingArtist(PatchCollection):
         layout: LayoutType,
         vertexpadding: Union[None, int] = None,
         npoints_per_vertex=30,
+        transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         *args,
         **kwargs,
     ):
@@ -45,6 +46,10 @@ class GroupingArtist(PatchCollection):
             layout: The layout of the vertices. If this object has no keys/index, the
                 vertices are assumed to have IDs corresponding to integers starting from
                 zero.
+            vertexpadding: How may points of padding to leave around each vertex centre.
+            npoints_per_vertex: How many points to use to approximate a round envelope around
+                each convex hull vertex.
+            transform: The matplotlib transform to use for the patches (typically transData).
         """
         if vertexpadding is not None:
             self._vertexpadding = vertexpadding
@@ -66,6 +71,14 @@ class GroupingArtist(PatchCollection):
 
         zorder = get_style(".grouping").get("zorder", 1)
         self.set_zorder(zorder)
+
+        self.set_transform(transform)
+
+    def set_figure(self, figure):
+        """Set the figure for the grouping, recomputing the paths depending on the figure's dpi."""
+        ret = super().set_figure(figure)
+        self._compute_paths(self.get_figure(root=True).dpi)
+        return ret
 
     def get_vertexpadding(self):
         """Get the vertex padding of each group."""
@@ -120,7 +133,6 @@ class GroupingArtist(PatchCollection):
             )
 
     def _process(self):
-        self.set_transform(self.axes.transData)
         self._compute_paths()
 
     def draw(self, renderer):
