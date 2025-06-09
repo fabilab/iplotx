@@ -1,15 +1,21 @@
+from typing import Optional
 from collections import defaultdict
-from networkx import number_of_nodes
 import numpy as np
 import pandas as pd
 
 from ..importing import igraph, networkx
-from ..typing import GraphType, GroupingType, LayoutType
+from ..layout import compute_tree_layout
+from ..typing import (
+    GraphType,
+    GroupingType,
+    TreeType,
+    LayoutType,
+)
 
 
 def network_library(
     network: GraphType,
-    data_providers: dict = None,
+    data_providers: Optional[dict] = None,
 ) -> str:
     # NOTE: data_providers is not used yet, but it will be by external plugins. That will require
     # changes to this function as well.
@@ -22,10 +28,40 @@ def network_library(
         if isinstance(network, networkx.DiGraph):
             return "networkx"
         if isinstance(network, networkx.MultiGraph):
-            return "networkx"
+        return "networkx"
         if isinstance(network, networkx.MultiDiGraph):
             return "networkx"
     raise TypeError("Unsupported graph type. Supported types are igraph and networkx.")
+
+
+def tree_library(
+    tree: TreeType,
+    data_providers: Optional[dict] = None,
+):
+    """Guess the library that provides this tree object."""
+    try:
+        from Bio import Phylo
+
+        if isinstance(tree, Phylo.TreeBase):
+            return "biopython"
+    except ImportError:
+        pass
+
+    try:
+        from ete3 import Tree as ETE3Tree
+
+        if isinstance(tree, ETE3Tree):
+            return "ete3"
+    except ImportError:
+        pass
+
+    try:
+        from pycogent import Tree as PyCTree
+
+        if isinstance(tree, PyCTree):
+            return "pycogent"
+    except ImportError:
+        pass
 
 
 def number_of_vertices(network: GraphType) -> int:
@@ -79,6 +115,21 @@ def normalise_layout(layout, network=None):
     if isinstance(layout, np.ndarray):
         return pd.DataFrame(layout)
     raise TypeError("Layout could not be normalised.")
+
+
+def normalise_tree_layout(
+    layout,
+    tree: Optional[TreeType] = None,
+    **kwargs,
+):
+    if isinstance(layout, str):
+        return compute_tree_layout(tree, layout, **kwargs)
+
+    raise NotImplementedError(
+        "Only internally computed tree layout currently accepted."
+    )
+
+
 
 
 def normalise_grouping(

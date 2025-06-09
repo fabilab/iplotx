@@ -5,6 +5,7 @@ from pandas import DataFrame
 from .importing import igraph, networkx
 
 
+# FIXME: check this mess with static type checkers and see how far it needs to/can go.
 igraphGraph = igraph.Graph if igraph is not None else Never
 if networkx is not None:
     networkxOmniGraph = Union[
@@ -37,3 +38,5 @@ if (igraph is not None) and (networkx is not None):
     ]
 
 LayoutType = Union[str, Sequence[Sequence[float]], ndarray, DataFrame]
+
+TreeType = dict

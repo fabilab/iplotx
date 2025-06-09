@@ -10,6 +10,7 @@ import pandas as pd
 from ..typing import (
     GraphType,
     LayoutType,
+    TreeType,
 )
 
 
@@ -21,9 +22,9 @@ def _make_layout_columns(ndim):
 class NetworkData(TypedDict):
     """Network data structure for iplotx."""
 
+    directed: bool
     vertices: pd.DataFrame
     edges: pd.DataFrame
-    directed: bool
     ndim: int
     network_library: NotRequired[str]
 
@@ -37,4 +38,23 @@ class NetworkDataProvider(Protocol):
         edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> NetworkData:
         """Create network data object for iplotx from any provider."""
+        pass
+
+
+class TreeData(TypedDict):
+    """Tree data structure for iplotx."""
+
+    rooted: bool
+    root: Optional[Hashable]
+    leaves: list[Hashable]
+    tree_library: NotRequired[str]
+
+
+class TreeDataProvider(Protocol):
+    def __call__(
+        self,
+        tree: TreeType,
+        layout: str | LayoutType,
+    ) -> TreeData:
+        """Create tree data object for iplotx from any provider."""
         pass
