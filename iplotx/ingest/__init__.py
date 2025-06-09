@@ -76,6 +76,32 @@ def ingest_network_data(
     return result
 
 
+def ingest_tree_data(
+    tree: TreeType,
+    layout: Optional[str] = None,
+) -> TreeData:
+    """Create internal data for the tree."""
+    _update_data_providers()
+
+    tl = tree_library(tree, data_providers=tree_data_providers)
+
+    if tl in tree_data_providers:
+        provider: TreeDataProvider = tree_data_providers[tl]
+    else:
+        sup = ", ".join(tree_data_providers.keys())
+        raise ValueError(
+            f"Tree library '{tl}' is not installed. "
+            "Currently installed supported libraries: {sup}."
+        )
+
+    result = provider(
+        tree=tree,
+        layout=layout,
+    )
+    result["tree_library"] = tl
+    return result
+
+
 def _update_data_providers():
     """Update data provieders dynamically from external packages."""
     global network_data_providers

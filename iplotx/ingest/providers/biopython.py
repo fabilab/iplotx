@@ -8,7 +8,7 @@ import pandas as pd
 from Bio import Phylo
 
 from ...typing import (
-    GraphType,
+    TreeType,
     LayoutType,
 )
 from ..common import (
@@ -31,7 +31,6 @@ class BiopythonDataProvider(TreeDataProvider):
             {
                 "root": tree.root,
                 "leaves": tree.get_terminals(),
-                "tree_library": "biopython",
                 "rooted": tree.rooted,
             }
         )

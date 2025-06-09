@@ -1,3 +1,7 @@
+from typing import (
+    Optional,
+)
+
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -12,7 +16,7 @@ from .utils.matplotlib import (
     _build_cmap_fun,
 )
 from .ingest import (
-    ingest_network_data,
+    ingest_tree_data,
 )
 from .vertex import (
     VertexCollection,

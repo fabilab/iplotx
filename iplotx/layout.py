@@ -91,7 +91,7 @@ def _vertical_tree_layout(tree, direction="descending"):
 
 
 def _circular_tree_layout(tree, direction="clockwise", starting_angle=0):
-    """Circular tree layout.""""
+    """Circular tree layout."""
     # Short form
     th = starting_angle
 

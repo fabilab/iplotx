@@ -28,7 +28,7 @@ def network_library(
         if isinstance(network, networkx.DiGraph):
             return "networkx"
         if isinstance(network, networkx.MultiGraph):
-        return "networkx"
+            return "networkx"
         if isinstance(network, networkx.MultiDiGraph):
             return "networkx"
     raise TypeError("Unsupported graph type. Supported types are igraph and networkx.")
@@ -128,8 +128,6 @@ def normalise_tree_layout(
     raise NotImplementedError(
         "Only internally computed tree layout currently accepted."
     )
-
-
 
 
 def normalise_grouping(

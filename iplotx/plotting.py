@@ -9,6 +9,7 @@ from .typing import (
     GraphType,
     LayoutType,
     GroupingType,
+    TreeType,
 )
 from .network import NetworkArtist
 from .groups import GroupingArtist
@@ -112,6 +113,7 @@ def tree(
     tree: Optional[TreeType] = None,
     layout: str | LayoutType = "horizontal",
     direction: str = "right",
+    ax: Optional[mpl.axes.Axes] = None,
     title: Optional[str] = None,
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
