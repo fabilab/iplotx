@@ -12,6 +12,7 @@ from .typing import (
 )
 from .network import NetworkArtist
 from .groups import GroupingArtist
+from .tree import TreeArtist
 from .style import context
 
 
@@ -27,7 +28,7 @@ def plot(
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
     **kwargs,
-):
+) -> list[mpl.artist.Artist]:
     """Plot this network using the specified layout.
 
     Args:
@@ -105,6 +106,47 @@ def plot(
             ax.margins(*margins)
 
         return artists
+
+
+def tree(
+    tree: Optional[TreeType] = None,
+    layout: str | LayoutType = "horizontal",
+    direction: str = "right",
+    title: Optional[str] = None,
+    aspect: Optional[str | float] = None,
+    margins: float | tuple[float, float] = 0,
+) -> list[mpl.artist.Artist]:
+    """Plot a tree using the specified layout.
+
+    Args:
+        tree: The tree to plot. Can be a BioPython.Phylo.Tree object.
+        layout: The layout to use for plotting.
+        direction: The direction of the horizontal layout. Can be "right" or "left". Defaults to "right".
+    """
+
+    if ax is None:
+        fig, ax = plt.subplots()
+
+    artist = TreeArtist(
+        tree=tree,
+        layout=layout,
+        direction=direction,
+    )
+
+    if title is not None:
+        ax.set_title(title)
+
+    if aspect is not None:
+        ax.set_aspect(aspect)
+
+    _postprocess_axis(ax, [artist])
+
+    if np.isscalar(margins):
+        margins = (margins, margins)
+    if (margins[0] != 0) or (margins[1] != 0):
+        ax.margins(*margins)
+
+    return artist
 
 
 # INTERNAL ROUTINES

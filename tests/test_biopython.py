@@ -36,4 +36,8 @@ class TreeTestRunner(unittest.TestCase):
 
         tree = self.small_tree
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(tree, ax=ax, layout="horizontal")
+        ipx.plotting.tree(
+            tree=tree,
+            ax=ax,
+            layout="horizontal",
+        )
