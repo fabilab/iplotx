@@ -70,6 +70,9 @@ with ipx.style.context({
 
 See <project:style.md> for more info.
 
+## Reference API
+See <project:api.md> for reference documentation of all functions and classes in `iplotx`.
+
 ## Rationale
 We believe graph **analysis**, graph **layouting**, and graph **visualisation** to be three separate tasks. `iplotx` currently focuses on visualisation. It might expand towards layouting in the future.
 
@@ -79,4 +82,5 @@ We believe graph **analysis**, graph **layouting**, and graph **visualisation** 
 
 style
 gallery/index
+API <api>
 ```
