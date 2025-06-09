@@ -57,10 +57,10 @@ default = {
                 "edgecolor": "none",
             },
         },
-    },
-    "arrow": {
-        "marker": "|>",
-        "width": 8,
+        "arrow": {
+            "marker": "|>",
+            "width": 8,
+        },
     },
     "grouping": {
         "facecolor": ["grey", "steelblue", "tomato"],
@@ -226,7 +226,7 @@ def unflatten_style(
                 style_flat[keyhead][keytail] = value
 
         for key, value in style_flat.items():
-            if isinstance(value, dict) and (value not in style_leaves):
+            if isinstance(value, dict) and (key not in style_leaves):
                 _inner(value)
 
     # top-level adjustments

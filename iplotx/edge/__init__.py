@@ -659,12 +659,13 @@ def make_stub_patch(**kwargs):
 
     # Forget specific properties that are not supported here
     forbidden_props = [
+        "arrow",
+        "label",
         "curved",
         "tension",
         "looptension",
         "loopmaxangle",
         "offset",
-        "label",
         "cmap",
     ]
     for prop in forbidden_props:

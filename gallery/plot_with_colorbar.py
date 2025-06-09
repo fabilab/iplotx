@@ -37,10 +37,10 @@ network_artist = ipx.plot(
             "cmap": cmap,
             "linewidth": 2,
             "offset": 0,
-        },
-        "arrow": {
-            "marker": ">",
-            "width": 5,
+            "arrow": {
+                "marker": ">",
+                "width": 5,
+            },
         },
     },
 )[0]
@@ -70,11 +70,11 @@ network_artist = ipx.plot(
             "cmap": cmap,
             "linewidth": 2,
             "offset": 0,
-        },
-        "arrow": {
-            "marker": ">",
-            "width": 5,
-            "color": "black",  # Make arrows black
+            "arrow": {
+                "marker": ">",
+                "width": 5,
+                "color": "black",  # Make arrows black
+            },
         },
     },
 )[0]
@@ -104,12 +104,12 @@ network_artist = ipx.plot(
             "cmap": cmap,
             "linewidth": 2,
             "offset": 0,
-        },
-        "arrow": {
-            "marker": ">",
-            "width": 5,
-            "color": "black",  # Make arrows black
-            "alpha": 1.0,  # Set 100% opacity for arrows
+            "arrow": {
+                "marker": ">",
+                "width": 5,
+                "color": "black",  # Make arrows black
+                "alpha": 1.0,  # Set 100% opacity for arrows
+            },
         },
     },
 )[0]

@@ -22,7 +22,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
     ):
 
         self._edge_collection = edge_collection
-        self._style = get_style(".arrow")
+        self._style = get_style(".edge.arrow")
 
         patches, sizes = self._create_artists()
 

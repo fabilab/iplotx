@@ -73,10 +73,10 @@ ipx.plot(
         "edge": {
             "linewidth": 1.7,
             "offset": 0,
-        },
-        "arrow": {
-            "height": 5,
-            "marker": "|>",
+            "arrow": {
+                "height": 5,
+                "marker": "|>",
+            },
         },
     },
 )

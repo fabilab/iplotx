@@ -183,10 +183,10 @@ class GraphTestRunner(unittest.TestCase):
                     "cmap": cmap,
                     "linewidth": 2,
                     "offset": 0,
-                },
-                "arrow": {
-                    "marker": ">",
-                    "width": 5,
+                    "arrow": {
+                        "marker": ">",
+                        "width": 5,
+                    },
                 },
             },
         )

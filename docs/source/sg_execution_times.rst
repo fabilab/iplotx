@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.339** total execution time for 24 files **from all galleries**:
+**00:00.546** total execution time for 24 files **from all galleries**:
 
 .. container::
 
@@ -32,14 +32,14 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_complex.py` (``../../gallery/plot_complex.py``)
-     - 00:00.228
+   * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
+     - 00:00.264
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_minimum_spanning_trees.py` (``../../gallery/plot_minimum_spanning_trees.py``)
-     - 00:00.083
+   * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
+     - 00:00.201
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
-     - 00:00.029
+   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
+     - 00:00.081
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
      - 00:00.000
@@ -56,13 +56,13 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_plot_complex.py` (``../../gallery/plot_complex.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_plot_dag.py` (``../../gallery/plot_dag.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_directed.py` (``../../gallery/plot_directed.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_grouping.py` (``../../gallery/plot_grouping.py``)
@@ -77,16 +77,19 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_labels_and_colors.py` (``../../gallery/plot_labels_and_colors.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
+   * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)
+   * - :ref:`sphx_glr_gallery_plot_minimum_spanning_trees.py` (``../../gallery/plot_minimum_spanning_trees.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_multipartite_layout.py` (``../../gallery/plot_multipartite_layout.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)
@@ -99,8 +102,5 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_traveling_salesman.py` (``../../gallery/plot_traveling_salesman.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
      - 00:00.000
      - 0.0

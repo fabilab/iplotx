@@ -163,10 +163,10 @@ class GraphTestRunner(unittest.TestCase):
                     "offset": 8,
                     "curved": True,
                     "tension": 0.5,
-                },
-                "arrow": {
-                    "height": 5,
-                    "width": 5,
+                    "arrow": {
+                        "height": 5,
+                        "width": 5,
+                    },
                 },
             },
         )
@@ -192,10 +192,10 @@ class GraphTestRunner(unittest.TestCase):
                     "offset": 8,
                     "curved": True,
                     "tension": 0.5,
-                },
-                "arrow": {
-                    "height": 5,
-                    "width": 5,
+                    "arrow": {
+                        "height": 5,
+                        "width": 5,
+                    },
                 },
             },
         )
@@ -303,9 +303,11 @@ class ClusteringTestRunner(unittest.TestCase):
                 "vertex": {
                     "size": 15,
                 },
-                "arrow": {
-                    "width": 5,
-                    "height": 5,
+                "edge": {
+                    "arrow": {
+                        "width": 5,
+                        "height": 5,
+                    },
                 },
                 "grouping": {
                     "vertexpadding": 9,

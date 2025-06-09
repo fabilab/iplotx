@@ -39,9 +39,9 @@ ipx.plot(
             "linestyle": linestyle,
             "offset": 0,
             "looptension": 3.5,
-        },
-        "arrow": {
-            "marker": "|>",
+            "arrow": {
+                "marker": "|>",
+            },
         },
     },
 )
@@ -63,7 +63,7 @@ ipx.plot(
         edge_linestyle=linestyle,
         edge_offset=0,
         edge_looptension=3.5,
-        arrow_marker="|>",
+        edge_arrow_marker="|>",
     ),
 )
 
@@ -82,7 +82,7 @@ ipx.plot(
     edge_linestyle=linestyle,
     edge_offset=0,
     edge_looptension=3.5,
-    arrow_marker="|>",
+    edge_arrow_marker="|>",
 )
 
 # %%
@@ -96,7 +96,7 @@ with ipx.style.context(
     edge_linestyle=linestyle,
     edge_offset=0,
     edge_looptension=3.5,
-    arrow_marker="|>",
+    edge_arrow_marker="|>",
 ):
     ipx.plot(
         G,
