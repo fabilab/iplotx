@@ -23,18 +23,27 @@ from ..typing import (
 from .common import (
     NetworkDataProvider,
     NetworkData,
+    TreeDataProvider,
 )
 
 
-data_providers: dict[NetworkDataProvider] = {}
+network_data_providers: dict[NetworkDataProvider] = {}
+tree_data_providers: dict[TreeDataProvider] = {}
 if networkx is not None:
     from .providers.networkx import NetworkXDataProvider
 
-    data_providers["networkx"] = NetworkXDataProvider()
+    network_data_providers["networkx"] = NetworkXDataProvider()
 if igraph is not None:
     from .providers.igraph import IGraphDataProvider
 
-    data_providers["igraph"] = IGraphDataProvider()
+    network_data_providers["igraph"] = IGraphDataProvider()
+
+try:
+    from .providers.biopython import BiopythonDataProvider
+
+    tree_data_providers["biopython"] = BiopythonDataProvider
+except ImportError:
+    pass
 
 
 def ingest_network_data(
@@ -46,12 +55,12 @@ def ingest_network_data(
     """Create internal data for the network."""
     _update_data_providers()
 
-    nl = network_library(network, data_providers=data_providers)
+    nl = network_library(network, data_providers=network_data_providers)
 
-    if nl in data_providers:
-        provider: NetworkDataProvider = data_providers[nl]
+    if nl in network_data_providers:
+        provider: NetworkDataProvider = network_data_providers[nl]
     else:
-        sup = ", ".join(data_providers.keys())
+        sup = ", ".join(network_data_providers.keys())
         raise ValueError(
             f"Network library '{nl}' is not installed. "
             "Currently installed supported libraries: {sup}."
@@ -69,15 +78,27 @@ def ingest_network_data(
 
 def _update_data_providers():
     """Update data provieders dynamically from external packages."""
-    global data_providers
+    global network_data_providers
+    global tree_data_providers
 
     discovered_providers = entry_points(group="iplotx.network_data_providers")
     for entry_point in discovered_providers:
-        if entry_point.name not in data_providers:
+        if entry_point.name not in network_data_providers:
             try:
                 provider: NetworkDataProvider = entry_point.load()
-                data_providers[entry_point.name] = provider
+                network_data_providers[entry_point.name] = provider
             except Exception as e:
                 warnings.warn(
                     f"Failed to load network data provider '{entry_point.name}': {e}"
+                )
+
+    discovered_providers = entry_points(group="iplotx.tree_data_providers")
+    for entry_point in discovered_providers:
+        if entry_point.name not in tree_data_providers:
+            try:
+                provider: TreeDataProvider = entry_point.load()
+                tree_data_providers[entry_point.name] = provider
+            except Exception as e:
+                warnings.warn(
+                    f"Failed to load tree data provider '{entry_point.name}': {e}"
                 )

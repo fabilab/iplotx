@@ -16,7 +16,6 @@ from .style import (
 from .utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
-    _get_label_width_height,
     _build_cmap_fun,
 )
 from .ingest import (
@@ -24,7 +23,6 @@ from .ingest import (
 )
 from .vertex import (
     VertexCollection,
-    make_patch as make_vertex_patch,
 )
 from .edge import (
     EdgeCollection,
@@ -84,10 +82,6 @@ class NetworkArtist(mpl.artist.Artist):
         zorder = get_style(".network").get("zorder", 1)
         self.set_zorder(zorder)
 
-        # We add the children here, before the axis is set
-        # When the figure is set, by virtue of the "forwarded" decorator,
-        # the figure is also set on the children. At that point it is possible
-        # to compute the data extent for edges, which depends on dpi.
         self._add_vertices()
         self._add_edges()
 
@@ -133,10 +127,7 @@ class NetworkArtist(mpl.artist.Artist):
         """
         import numpy as np
 
-        layout_columns = [
-            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
-        ]
-        layout = self._ipx_internal_data["vertex_df"][layout_columns].values
+        layout = self.get_layout().values
 
         if len(layout) == 0:
             return mpl.transforms.Bbox([[0, 0], [1, 1]])
@@ -171,7 +162,7 @@ class NetworkArtist(mpl.artist.Artist):
             return None
 
     def _add_vertices(self):
-        """Draw the vertices"""
+        """Add vertices to the network artist."""
 
         self._vertices = VertexCollection(
             layout=self.get_layout(),
@@ -182,7 +173,7 @@ class NetworkArtist(mpl.artist.Artist):
         )
 
     def _add_edges(self):
-        """Draw the edges.
+        """Add edges to the network artist.
 
         NOTE: UndirectedEdgeCollection and ArrowCollection are both subclasses of
         PatchCollection. When used with a cmap/norm, they set their facecolor

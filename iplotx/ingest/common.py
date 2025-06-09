@@ -48,6 +48,8 @@ class TreeData(TypedDict):
     root: Optional[Hashable]
     leaves: list[Hashable]
     tree_library: NotRequired[str]
+    vertices: dict[Hashable, tuple[float, float]]
+    edges: dict[Hashable, Sequence[tuple[float, float]]]
 
 
 class TreeDataProvider(Protocol):

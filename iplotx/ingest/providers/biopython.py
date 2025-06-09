@@ -5,6 +5,7 @@ from typing import (
 )
 import numpy as np
 import pandas as pd
+from Bio import Phylo
 
 from ...typing import (
     GraphType,
@@ -17,7 +18,7 @@ from ..common import (
 )
 
 
-class BioPythonDataProvider(TreeDataProvider):
+class BiopythonDataProvider(TreeDataProvider):
     def __call__(
         self,
         tree: TreeType,
@@ -25,7 +26,14 @@ class BioPythonDataProvider(TreeDataProvider):
     ) -> TreeData:
         """Create tree data object for iplotx from BioPython.Phylo.Tree classes."""
 
-        root = tree.root
-        leaves = tree.get_terminals()
+        tree_data = normalise_tree_layout(layout, tree=tree)
+        tree_data.update(
+            {
+                "root": tree.root,
+                "leaves": tree.get_terminals(),
+                "tree_library": "biopython",
+                "rooted": tree.rooted,
+            }
+        )
 
-        layout = normalise_tree_layout(layout, tree=tree)
+        return tree_data

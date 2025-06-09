@@ -9,11 +9,16 @@ def compute_tree_layout(
 ):
 
     if layout == "radial":
-        return _circular_tree_layout(tree)
-    if layout == "horizontal":
-        return _horizontal_tree_layout(tree)
-    if layout == "vertical":
-        return _vertical_tree_layout(tree)
+        layout_dict = _circular_tree_layout(tree)
+    elif layout == "horizontal":
+        layout_dict = _horizontal_tree_layout(tree)
+    elif layout == "vertical":
+        layout_dict = _vertical_tree_layout(tree)
+    else:
+        raise ValueError(f"Tree layout not available: {layout}")
+
+    layout_dict["name"] = layout
+    return layout_dict
 
 
 def _horizontal_tree_layout_right(tree):
