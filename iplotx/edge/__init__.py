@@ -75,7 +75,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
         ret = super().set_figure(figure)
         for child in self.get_children():
             child.set_figure(figure)
-        self._update_paths()
         self._update_children()
         return ret
 

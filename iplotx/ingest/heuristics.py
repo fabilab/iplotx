@@ -137,7 +137,6 @@ def normalise_tree_layout(
             index.append(key)
             coordinates.append(coordinate)
         index = pd.Index(index)
-        print(index)
         coordinates = np.array(coordinates)
         ndim = len(coordinates[0]) if len(coordinates) > 0 else 2
         layout_columns = [f"_ipx_layout_{i}" for i in range(ndim)]

@@ -62,6 +62,8 @@ class TreeArtist(mpl.artist.Artist):
             layout,
             orientation=orientation,
             directed=directed,
+            vertex_labels=vertex_labels,
+            edge_labels=edge_labels,
         )
 
         super().__init__()

@@ -115,9 +115,11 @@ def tree(
     orientation: str = "right",
     directed: bool | str = False,
     ax: Optional[mpl.axes.Axes] = None,
+    style: str | dict | Sequence[str | dict] = (),
     title: Optional[str] = None,
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
+    **kwargs,
 ) -> list[mpl.artist.Artist]:
     """Plot a tree using the specified layout.
 
@@ -127,29 +129,34 @@ def tree(
         orientation: The orientation of the horizontal layout. Can be "right" or "left". Defaults to "right".
         directed: If False, donot draw arrows. If True or "child", draw arrows from parent to child node. If "parent", draw arrows the other way around.
     """
+    stylecontext = context(style, **kwargs) if style or kwargs else nullcontext()
 
-    if ax is None:
-        fig, ax = plt.subplots()
+    with stylecontext:
+        if ax is None:
+            fig, ax = plt.subplots()
 
-    artist = TreeArtist(
-        tree=tree,
-        layout=layout,
-        orientation=orientation,
-        directed=directed,
-    )
+        artist = TreeArtist(
+            tree=tree,
+            layout=layout,
+            orientation=orientation,
+            directed=directed,
+        )
+        ax.add_artist(artist)
 
-    if title is not None:
-        ax.set_title(title)
+        artist.set_figure(ax.figure)
 
-    if aspect is not None:
-        ax.set_aspect(aspect)
+        if title is not None:
+            ax.set_title(title)
 
-    _postprocess_axis(ax, [artist])
+        if aspect is not None:
+            ax.set_aspect(aspect)
 
-    if np.isscalar(margins):
-        margins = (margins, margins)
-    if (margins[0] != 0) or (margins[1] != 0):
-        ax.margins(*margins)
+        _postprocess_axis(ax, [artist])
+
+        if np.isscalar(margins):
+            margins = (margins, margins)
+        if (margins[0] != 0) or (margins[1] != 0):
+            ax.margins(*margins)
 
     return artist
 
