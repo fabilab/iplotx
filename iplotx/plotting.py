@@ -140,6 +140,8 @@ def tree(
             layout=layout,
             orientation=orientation,
             directed=directed,
+            transform=mpl.transforms.IdentityTransform(),
+            offset_transform=ax.transData,
         )
         ax.add_artist(artist)
 

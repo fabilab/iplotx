@@ -126,12 +126,10 @@ class TreeArtist(mpl.artist.Artist):
         if len(layout) == 0:
             return mpl.transforms.Bbox([[0, 0], [1, 1]])
 
-        if self._vertices is not None:
-            bbox = self._vertices.get_datalim(transData)
+        bbox = self._vertices.get_datalim(transData)
 
-        if self._edges is not None:
-            edge_bbox = self._edges.get_datalim(transData)
-            bbox = mpl.transforms.Bbox.union([bbox, edge_bbox])
+        edge_bbox = self._edges.get_datalim(transData)
+        bbox = mpl.transforms.Bbox.union([bbox, edge_bbox])
 
         bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
         return bbox
@@ -252,10 +250,6 @@ class TreeArtist(mpl.artist.Artist):
     @_stale_wrapper
     def draw(self, renderer):
         """Draw each of the children, with some buffering mechanism."""
-        if not self.get_children():
-            self._add_vertices()
-            self._add_edges()
-
         if not self.get_visible():
             return
 
