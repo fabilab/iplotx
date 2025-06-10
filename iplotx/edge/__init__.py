@@ -1,3 +1,5 @@
+from typing import Sequence
+
 from math import atan2, tan, cos, pi, sin
 from collections import defaultdict
 import numpy as np
@@ -32,15 +34,18 @@ class EdgeCollection(mpl.collections.PatchCollection):
         patches,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         arrow_transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
+        vertex_ids: Sequence[tuple] = None,
+        directed: bool = False,
         *args,
         **kwargs,
     ):
         kwargs["match_original"] = True
-        self._vertex_ids = kwargs.pop("vertex_ids", None)
+        self._vertex_ids = vertex_ids
+
         self._vertex_collection = kwargs.pop("vertex_collection", None)
         self._style = kwargs.pop("style", None)
         self._labels = kwargs.pop("labels", None)
-        self._directed = kwargs.pop("directed", False)
+        self._directed = directed
         self._arrow_transform = arrow_transform
         if "cmap" in self._style:
             kwargs["cmap"] = self._style["cmap"]
@@ -75,6 +80,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         ret = super().set_figure(figure)
         for child in self.get_children():
             child.set_figure(figure)
+        self._update_paths()
         self._update_children()
         return ret
 

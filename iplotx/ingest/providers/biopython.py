@@ -60,7 +60,6 @@ class BiopythonDataProvider(TreeDataProvider):
                     edge_data["_ipx_source"].append(node)
                     edge_data["_ipx_target"].append(child)
         edge_df = pd.DataFrame(edge_data)
-        edge_df.set_index(["_ipx_source", "_ipx_target"], inplace=True, drop=False)
         tree_data["edge_df"] = edge_df
 
         # Add vertex labels

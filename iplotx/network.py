@@ -205,8 +205,6 @@ class NetworkArtist(mpl.artist.Artist):
         edgepatches = []
         adjacent_vertex_ids = []
         for i, (vid1, vid2) in enumerate(edge_df.index):
-            # Get the vertices for this edge
-
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
 
             # FIXME:: Improve this logic. We have three layers of priority:

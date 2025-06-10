@@ -201,8 +201,6 @@ class TreeArtist(mpl.artist.Artist):
         edgepatches = []
         adjacent_vertex_ids = []
         for i, (vid1, vid2) in enumerate(edge_df.index):
-            # Get the vertices for this edge
-
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
 
             # FIXME:: Improve this logic. We have three layers of priority:
@@ -253,6 +251,19 @@ class TreeArtist(mpl.artist.Artist):
 
     @_stale_wrapper
     def draw(self, renderer):
-        super().draw(renderer)
-        for child in self.get_children():
-            child.draw(renderer)
+        """Draw each of the children, with some buffering mechanism."""
+        if not self.get_children():
+            self._add_vertices()
+            self._add_edges()
+
+        if not self.get_visible():
+            return
+
+        # FIXME: Callbacks on stale vertices/edges??
+
+        # NOTE: looks like we have to manage the zorder ourselves
+        # this is kind of funny actually
+        children = list(self.get_children())
+        children.sort(key=lambda x: x.zorder)
+        for art in children:
+            art.draw(renderer)
