@@ -1,5 +1,7 @@
-from typing import Sequence
-
+from typing import (
+    Sequence,
+    Optional,
+)
 from math import atan2, tan, cos, pi, sin
 from collections import defaultdict
 import numpy as np
@@ -36,6 +38,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         arrow_transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         vertex_ids: Sequence[tuple] = None,
         directed: bool = False,
+        style: Optional[dict] = None,
         *args,
         **kwargs,
     ):
@@ -43,7 +46,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         self._vertex_ids = vertex_ids
 
         self._vertex_collection = kwargs.pop("vertex_collection", None)
-        self._style = kwargs.pop("style", None)
+        self._style = style if style is not None else {}
         self._labels = kwargs.pop("labels", None)
         self._directed = directed
         self._arrow_transform = arrow_transform
@@ -60,7 +63,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 transform=self._arrow_transform,
             )
         if self._labels is not None:
-            style = self._style.get("label", None) if self._style is not None else {}
+            style = self._style.get("label", {})
             transform = self.get_transform()
             self._label_collection = LabelCollection(
                 self._labels,
@@ -233,19 +236,23 @@ class EdgeCollection(mpl.collections.PatchCollection):
             # Vertex size
             vsize_fig = vsizes[i]
 
-            # Shorten edge
+            # Leaf rotation
             edge_stylei = rotate_style(self._style, index=i, id=(v1, v2))
             tension = (
                 0
                 if not self._style.get("curved", False)
                 else edge_stylei.get("tension", 5)
             )
+            waypoints = edge_stylei.get("waypoints", "none")
+
+            # Compute actual edge path
             path, angles = self._compute_edge_path(
-                tension,
                 vcoord_fig,
                 vpath_fig,
                 vsize_fig,
                 trans_inv,
+                tension=tension,
+                waypoints=waypoints,
             )
 
             # Collect angles for this vertex, to be used for loops plotting below
@@ -384,13 +391,69 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
     def _compute_edge_path(
         self,
-        tension,
         *args,
         **kwargs,
     ):
+        tension = kwargs.pop("tension", 0)
+        waypoints = kwargs.pop("waypoints", "none")
+
+        if (waypoints != "none") and (tension != 0):
+            raise ValueError("Waypoints not supported for curved edges.")
+
+        if waypoints != "none":
+            return self._compute_edge_path_waypoints(waypoints, *args, **kwargs)
+
         if tension == 0:
             return self._compute_edge_path_straight(*args, **kwargs)
+
         return self._compute_edge_path_curved(tension, *args, **kwargs)
+
+    def _compute_edge_path_waypoints(
+        self,
+        waypoints,
+        vcoord_fig,
+        vpath_fig,
+        vsize_fig,
+        trans_inv,
+        **kwargs,
+    ):
+        if waypoints in ("x0y1", "y0x1"):
+            if waypoints == "x0y1":
+                waypoint = np.array([vcoord_fig[0][0], vcoord_fig[1][1]])
+            else:
+                waypoint = np.array([vcoord_fig[1][0], vcoord_fig[0][1]])
+
+            # Angles of the straight lines
+            theta0 = atan2(*((waypoint - vcoord_fig[0])[::-1]))
+            theta1 = atan2(*((waypoint - vcoord_fig[1])[::-1]))
+
+            # Shorten at starting vertex
+            vs = (
+                self._get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta0)
+                + vcoord_fig[0]
+            )
+
+            # Shorten at end vertex
+            ve = (
+                self._get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta1)
+                + vcoord_fig[1]
+            )
+
+            points = [vs, waypoint, ve]
+            codes = ["MOVETO", "LINETO", "LINETO"]
+            angles = (theta0, theta1)
+        else:
+            raise NotImplementedError(
+                f"Edge shortening with waypoints not implemented yet: {waypoints}.",
+            )
+
+        path = mpl.path.Path(
+            points,
+            codes=[getattr(mpl.path.Path, x) for x in codes],
+        )
+
+        path.vertices = trans_inv(path.vertices)
+        return path, angles
 
     def _compute_edge_path_straight(
         self,
@@ -400,11 +463,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         trans_inv,
         **kwargs,
     ):
-        # Straight SVG instructions
-        path = {
-            "vertices": [],
-            "codes": ["MOVETO", "LINETO"],
-        }
+        points = []
 
         # Angle of the straight line
         theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
@@ -414,18 +473,19 @@ class EdgeCollection(mpl.collections.PatchCollection):
             self._get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta)
             + vcoord_fig[0]
         )
-        path["vertices"].append(vs)
+        points.append(vs)
 
         # Shorten at end vertex
         ve = (
             self._get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi)
             + vcoord_fig[1]
         )
-        path["vertices"].append(ve)
+        points.append(ve)
 
+        codes = ["MOVETO", "LINETO"]
         path = mpl.path.Path(
-            path["vertices"],
-            codes=[getattr(mpl.path.Path, x) for x in path["codes"]],
+            points,
+            codes=[getattr(mpl.path.Path, x) for x in codes],
         )
         path.vertices = trans_inv(path.vertices)
         return path, (theta, theta + np.pi)
@@ -695,6 +755,7 @@ def make_stub_patch(**kwargs):
         "label",
         "curved",
         "tension",
+        "waypoints",
         "looptension",
         "loopmaxangle",
         "offset",

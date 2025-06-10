@@ -198,6 +198,7 @@ class TreeArtist(mpl.artist.Artist):
             colorarray = []
         edgepatches = []
         adjacent_vertex_ids = []
+        waypoints = []
         for i, (vid1, vid2) in enumerate(edge_df.index):
             edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
 
@@ -219,6 +220,20 @@ class TreeArtist(mpl.artist.Artist):
                 colorarray.append(edge_style["color"])
                 edge_stylei["color"] = cmap_fun(edge_stylei["color"])
 
+            # Tree layout determines waypoints
+            waypointsi = edge_stylei.pop("waypoints", None)
+            if waypointsi is None:
+                layout_name = self._ipx_internal_data["layout_name"]
+                if layout_name == "horizontal":
+                    waypointsi = "x0y1"
+                elif layout_name == "vertical":
+                    waypointsi = "y0y0"
+                elif layout_name == "radial":
+                    waypointsi = "r0a1"
+                else:
+                    waypointsi = "none"
+            waypoints.append(waypointsi)
+
             # These are not the actual edges drawn, only stubs to establish
             # the styles which are then fed into the dynamic, optimised
             # factory (the collection) below
@@ -235,6 +250,8 @@ class TreeArtist(mpl.artist.Artist):
             vmax = np.max(colorarray)
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
+
+        edge_style["waypoints"] = waypoints
 
         # NOTE: Trees are directed is their "directed" property is True, "child", or "parent"
         self._edges = EdgeCollection(

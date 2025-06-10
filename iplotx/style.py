@@ -22,6 +22,7 @@ style_leaves = (
     "lloopmaxangle",
     "rotate",
     "marker",
+    "waypoints",
 )
 
 

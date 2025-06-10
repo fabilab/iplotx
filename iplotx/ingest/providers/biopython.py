@@ -40,6 +40,7 @@ class BiopythonDataProvider(TreeDataProvider):
             "rooted": tree.rooted,
             "directed": directed,
             "ndim": 2,
+            "layout_name": layout,
         }
 
         # Add vertex_df including layout
