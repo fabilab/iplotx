@@ -112,7 +112,8 @@ def plot(
 def tree(
     tree: Optional[TreeType] = None,
     layout: str | LayoutType = "horizontal",
-    direction: str = "right",
+    orientation: str = "right",
+    directed: bool | str = False,
     ax: Optional[mpl.axes.Axes] = None,
     title: Optional[str] = None,
     aspect: Optional[str | float] = None,
@@ -123,7 +124,8 @@ def tree(
     Args:
         tree: The tree to plot. Can be a BioPython.Phylo.Tree object.
         layout: The layout to use for plotting.
-        direction: The direction of the horizontal layout. Can be "right" or "left". Defaults to "right".
+        orientation: The orientation of the horizontal layout. Can be "right" or "left". Defaults to "right".
+        directed: If False, donot draw arrows. If True or "child", draw arrows from parent to child node. If "parent", draw arrows the other way around.
     """
 
     if ax is None:
@@ -132,7 +134,8 @@ def tree(
     artist = TreeArtist(
         tree=tree,
         layout=layout,
-        direction=direction,
+        orientation=orientation,
+        directed=directed,
     )
 
     if title is not None:

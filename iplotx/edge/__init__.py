@@ -40,7 +40,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
         self._vertex_collection = kwargs.pop("vertex_collection", None)
         self._style = kwargs.pop("style", None)
         self._labels = kwargs.pop("labels", None)
-        self.directed = kwargs.pop("directed", False)
+        self._directed = kwargs.pop("directed", False)
+        self._arrow_transform = arrow_transform
         if "cmap" in self._style:
             kwargs["cmap"] = self._style["cmap"]
             kwargs["norm"] = self._style["norm"]
@@ -51,7 +52,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         if self.directed:
             self._arrows = EdgeArrowCollection(
                 self,
-                transform=arrow_transform,
+                transform=self._arrow_transform,
             )
         if self._labels is not None:
             style = self._style.get("label", None) if self._style is not None else {}
@@ -81,6 +82,32 @@ class EdgeCollection(mpl.collections.PatchCollection):
     def _update_children(self):
         self._update_arrows()
         self._update_labels()
+
+    @property
+    def directed(self):
+        return self._directed
+
+    @directed.setter
+    def directed(self, value):
+        value = bool(value)
+        if self._directed == value:
+            return
+
+        # Moving to undirected, remove arrows
+        if not value:
+            self._arrows.remove()
+            del self._arrows
+        # Moving to directed, create arrows
+        else:
+            self._arrows = EdgeArrowCollection(
+                self,
+                transform=self._arrow_transform,
+            )
+
+        self._directed = value
+        # NOTE: setting stale to True should trigger a redraw as soon as needed
+        # and that will update children. We might need to verify that.
+        self.stale = True
 
     def set_array(self, array):
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""

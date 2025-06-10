@@ -80,3 +80,10 @@ class IGraphDataProvider(NetworkDataProvider):
             "ndim": ndim,
         }
         return network_data
+
+    def check_dependencies(self) -> bool:
+        try:
+            import igraph
+        except ImportError:
+            return False
+        return True

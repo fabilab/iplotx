@@ -115,3 +115,10 @@ class NetworkXDataProvider(NetworkDataProvider):
             "ndim": ndim,
         }
         return network_data
+
+    def check_dependencies(self) -> bool:
+        try:
+            import networkx
+        except ImportError:
+            return False
+        return True

@@ -1,5 +1,6 @@
 from typing import (
     Optional,
+    Sequence,
 )
 
 import numpy as np
@@ -25,6 +26,9 @@ from .edge import (
     EdgeCollection,
     make_stub_patch as make_undirected_edge_patch,
 )
+from .network import (
+    _update_from_internal,
+)
 
 
 @_forwarder(
@@ -44,7 +48,10 @@ class TreeArtist(mpl.artist.Artist):
         self,
         tree,
         layout="horizontal",
-        direction="right",
+        orientation="right",
+        directed: bool | str = False,
+        vertex_labels: Optional[list | dict | pd.Series] = None,
+        edge_labels: Optional[Sequence] = None,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         offset_transform: Optional[mpl.transforms.Transform] = None,
     ):
@@ -53,8 +60,8 @@ class TreeArtist(mpl.artist.Artist):
         self._ipx_internal_data = ingest_tree_data(
             tree,
             layout,
-            vertex_labels=vertex_labels,
-            edge_labels=edge_labels,
+            orientation=orientation,
+            directed=directed,
         )
 
         super().__init__()
@@ -86,6 +93,52 @@ class TreeArtist(mpl.artist.Artist):
     def set_offset_transform(self, offset_transform):
         """Set the offset transform (for vertices/edges)."""
         self._offset_transform = offset_transform
+
+    def get_layout(self, kind="vertex"):
+        """Get vertex or edge layout."""
+        layout_columns = [
+            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
+        ]
+
+        if kind == "vertex":
+            layout = self._ipx_internal_data["vertex_df"][layout_columns]
+            return layout
+
+        elif kind == "edge":
+            return self._ipx_internal_data["edge_df"][layout_columns]
+        else:
+            raise ValueError(f"Unknown layout kind: {kind}. Use 'vertex' or 'edge'.")
+
+    def get_datalim(self, transData, pad=0.15):
+        """Get limits on x/y axes based on the graph layout data.
+
+        Parameters:
+            transData (Transform): The transform to use for the data.
+            pad (float): Padding to add to the limits. Default is 0.05.
+                Units are a fraction of total axis range before padding.
+        """
+        import numpy as np
+
+        layout = self.get_layout().values
+
+        if len(layout) == 0:
+            return mpl.transforms.Bbox([[0, 0], [1, 1]])
+
+        if self._vertices is not None:
+            bbox = self._vertices.get_datalim(transData)
+
+        if self._edges is not None:
+            edge_bbox = self._edges.get_datalim(transData)
+            bbox = mpl.transforms.Bbox.union([bbox, edge_bbox])
+
+        bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
+        return bbox
+
+    def _get_label_series(self, kind):
+        if "label" in self._ipx_internal_data[f"{kind}_df"].columns:
+            return self._ipx_internal_data[f"{kind}_df"]["label"]
+        else:
+            return None
 
     def get_vertices(self):
         """Get VertexCollection artist."""
@@ -185,6 +238,7 @@ class TreeArtist(mpl.artist.Artist):
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
 
+        # NOTE: Trees are directed is their "directed" property is True, "child", or "parent"
         self._edges = EdgeCollection(
             edgepatches,
             labels=labels,
@@ -192,7 +246,7 @@ class TreeArtist(mpl.artist.Artist):
             vertex_collection=self._vertices,
             transform=self.get_offset_transform(),
             style=edge_style,
-            directed=self._ipx_internal_data["directed"],
+            directed=bool(self._ipx_internal_data["directed"]),
         )
 
     @_stale_wrapper

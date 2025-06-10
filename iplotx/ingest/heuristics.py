@@ -42,7 +42,7 @@ def tree_library(
     try:
         from Bio import Phylo
 
-        if isinstance(tree, Phylo.TreeBase):
+        if isinstance(tree, Phylo.BaseTree.Tree):
             return "biopython"
     except ImportError:
         pass
@@ -123,11 +123,31 @@ def normalise_tree_layout(
     **kwargs,
 ):
     if isinstance(layout, str):
-        return compute_tree_layout(tree, layout, **kwargs)
+        layout = compute_tree_layout(tree, layout, **kwargs)
+    else:
+        raise NotImplementedError(
+            "Only internally computed tree layout currently accepted."
+        )
 
-    raise NotImplementedError(
-        "Only internally computed tree layout currently accepted."
-    )
+    if isinstance(layout, dict):
+        # Adjust vertex layout
+        index = []
+        coordinates = []
+        for key, coordinate in layout.items():
+            index.append(key)
+            coordinates.append(coordinate)
+        index = pd.Index(index)
+        print(index)
+        coordinates = np.array(coordinates)
+        ndim = len(coordinates[0]) if len(coordinates) > 0 else 2
+        layout_columns = [f"_ipx_layout_{i}" for i in range(ndim)]
+        layout = pd.DataFrame(
+            coordinates,
+            index=index,
+            columns=layout_columns,
+        )
+
+    return layout
 
 
 def normalise_grouping(

@@ -23,8 +23,8 @@ class NetworkData(TypedDict):
     """Network data structure for iplotx."""
 
     directed: bool
-    vertices: pd.DataFrame
-    edges: pd.DataFrame
+    vertex_df: pd.DataFrame
+    edge_df: pd.DataFrame
     ndim: int
     network_library: NotRequired[str]
 
@@ -40,16 +40,24 @@ class NetworkDataProvider(Protocol):
         """Create network data object for iplotx from any provider."""
         pass
 
+    def check_dependencies(
+        self,
+    ):
+        """Check whether the dependencies for this provider are installed."""
+        pass
+
 
 class TreeData(TypedDict):
     """Tree data structure for iplotx."""
 
     rooted: bool
+    directed: bool | str
     root: Optional[Hashable]
     leaves: list[Hashable]
+    vertex_df: dict[Hashable, tuple[float, float]]
+    edge_df: dict[Hashable, Sequence[tuple[float, float]]]
+    ndim: int
     tree_library: NotRequired[str]
-    vertices: dict[Hashable, tuple[float, float]]
-    edges: dict[Hashable, Sequence[tuple[float, float]]]
 
 
 class TreeDataProvider(Protocol):
@@ -57,6 +65,16 @@ class TreeDataProvider(Protocol):
         self,
         tree: TreeType,
         layout: str | LayoutType,
+        orientation: Optional[str] = None,
+        directed: bool | str = False,
+        vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
+        edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> TreeData:
         """Create tree data object for iplotx from any provider."""
+        pass
+
+    def check_dependencies(
+        self,
+    ):
+        """Check whether the dependencies for this provider are installed."""
         pass
