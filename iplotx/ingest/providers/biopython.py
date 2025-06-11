@@ -75,7 +75,15 @@ class BiopythonDataProvider(TreeDataProvider):
                 x.name for x in tree_data["vertices"].index
             ]
         elif not np.isscalar(vertex_labels):
-            tree_data["vertex_df"]["label"] = vertex_labels
+            # If a dict-like object is passed, it can be incomplete (e.g. only the leaves):
+            # we fill the rest with empty strings which are not going to show up in the plot.
+            if isinstance(vertex_labels, pd.Series):
+                vertex_labels = dict(vertex_labels)
+            if isinstance(vertex_labels, dict):
+                for vertex in tree_data["vertex_df"].index:
+                    if vertex not in vertex_labels:
+                        vertex_labels[vertex] = ""
+            tree_data["vertex_df"]["label"] = pd.Series(vertex_labels)
 
         return tree_data
 

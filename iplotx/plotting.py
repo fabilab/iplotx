@@ -114,6 +114,7 @@ def tree(
     layout: str | LayoutType = "horizontal",
     orientation: str = "right",
     directed: bool | str = False,
+    vertex_labels: Optional[list | dict | pd.Series] = None,
     ax: Optional[mpl.axes.Axes] = None,
     style: str | dict | Sequence[str | dict] = "tree",
     title: Optional[str] = None,
@@ -142,6 +143,7 @@ def tree(
             directed=directed,
             transform=mpl.transforms.IdentityTransform(),
             offset_transform=ax.transData,
+            vertex_labels=vertex_labels,
         )
         ax.add_artist(artist)
 

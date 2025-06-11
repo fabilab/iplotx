@@ -2,6 +2,9 @@ from copy import deepcopy
 import numpy as np
 import matplotlib as mpl
 
+from .style import (
+    rotate_style,
+)
 from .utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
@@ -9,6 +12,16 @@ from .utils.matplotlib import (
 )
 
 
+@_forwarder(
+    (
+        "set_clip_path",
+        "set_clip_box",
+        "set_snap",
+        "set_sketch_params",
+        "set_animated",
+        "set_picker",
+    )
+)
 class LabelCollection(mpl.artist.Artist):
     def __init__(
         self,
@@ -26,15 +39,21 @@ class LabelCollection(mpl.artist.Artist):
         self._create_artists()
 
     def get_children(self):
-        return self._labelartists
+        return tuple(self._labelartists)
 
     def set_figure(self, figure):
         super().set_figure(figure)
         for child in self.get_children():
             child.set_figure(figure)
+        self._update_offsets(dpi=figure.dpi)
+
+    def _get_margins_with_dpi(self, dpi=72.0):
+        return self._margins * dpi / 72.0
 
     def _create_artists(self):
         style = deepcopy(self._style) if self._style is not None else {}
+
+        margins = []
 
         forbidden_props = ["rotate"]
         for prop in forbidden_props:
@@ -43,20 +62,45 @@ class LabelCollection(mpl.artist.Artist):
 
         arts = []
         for i, label in enumerate(self._labels):
+            stylei = rotate_style(style, i)
+            # Margins are handled separately
+            hmargin = stylei.pop("hmargin", 0.0)
+            vmargin = stylei.pop("vmargin", 0.0)
+            margins.append((hmargin, vmargin))
+
             art = mpl.text.Text(
                 self._offsets[i][0],
                 self._offsets[i][1],
                 label,
                 transform=self.get_transform(),
-                **style,
+                **stylei,
             )
             arts.append(art)
         self._labelartists = arts
+        self._margins = np.array(margins)
+
+    def _update_offsets(self, dpi=72.0):
+        """Update offsets including margins."""
+        offsets = self._adjust_offsets_for_margins(self._offsets, dpi=dpi)
+        self.set_offsets(offsets)
+
+    def get_offsets(self):
+        return self._offsets
+
+    def _adjust_offsets_for_margins(self, offsets, dpi=72.0):
+        margins = self._get_margins_with_dpi(dpi=dpi)
+        if (margins != 0).any():
+            transform = self.get_transform()
+            trans = transform.transform
+            trans_inv = transform.inverted().transform
+            offsets = trans_inv(trans(offsets) + margins)
+        return offsets
 
     def set_offsets(self, offsets):
+        """Set positions (offsets) of the labels."""
         for art, offset in zip(self._labelartists, offsets):
             art.set_position((offset[0], offset[1]))
-        stale = True
+        self.stale = True
 
     def set_rotations(self, rotations):
         for art, rotation in zip(self._labelartists, rotations):
@@ -67,12 +111,14 @@ class LabelCollection(mpl.artist.Artist):
         stale = True
 
     @_stale_wrapper
-    def draw(self, renderer, *args, **kwds):
+    def draw(self, renderer):
         """Draw each of the children, with some buffering mechanism."""
         if not self.get_visible():
             return
 
+        self._update_offsets(dpi=renderer.dpi)
+
         # We should manage zorder ourselves, but we need to compute
         # the new offsets and angles of arrows from the edges before drawing them
         for art in self.get_children():
-            art.draw(renderer, *args, **kwds)
+            art.draw(renderer)

@@ -25,10 +25,13 @@ style_leaves = (
     "rotate",
     "marker",
     "waypoints",
-    "pad",
     "horizontalalignment",
     "verticalalignment",
     "boxstyle",
+    "hpadding",
+    "vpadding",
+    "hmargin",
+    "vmargin",
 )
 
 
@@ -90,9 +93,15 @@ tree = deepcopy(default)
 tree["vertex"]["size"] = 0
 tree["vertex"]["alpha"] = 0
 tree["edge"]["linewidth"] = 2.5
-tree["vertex"]["label"]["bbox"] = {"boxstyle": "square,pad=0.5"}
+tree["vertex"]["label"]["bbox"] = {
+    "boxstyle": "square,pad=0.5",
+    "facecolor": "white",
+    "edgecolor": "none",
+}
+tree["vertex"]["label"]["color"] = "black"
+tree["vertex"]["label"]["size"] = 12
 tree["vertex"]["label"]["horizontalalignment"] = "left"
-tree["vertex"]["label"]["hpadding"] = 30
+tree["vertex"]["label"]["hmargin"] = 20
 
 
 styles = {

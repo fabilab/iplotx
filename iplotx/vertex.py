@@ -72,6 +72,9 @@ class VertexCollection(PatchCollection):
         # Compute _transforms like in _CollectionWithScales for dpi issues
         self.set_sizes(sizes)
 
+        if self._labels is not None:
+            self._compute_label_collection()
+
     def get_children(self):
         children = []
         if hasattr(self, "_label_collection"):
@@ -187,7 +190,6 @@ class VertexCollection(PatchCollection):
 
     def _compute_label_collection(self):
         transform = self.get_offset_transform()
-        trans = transform.transform
 
         style = (
             deepcopy(self._style.get("label", None)) if self._style is not None else {}
@@ -203,18 +205,6 @@ class VertexCollection(PatchCollection):
             offsets=self._offsets,
             transform=transform,
         )
-
-        # Forward a bunch of mpl settings that are needed
-        self._label_collection.set_figure(self.figure)
-        self._label_collection.axes = self.axes
-        # forward the clippath/box to the children need this logic
-        # because mpl exposes some fast-path logic
-        clip_path = self.get_clip_path()
-        if clip_path is None:
-            clip_box = self.get_clip_box()
-            self._label_collection.set_clip_box(clip_box)
-        else:
-            self._label_collection.set_clip_path(clip_path)
 
     def get_labels(self):
         if hasattr(self, "_label_collection"):
@@ -243,8 +233,6 @@ class VertexCollection(PatchCollection):
             return
 
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
-        if (self._labels is not None) and (not hasattr(self, "_label_collection")):
-            self._compute_label_collection()
 
         # NOTE: This draws the vertices first, then the labels.
         # The correct order would be vertex1->label1->vertex2->label2, etc.
