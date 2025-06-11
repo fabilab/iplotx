@@ -25,6 +25,10 @@ style_leaves = (
     "rotate",
     "marker",
     "waypoints",
+    "pad",
+    "horizontalalignment",
+    "verticalalignment",
+    "boxstyle",
 )
 
 
@@ -82,16 +86,19 @@ hollow["vertex"]["linewidth"] = 1.5
 hollow["vertex"]["marker"] = "r"
 hollow["vertex"]["size"] = "label"
 
-novertices = deepcopy(default)
-novertices["vertex"]["size"] = 0
-novertices["vertex"]["alpha"] = 0
-novertices["edge"]["linewidth"] = 2.5
+tree = deepcopy(default)
+tree["vertex"]["size"] = 0
+tree["vertex"]["alpha"] = 0
+tree["edge"]["linewidth"] = 2.5
+tree["vertex"]["label"]["bbox"] = {"boxstyle": "square,pad=0.5"}
+tree["vertex"]["label"]["horizontalalignment"] = "left"
+tree["vertex"]["label"]["hpadding"] = 30
 
 
 styles = {
     "default": default,
     "hollow": hollow,
-    "novertices": novertices,
+    "tree": tree,
 }
 
 

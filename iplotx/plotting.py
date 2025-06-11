@@ -115,7 +115,7 @@ def tree(
     orientation: str = "right",
     directed: bool | str = False,
     ax: Optional[mpl.axes.Axes] = None,
-    style: str | dict | Sequence[str | dict] = (),
+    style: str | dict | Sequence[str | dict] = "tree",
     title: Optional[str] = None,
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
