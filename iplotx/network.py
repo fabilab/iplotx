@@ -244,9 +244,11 @@ class NetworkArtist(mpl.artist.Artist):
 
         self._edges = EdgeCollection(
             edgepatches,
-            labels=labels,
             vertex_ids=adjacent_vertex_ids,
             vertex_collection=self._vertices,
+            layout=self.get_layout(),
+            layout_coordinate_system="cartesian",
+            labels=labels,
             transform=self.get_offset_transform(),
             style=edge_style,
             directed=self._ipx_internal_data["directed"],

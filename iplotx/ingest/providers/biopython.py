@@ -49,6 +49,10 @@ class BiopythonDataProvider(TreeDataProvider):
             tree=tree,
             orientation=orientation,
         )
+        if layout in ("radial",):
+            tree_data["layout_coordinate_system"] = "polar"
+        else:
+            tree_data["layout_coordinate_system"] = "cartesian"
 
         # Add edge_df
         edge_data = {"_ipx_source": [], "_ipx_target": []}

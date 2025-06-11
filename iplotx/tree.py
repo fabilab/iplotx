@@ -164,6 +164,10 @@ class TreeArtist(mpl.artist.Artist):
             transform=self.get_transform(),
             style=get_style(".vertex"),
             labels=self._get_label_series("vertex"),
+            layout_coordinate_system=self._ipx_internal_data.get(
+                "layout_coordinate_system",
+                "catesian",
+            ),
         )
 
     def _add_edges(self):
@@ -256,9 +260,14 @@ class TreeArtist(mpl.artist.Artist):
         # NOTE: Trees are directed is their "directed" property is True, "child", or "parent"
         self._edges = EdgeCollection(
             edgepatches,
-            labels=labels,
             vertex_ids=adjacent_vertex_ids,
             vertex_collection=self._vertices,
+            layout=self.get_layout(kind="vertex"),
+            layout_coordinate_system=self._ipx_internal_data.get(
+                "layout_coordinate_system",
+                "cartesian",
+            ),
+            labels=labels,
             transform=self.get_offset_transform(),
             style=edge_style,
             directed=bool(self._ipx_internal_data["directed"]),

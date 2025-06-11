@@ -56,6 +56,7 @@ class TreeData(TypedDict):
     leaves: list[Hashable]
     vertex_df: dict[Hashable, tuple[float, float]]
     edge_df: dict[Hashable, Sequence[tuple[float, float]]]
+    layout_coordinate_system: str
     layout_name: str
     ndim: int
     tree_library: NotRequired[str]

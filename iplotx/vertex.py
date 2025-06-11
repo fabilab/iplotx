@@ -48,6 +48,10 @@ class VertexCollection(PatchCollection):
     def __init__(self, *args, **kwargs):
 
         layout_df = kwargs.pop("layout")
+        layout_coordinate_system = kwargs.pop(
+            "layout_coordinate_system",
+            "cartesian",
+        )
         self._index = layout_df.index
         self._style = kwargs.pop("style", None)
         self._labels = kwargs.pop("labels", None)
@@ -55,6 +59,7 @@ class VertexCollection(PatchCollection):
         # Create patches from structured data
         patches, offsets, sizes, kwargs2 = self._init_vertex_patches(
             layout_df,
+            layout_coordinate_system=layout_coordinate_system,
         )
 
         kwargs.update(kwargs2)
@@ -117,7 +122,9 @@ class VertexCollection(PatchCollection):
     get_size = get_sizes
     set_size = set_sizes
 
-    def _init_vertex_patches(self, vertex_layout_df):
+    def _init_vertex_patches(
+        self, vertex_layout_df, layout_coordinate_system="cartesian"
+    ):
         style = self._style or {}
         if "cmap" in style:
             cmap_fun = _build_cmap_fun(
@@ -143,7 +150,14 @@ class VertexCollection(PatchCollection):
         sizes = []
         for i, (vid, row) in enumerate(vertex_layout_df.iterrows()):
             # Centre of the vertex
-            offsets.append(list(row.values))
+            offset = list(row.values)
+
+            # Transform to cartesian coordinates if needed
+            if layout_coordinate_system == "polar":
+                r, theta = offset
+                offset = [r * np.cos(theta), r * np.sin(theta)]
+
+            offsets.append(offset)
 
             if style.get("size") == "label":
                 # NOTE: it's ok to overwrite the dict here

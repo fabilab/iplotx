@@ -79,16 +79,19 @@ def _vertical_tree_layout(tree, orientation="descending"):
     return layout
 
 
-def _circular_tree_layout(tree, orientation="clockwise", starting_angle=0):
+def _circular_tree_layout(tree, orientation="right", starting_angle=0):
     """Circular tree layout."""
     # Short form
     th = starting_angle
-    sign = 1 if orientation == "clockwise" else -1
+    sign = 1 if orientation == "right" else -1
 
     layout = _horizontal_tree_layout_right(tree)
+    ymax = max(point[1] for point in layout.values())
     for key, (x, y) in layout.items():
-        r = np.sqrt(x**2 + y**2)
-        theta = sign * np.arctan2(y, x) + th
-        layout[key] = (r * np.cos(theta), r * np.sin(theta))
+        r = x
+        theta = sign * 2 * np.pi * y / (ymax + 1) + th
+        # We export r and theta to ensure theta does not
+        # modulo 2pi if we take the tan and then arctan later.
+        layout[key] = (r, theta)
 
     return layout

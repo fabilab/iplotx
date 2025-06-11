@@ -17,6 +17,7 @@ from ..style import (
     rotate_style,
 )
 from ..label import LabelCollection
+from ..vertex import VertexCollection
 from .arrow import EdgeArrowCollection
 
 
@@ -34,9 +35,12 @@ class EdgeCollection(mpl.collections.PatchCollection):
     def __init__(
         self,
         patches,
+        vertex_ids: Sequence[tuple],
+        vertex_collection: VertexCollection,
+        layout: pd.DataFrame,
+        layout_coordinate_system: str = "cartesian",
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         arrow_transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
-        vertex_ids: Sequence[tuple] = None,
         directed: bool = False,
         style: Optional[dict] = None,
         *args,
@@ -45,7 +49,12 @@ class EdgeCollection(mpl.collections.PatchCollection):
         kwargs["match_original"] = True
         self._vertex_ids = vertex_ids
 
-        self._vertex_collection = kwargs.pop("vertex_collection", None)
+        self._vertex_collection = vertex_collection
+        # NOTE: the layout is needed for non-cartesian coordinate systems
+        # for which information is lost upon cartesianisation (e.g. polar,
+        # for which multiple angles are degenerate in cartesian space).
+        self._layout = layout
+        self._layout_coordinate_system = layout_coordinate_system
         self._style = style if style is not None else {}
         self._labels = kwargs.pop("labels", None)
         self._directed = directed
@@ -163,8 +172,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
         vpaths = []
         vsizes = []
         for v1, v2 in self._vertex_ids:
-            offset1 = self._vertex_collection.get_offsets()[index[v1]]
-            offset2 = self._vertex_collection.get_offsets()[index[v2]]
+            # NOTE: these are in the original layout coordinate system
+            # not cartesianised yet.
+            offset1 = self._layout.values[index[v1]]
+            offset2 = self._layout.values[index[v2]]
             voffsets.append((offset1, offset2))
 
             path1 = self._vertex_collection.get_paths()[index[v1]]
@@ -227,9 +238,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
             # Coordinates of the adjacent vertices, in data coords
             vcoord_data = vcenters[i]
 
-            # Coordinates in figure (default) coords
-            vcoord_fig = trans(vcoord_data)
-
             # Vertex paths in figure (default) coords
             vpath_fig = vpaths[i]
 
@@ -247,9 +255,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
             # Compute actual edge path
             path, angles = self._compute_edge_path(
-                vcoord_fig,
+                vcoord_data,
                 vpath_fig,
                 vsize_fig,
+                trans,
                 trans_inv,
                 tension=tension,
                 waypoints=waypoints,
@@ -411,13 +420,20 @@ class EdgeCollection(mpl.collections.PatchCollection):
     def _compute_edge_path_waypoints(
         self,
         waypoints,
-        vcoord_fig,
+        vcoord_data,
         vpath_fig,
         vsize_fig,
+        trans,
         trans_inv,
         **kwargs,
     ):
+
         if waypoints in ("x0y1", "y0x1"):
+            assert self._layout_coordinate_system == "cartesian"
+
+            # Coordinates in figure (default) coords
+            vcoord_fig = trans(vcoord_data)
+
             if waypoints == "x0y1":
                 waypoint = np.array([vcoord_fig[0][0], vcoord_fig[1][1]])
             else:
@@ -443,16 +459,24 @@ class EdgeCollection(mpl.collections.PatchCollection):
             codes = ["MOVETO", "LINETO", "LINETO"]
             angles = (theta0, theta1)
         elif waypoints == "r0a1":
-            r0 = np.sqrt((vcoord_fig[0] ** 2).sum())
-            r1 = np.sqrt((vcoord_fig[1] ** 2).sum())
-            alpha0 = atan2(*(vcoord_fig[0][::-1]))
-            alpha1 = atan2(*(vcoord_fig[1][::-1]))
+            assert self._layout_coordinate_system == "polar"
 
-            # FIXME: this requires knowing whether it's a left or right turn
+            r0, alpha0 = vcoord_data[0]
+            r1, alpha1 = vcoord_data[1]
+            idx_inner = np.argmin([r0, r1])
+            idx_outer = 1 - idx_inner
+            alpha_outer = [alpha0, alpha1][idx_outer]
+
+            # FIXME: this is aware of chirality as stored by the layout function
             betas = np.linspace(alpha0, alpha1, 30)
-            waypoints = min(r0, r1) * np.vstack([np.cos(betas), np.sin(betas)]).T
-            endpoint = vcoord_fig[1] if r1 > r0 else vcoord_fig[0]
-            points = list(waypoints) + [endpoint]
+            waypoints = [r0, r1][idx_inner] * np.vstack(
+                [np.cos(betas), np.sin(betas)]
+            ).T
+            endpoint = [r0, r1][idx_outer] * np.array(
+                [np.cos(alpha_outer), np.sin(alpha_outer)]
+            )
+            points = np.array(list(waypoints) + [endpoint])
+            points = trans(points)
             codes = ["MOVETO"] + ["LINETO"] * len(waypoints)
             # FIXME: same as previus comment
             angles = (alpha0 + pi / 2, alpha1)
@@ -472,12 +496,17 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
     def _compute_edge_path_straight(
         self,
-        vcoord_fig,
+        vcoord_data,
         vpath_fig,
         vsize_fig,
+        trans,
         trans_inv,
         **kwargs,
     ):
+
+        # Coordinates in figure (default) coords
+        vcoord_fig = trans(vcoord_data)
+
         points = []
 
         # Angle of the straight line
@@ -508,9 +537,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
     def _compute_edge_path_curved(
         self,
         tension,
-        vcoord_fig,
+        vcoord_data,
         vpath_fig,
         vsize_fig,
+        trans,
         trans_inv,
         ports=(None, None),
     ):
@@ -519,6 +549,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
         The most important part is that the derivative of the Bezier at the start
         and end point towards the vertex centres: people notice if they do not.
         """
+
+        # Coordinates in figure (default) coords
+        vcoord_fig = trans(vcoord_data)
+
         dv = vcoord_fig[1] - vcoord_fig[0]
         edge_straight_length = np.sqrt((dv**2).sum())
 
