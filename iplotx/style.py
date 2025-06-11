@@ -4,6 +4,8 @@ from contextlib import contextmanager
 import numpy as np
 import pandas as pd
 
+from iplotx.ingest.heuristics import number_of_vertices
+
 from .importing import igraph, networkx
 
 
@@ -80,10 +82,16 @@ hollow["vertex"]["linewidth"] = 1.5
 hollow["vertex"]["marker"] = "r"
 hollow["vertex"]["size"] = "label"
 
+novertices = deepcopy(default)
+novertices["vertex"]["size"] = 0
+novertices["vertex"]["alpha"] = 0
+novertices["edge"]["linewidth"] = 2.5
+
 
 styles = {
     "default": default,
     "hollow": hollow,
+    "novertices": novertices,
 }
 
 

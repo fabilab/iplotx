@@ -32,7 +32,7 @@ class GroupingArtist(PatchCollection):
         grouping: GroupingType,
         layout: LayoutType,
         vertexpadding: Union[None, int] = None,
-        npoints_per_vertex=30,
+        points_per_curve: int = 30,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         *args,
         **kwargs,
@@ -47,7 +47,7 @@ class GroupingArtist(PatchCollection):
                 vertices are assumed to have IDs corresponding to integers starting from
                 zero.
             vertexpadding: How may points of padding to leave around each vertex centre.
-            npoints_per_vertex: How many points to use to approximate a round envelope around
+            points_per_curve: How many points to use to approximate a round envelope around
                 each convex hull vertex.
             transform: The matplotlib transform to use for the patches (typically transData).
         """
@@ -56,6 +56,8 @@ class GroupingArtist(PatchCollection):
         else:
             style = get_style(".grouping")
             self._vertexpadding = style.get("vertexpadding", 10)
+
+        self.points_per_curve = points_per_curve
 
         network = kwargs.pop("network", None)
         patches, grouping, coords_hulls = self._create_patches(
@@ -120,16 +122,15 @@ class GroupingArtist(PatchCollection):
             patches.append(patch)
         return patches, grouping, coords_hulls
 
-    def _compute_paths(self, dpi=72.0, points_per_vertex=30):
-        # Short form
-        ppv = points_per_vertex
+    def _compute_paths(self, dpi=72.0):
+        ppc = self._points_per_curve
         for i, hull in enumerate(self._coords_hulls):
             self._paths[i].vertices = _compute_group_path_with_vertex_padding(
                 hull,
                 self._paths[i].vertices,
                 self.get_transform(),
                 vertexpadding=self.get_vertexpadding_dpi(dpi),
-                points_per_vertex=ppv,
+                points_per_vertex=ppc,
             )
 
     def _process(self):

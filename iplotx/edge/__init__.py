@@ -425,6 +425,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         vsize_fig,
         trans,
         trans_inv,
+        points_per_curve=30,
         **kwargs,
     ):
 
@@ -468,7 +469,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
             alpha_outer = [alpha0, alpha1][idx_outer]
 
             # FIXME: this is aware of chirality as stored by the layout function
-            betas = np.linspace(alpha0, alpha1, 30)
+            betas = np.linspace(alpha0, alpha1, points_per_curve)
             waypoints = [r0, r1][idx_inner] * np.vstack(
                 [np.cos(betas), np.sin(betas)]
             ).T
