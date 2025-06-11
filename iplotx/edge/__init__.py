@@ -442,6 +442,21 @@ class EdgeCollection(mpl.collections.PatchCollection):
             points = [vs, waypoint, ve]
             codes = ["MOVETO", "LINETO", "LINETO"]
             angles = (theta0, theta1)
+        elif waypoints == "r0a1":
+            r0 = np.sqrt((vcoord_fig[0] ** 2).sum())
+            r1 = np.sqrt((vcoord_fig[1] ** 2).sum())
+            alpha0 = atan2(*(vcoord_fig[0][::-1]))
+            alpha1 = atan2(*(vcoord_fig[1][::-1]))
+
+            # FIXME: this requires knowing whether it's a left or right turn
+            betas = np.linspace(alpha0, alpha1, 30)
+            waypoints = min(r0, r1) * np.vstack([np.cos(betas), np.sin(betas)]).T
+            endpoint = vcoord_fig[1] if r1 > r0 else vcoord_fig[0]
+            points = list(waypoints) + [endpoint]
+            codes = ["MOVETO"] + ["LINETO"] * len(waypoints)
+            # FIXME: same as previus comment
+            angles = (alpha0 + pi / 2, alpha1)
+
         else:
             raise NotImplementedError(
                 f"Edge shortening with waypoints not implemented yet: {waypoints}.",

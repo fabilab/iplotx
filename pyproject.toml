@@ -15,6 +15,7 @@ requires-python = ">=3.11"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
+  "biopython>=1.85",
   "matplotlib>=2.0.0",
   "numpy>=2.0.0",
   "pandas>=2.0.0",
