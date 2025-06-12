@@ -57,7 +57,7 @@ class GroupingArtist(PatchCollection):
             style = get_style(".grouping")
             self._vertexpadding = style.get("vertexpadding", 10)
 
-        self.points_per_curve = points_per_curve
+        self._points_per_curve = points_per_curve
 
         network = kwargs.pop("network", None)
         patches, grouping, coords_hulls = self._create_patches(
@@ -130,7 +130,7 @@ class GroupingArtist(PatchCollection):
                 self._paths[i].vertices,
                 self.get_transform(),
                 vertexpadding=self.get_vertexpadding_dpi(dpi),
-                points_per_vertex=ppc,
+                points_per_curve=ppc,
             )
 
     def _process(self):

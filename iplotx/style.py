@@ -101,7 +101,7 @@ tree["vertex"]["label"]["bbox"] = {
 tree["vertex"]["label"]["color"] = "black"
 tree["vertex"]["label"]["size"] = 12
 tree["vertex"]["label"]["horizontalalignment"] = "left"
-tree["vertex"]["label"]["hmargin"] = 20
+tree["vertex"]["label"]["hmargin"] = 5
 
 
 styles = {

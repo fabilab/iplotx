@@ -14,7 +14,11 @@ mpl.use("agg")
 import matplotlib.pyplot as plt
 
 import iplotx as ipx
-from iplotx.importing import networkx as nx
+
+try:
+    from .utils import image_comparison
+except ImportError:
+    from utils import image_comparison
 
 
 class TreeTestRunner(unittest.TestCase):
@@ -40,4 +44,50 @@ class TreeTestRunner(unittest.TestCase):
             tree=tree,
             ax=ax,
             layout="horizontal",
+        )
+
+    @image_comparison(baseline_images=["tree_radial"], remove_text=True)
+    def test_radial(self):
+        plt.close("all")
+
+        tree = self.small_tree
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ipx.plotting.tree(
+            tree=tree,
+            ax=ax,
+            layout="radial",
+            aspect=1,
+        )
+
+    @image_comparison(baseline_images=["leaf_labels"], remove_text=True)
+    def test_leaf_labels(self):
+        plt.close("all")
+
+        tree = self.small_tree
+        leaf_labels = {leaf: str(i + 1) for i, leaf in enumerate(tree.get_terminals())}
+
+        fig, ax = plt.subplots(figsize=(4, 4))
+        ipx.plotting.tree(
+            tree=tree,
+            ax=ax,
+            layout="horizontal",
+            vertex_labels=leaf_labels,
+            margins=0.1,
+        )
+
+    @image_comparison(baseline_images=["leaf_labels_hmargin"], remove_text=True)
+    def test_leaf_labels_hmargin(self):
+        plt.close("all")
+
+        tree = self.small_tree
+        leaf_labels = {leaf: str(i + 1) for i, leaf in enumerate(tree.get_terminals())}
+
+        fig, ax = plt.subplots(figsize=(4, 4))
+        ipx.plotting.tree(
+            tree=tree,
+            ax=ax,
+            layout="horizontal",
+            vertex_labels=leaf_labels,
+            vertex_label_hmargin=[2, 20],
+            margins=0.1,
         )
