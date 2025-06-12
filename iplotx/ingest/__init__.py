@@ -12,6 +12,8 @@ from typing import (
 import numpy as np
 import pandas as pd
 
+from iplotx.ingest.providers.cogent3 import Cogent3DataProvider
+
 from ..importing import igraph, networkx
 from .heuristics import (
     network_library,
@@ -31,6 +33,7 @@ from .common import (
 from .providers.networkx import NetworkXDataProvider
 from .providers.igraph import IGraphDataProvider
 from .providers.biopython import BiopythonDataProvider
+from .providers.cogent3 import Cogent3DataProvider
 
 
 # Internally supported data providers
@@ -48,6 +51,10 @@ if provider.check_dependencies():
 provider = BiopythonDataProvider()
 if provider.check_dependencies():
     tree_data_providers["biopython"] = provider
+
+provider = Cogent3DataProvider()
+if provider.check_dependencies():
+    tree_data_providers["cogent3"] = provider
 
 
 # Functions to ingest data from various libraries

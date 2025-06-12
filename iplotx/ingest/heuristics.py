@@ -56,10 +56,10 @@ def tree_library(
         pass
 
     try:
-        from pycogent import Tree as PyCTree
+        from cogent3.core.tree import PhyloNode
 
-        if isinstance(tree, PyCTree):
-            return "pycogent"
+        if isinstance(tree, PhyloNode):
+            return "cogent3"
     except ImportError:
         pass
 

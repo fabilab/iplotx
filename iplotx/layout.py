@@ -7,21 +7,29 @@ def compute_tree_layout(
     tree: TreeType,
     layout: str,
     orientation: str,
+    **kwargs,
 ):
 
     if layout == "radial":
-        layout_dict = _circular_tree_layout(tree, orientation=orientation)
+        layout_dict = _circular_tree_layout(tree, orientation=orientation, **kwargs)
     elif layout == "horizontal":
-        layout_dict = _horizontal_tree_layout(tree, orientation=orientation)
+        layout_dict = _horizontal_tree_layout(tree, orientation=orientation, **kwargs)
     elif layout == "vertical":
-        layout_dict = _vertical_tree_layout(tree, orientation=orientation)
+        layout_dict = _vertical_tree_layout(tree, orientation=orientation, **kwargs)
     else:
         raise ValueError(f"Tree layout not available: {layout}")
 
     return layout_dict
 
 
-def _horizontal_tree_layout_right(tree):
+def _horizontal_tree_layout_right(
+    tree,
+    root_fun: callable,
+    preorder_fun: callable,
+    postorder_fun: callable,
+    children_fun: callable,
+    branch_length_fun: callable,
+):
     """Build a tree layout horizontally, left to right.
 
     The strategy is the usual one:
@@ -34,30 +42,36 @@ def _horizontal_tree_layout_right(tree):
     layout = {}
 
     # Set the y values for vertices
-    for i, leaf in enumerate(tree.get_terminals()):
-        layout[leaf] = [None, i]
-    for node in tree.get_nonterminals(order="postorder"):
-        layout[node] = [
-            None,
-            np.mean([layout[child][1] for child in node.clades]),
-        ]
+    i = 0
+    for node in postorder_fun(tree):
+        children = children_fun(node)
+        if len(children) == 0:
+            layout[node] = [None, i]
+            i += 1
+        else:
+            layout[node] = [
+                None,
+                np.mean([layout[child][1] for child in children]),
+            ]
 
     # Set the x values for vertices
-    layout[tree.root][0] = 0
-    for node in tree.find_clades(order="level"):
+    layout[root_fun(tree)][0] = 0
+    for node in preorder_fun(tree):
         x0, y0 = layout[node]
-        for child in node.clades:
-            bl = child.branch_length if child.branch_length is not None else 1.0
+        for child in children_fun(node):
+            bl = branch_length_fun(child)
+            if bl is None:
+                bl = 1.0
             layout[child][0] = layout[node][0] + bl
 
     return layout
 
 
-def _horizontal_tree_layout(tree, orientation="right"):
+def _horizontal_tree_layout(tree, orientation="right", **kwargs):
     if orientation not in ("right", "left"):
         raise ValueError("Orientation must be 'right' or 'left'.")
 
-    layout = _horizontal_tree_layout_right(tree)
+    layout = _horizontal_tree_layout_right(tree, **kwargs)
 
     if orientation == "left":
         for key, value in layout.items():
@@ -65,10 +79,10 @@ def _horizontal_tree_layout(tree, orientation="right"):
     return layout
 
 
-def _vertical_tree_layout(tree, orientation="descending"):
+def _vertical_tree_layout(tree, orientation="descending", **kwargs):
     """Vertical tree layout."""
     sign = 1 if orientation == "descending" else -1
-    layout = _horizontal_tree_layout(tree)
+    layout = _horizontal_tree_layout(tree, **kwargs)
     # FIXME: the data structure might end up differing
     for key, value in layout.items():
         value = value.values @ np.array([[0, sign], [-sign, 0]])
@@ -84,6 +98,7 @@ def _circular_tree_layout(
     orientation="right",
     starting_angle=0,
     angular_span=360,
+    **kwargs,
 ):
     """Circular tree layout."""
     # Short form
@@ -91,7 +106,7 @@ def _circular_tree_layout(
     th_span = angular_span * np.pi / 180
     sign = 1 if orientation == "right" else -1
 
-    layout = _horizontal_tree_layout_right(tree)
+    layout = _horizontal_tree_layout_right(tree, **kwargs)
     ymax = max(point[1] for point in layout.values())
     for key, (x, y) in layout.items():
         r = x
