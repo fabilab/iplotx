@@ -243,7 +243,13 @@ class GraphTestRunner(unittest.TestCase):
         )
 
         fig, ax = plt.subplots()
-        ipx.plot(G, ax=ax, layout="pos", vertex_labels=True, edge_labels=True)
+        ipx.plot(
+            G,
+            ax=ax,
+            layout="pos",
+            vertex_labels=True,
+            edge_labels=True,
+        )
 
     @image_comparison(baseline_images=["house_with_colors"], remove_text=True)
     def test_display_house_with_colors(self):
@@ -375,6 +381,7 @@ class GraphTestRunner(unittest.TestCase):
             ax=ax,
             layout="pos",
             edge_labels=True,
+            margins=0.03,
             style={
                 "edge": {
                     "curved": True,

@@ -73,7 +73,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
             )
         if self._labels is not None:
             style = self._style.get("label", {})
-            transform = self.get_transform()
             self._label_collection = LabelCollection(
                 self._labels,
                 style=style,
@@ -651,6 +650,9 @@ class EdgeCollection(mpl.collections.PatchCollection):
         transform=None,
     ):
         """Extract the start and/or end angles of the paths to compute arrows."""
+        if not hasattr(self, "_arrows"):
+            return
+
         if transform is None:
             transform = self.get_transform()
         trans = transform.transform
@@ -682,11 +684,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
             return
 
         self._update_paths()
-        self._update_labels()
 
         super().draw(renderer)
-        if hasattr(self, "_arrows"):
-            self._set_edge_info_for_arrows(which="end")
+        self._set_edge_info_for_arrows(which="end")
+        self._update_labels()
 
         for child in self.get_children():
             child.draw(renderer)

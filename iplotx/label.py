@@ -52,6 +52,7 @@ class LabelCollection(mpl.artist.Artist):
 
     def _create_artists(self):
         style = deepcopy(self._style) if self._style is not None else {}
+        transform = self.get_transform()
 
         margins = []
 
@@ -72,7 +73,7 @@ class LabelCollection(mpl.artist.Artist):
                 self._offsets[i][0],
                 self._offsets[i][1],
                 label,
-                transform=self.get_transform(),
+                transform=transform,
                 **stylei,
             )
             arts.append(art)
@@ -98,9 +99,9 @@ class LabelCollection(mpl.artist.Artist):
 
     def set_offsets(self, offsets):
         """Set positions (offsets) of the labels."""
-        for art, offset in zip(self._labelartists, offsets):
+        self._offsets = np.asarray(offsets)
+        for art, offset in zip(self._labelartists, self._offsets):
             art.set_position((offset[0], offset[1]))
-        self.stale = True
 
     def set_rotations(self, rotations):
         for art, rotation in zip(self._labelartists, rotations):
@@ -108,7 +109,6 @@ class LabelCollection(mpl.artist.Artist):
             # Force the font size to be upwards
             rot_deg = ((rot_deg + 90) % 180) - 90
             art.set_rotation(rot_deg)
-        stale = True
 
     @_stale_wrapper
     def draw(self, renderer):
