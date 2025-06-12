@@ -17,6 +17,7 @@ dynamic = ["version"]
 dependencies = [
   "biopython>=1.85",
   "matplotlib>=2.0.0",
+  "mypy>=1.15.0",
   "numpy>=2.0.0",
   "pandas>=2.0.0",
 ]

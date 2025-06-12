@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.546** total execution time for 24 files **from all galleries**:
+**00:00.070** total execution time for 25 files **from all galleries**:
 
 .. container::
 
@@ -32,14 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
-     - 00:00.264
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
-     - 00:00.201
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
-     - 00:00.081
+   * - :ref:`sphx_glr_gallery_plot_biopython_tree.py` (``../../gallery/plot_biopython_tree.py``)
+     - 00:00.070
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
      - 00:00.000
@@ -65,6 +59,9 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_directed.py` (``../../gallery/plot_directed.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_plot_grouping.py` (``../../gallery/plot_grouping.py``)
      - 00:00.000
      - 0.0
@@ -75,6 +72,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_labels_and_colors.py` (``../../gallery/plot_labels_and_colors.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)
@@ -102,5 +102,8 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_traveling_salesman.py` (``../../gallery/plot_traveling_salesman.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
      - 00:00.000
      - 0.0
