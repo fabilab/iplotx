@@ -15,10 +15,7 @@ requires-python = ">=3.11"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
-  "biopython>=1.85",
-  "cogent3>=2025.5.8a6",
   "matplotlib>=2.0.0",
-  "mypy>=1.15.0",
   "numpy>=2.0.0",
   "pandas>=2.0.0",
 ]
@@ -48,6 +45,10 @@ test = [
   "flake8>=3.9.0",
   "igraph>=0.11.8",
   "networkx>=3.4.2",
+  "biopython>=1.85",
+  "cogent3>=2025.5.8a6",
+  "ete4>=4.3.0",
+  "mypy>=1.15.0",
 ]
 docs = [
   "sphinx",
@@ -57,6 +58,9 @@ docs = [
   "sphinx-gallery>=0.19.0",
   "igraph>=0.11.8",
   "networkx>=3.4.2",
+  "biopython>=1.85",
+  "cogent3>=2025.5.8a6",
+  "ete4>=4.3.0",
 ]
 typing = ["mypy", "types-requests"]
 typing-test = [{include-group = "typing"}, {include-group = "test"}, "useful-types"]

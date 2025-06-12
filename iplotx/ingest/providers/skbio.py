@@ -21,7 +21,7 @@ from ..heuristics import (
 )
 
 
-class Cogent3DataProvider(TreeDataProvider):
+class SkbioDataProvider(TreeDataProvider):
     def __call__(
         self,
         tree: TreeType,
@@ -33,7 +33,7 @@ class Cogent3DataProvider(TreeDataProvider):
         ] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> TreeData:
-        """Create tree data object for iplotx from cogent3.core.tree.PhyloNode classes."""
+        """Create tree data object for iplotx from skbio.tree.TreeNode classes."""
 
         root_fun = lambda tree: tree.root()
         preorder_fun = lambda tree: tree.preorder()
@@ -70,7 +70,7 @@ class Cogent3DataProvider(TreeDataProvider):
         # Add edge_df
         edge_data = {"_ipx_source": [], "_ipx_target": []}
         for node in preorder_fun(tree):
-            for child in node.children:
+            for child in children_fun(node):
                 if directed == "parent":
                     edge_data["_ipx_source"].append(child)
                     edge_data["_ipx_target"].append(node)
@@ -102,7 +102,7 @@ class Cogent3DataProvider(TreeDataProvider):
 
     def check_dependencies(self) -> bool:
         try:
-            import cogent3
+            from skbio import TreeNode
         except ImportError:
             return False
         return True

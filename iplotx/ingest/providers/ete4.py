@@ -21,7 +21,7 @@ from ..heuristics import (
 )
 
 
-class Cogent3DataProvider(TreeDataProvider):
+class Ete4DataProvider(TreeDataProvider):
     def __call__(
         self,
         tree: TreeType,
@@ -33,17 +33,17 @@ class Cogent3DataProvider(TreeDataProvider):
         ] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> TreeData:
-        """Create tree data object for iplotx from cogent3.core.tree.PhyloNode classes."""
+        """Create tree data object for iplotx from ete4.core.tre.Tree classes."""
 
-        root_fun = lambda tree: tree.root()
-        preorder_fun = lambda tree: tree.preorder()
-        postorder_fun = lambda tree: tree.postorder()
+        root_fun = attrgetter("root")
+        preorder_fun = lambda tree: tree.traverse("preorder")
+        postorder_fun = lambda tree: tree.traverse("postorder")
         children_fun = attrgetter("children")
-        branch_length_fun = attrgetter("length")
-        leaves_fun = lambda tree: tree.tips()
+        branch_length_fun = lambda node: node.dist if node.dist is not None else 1.0
+        leaves_fun = lambda tree: tree.leaves()
 
         tree_data = {
-            "root": root_fun(tree),
+            "root": tree.root,
             "leaves": leaves_fun(tree),
             "rooted": True,
             "directed": directed,
@@ -70,7 +70,7 @@ class Cogent3DataProvider(TreeDataProvider):
         # Add edge_df
         edge_data = {"_ipx_source": [], "_ipx_target": []}
         for node in preorder_fun(tree):
-            for child in node.children:
+            for child in children_fun(node):
                 if directed == "parent":
                     edge_data["_ipx_source"].append(child)
                     edge_data["_ipx_target"].append(node)
@@ -102,7 +102,7 @@ class Cogent3DataProvider(TreeDataProvider):
 
     def check_dependencies(self) -> bool:
         try:
-            import cogent3
+            from ete4 import Tree
         except ImportError:
             return False
         return True

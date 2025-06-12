@@ -13,6 +13,7 @@ import numpy as np
 import pandas as pd
 
 from iplotx.ingest.providers.cogent3 import Cogent3DataProvider
+from iplotx.ingest.providers.ete4 import Ete4DataProvider
 
 from ..importing import igraph, networkx
 from .heuristics import (
@@ -34,6 +35,8 @@ from .providers.networkx import NetworkXDataProvider
 from .providers.igraph import IGraphDataProvider
 from .providers.biopython import BiopythonDataProvider
 from .providers.cogent3 import Cogent3DataProvider
+from .providers.ete4 import Ete4DataProvider
+from .providers.skbio import SkbioDataProvider
 
 
 # Internally supported data providers
@@ -55,6 +58,14 @@ if provider.check_dependencies():
 provider = Cogent3DataProvider()
 if provider.check_dependencies():
     tree_data_providers["cogent3"] = provider
+
+provider = Ete4DataProvider()
+if provider.check_dependencies():
+    tree_data_providers["ete4"] = provider
+
+provider = SkbioDataProvider()
+if provider.check_dependencies():
+    tree_data_providers["skbio"] = provider
 
 
 # Functions to ingest data from various libraries

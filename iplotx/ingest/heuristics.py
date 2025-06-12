@@ -48,10 +48,10 @@ def tree_library(
         pass
 
     try:
-        from ete3 import Tree as ETE3Tree
+        from ete4 import Tree as ETE4Tree
 
-        if isinstance(tree, ETE3Tree):
-            return "ete3"
+        if isinstance(tree, ETE4Tree):
+            return "ete4"
     except ImportError:
         pass
 
@@ -62,6 +62,16 @@ def tree_library(
             return "cogent3"
     except ImportError:
         pass
+
+    try:
+        from skbio import TreeNode
+
+        if isinstance(tree, TreeNode):
+            return "skbio"
+    except ImportError:
+        pass
+
+    raise ValueError("Tree library not recognised.")
 
 
 def number_of_vertices(network: GraphType) -> int:
