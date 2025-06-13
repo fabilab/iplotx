@@ -45,6 +45,8 @@ def convex_hull(points):
     (Therefore, (v[i+1] - v[i]) rotated *left* by pi/2 points *outwards* of the convex hull.)
     """
     points = np.asarray(points)
+    if len(points) < 3:
+        return np.arange(len(points))
 
     hull_idx = None
 
