@@ -32,7 +32,27 @@ ipx.plot(
 )
 
 # %%
-# Here's the same example but setting some ports to None:
+# Ports react to inversion of the x- or y-axis and set of axis limits from positive to negatives, e.g.:
+
+fig, ax = plt.subplots()
+ipx.plot(
+    g,
+    ax=ax,
+    layout="circle",
+    edge_curved=True,
+    edge_ports=[
+        ("n", "w"),  # exit from the top, enter from the left
+        ("e", "s"),  # exit from the right, enter from the bottom
+        ("n", "s"),  # exit from the top, enter from the bottom
+    ],
+    edge_tension=[1.5, 1.8, 0.8],
+    edge_color=["tomato", "steelblue", "purple"],
+)
+ax.invert_xaxis()
+ax.invert_yaxis()
+
+# %%
+# is the mirror image (in both x and y) of the previous plot. Here's the same example but setting some ports to None:
 
 g = ig.Graph.Ring(3, directed=True)
 
