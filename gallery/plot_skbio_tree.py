@@ -7,9 +7,7 @@ This example shows how to use `iplotx` to plot trees from `skbio` or scikit-bio.
 
 from io import StringIO
 from skbio import TreeNode
-import numpy as np
 import iplotx as ipx
-import matplotlib.pyplot as plt
 
 tree = TreeNode.read(
     StringIO(
