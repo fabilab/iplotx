@@ -2,6 +2,8 @@
 
 `iplotx` is a Python library to display graphs, networks and trees using `matplotlib` as a backend. It supports multiple network analysis libraries including `networkx` and `igraph` for networks and `biopython`, `scikit-bio`, `cogent3`, and `ete4` for trees.
 
+`iplotx` guarantees the **exact same visual appearance** independently of what library you used to construct the network/tree.
+
 ## Installation
 ```
 pip install iplotx
@@ -57,8 +59,6 @@ See <project:gallery/index.rst> for examples of plots made with `iplotx`. Feel f
     to propose improvements or see support for it, please reach out with an issue/PR
     on GitHub!
 ```
-
-`iplotx` guarantees the **exact same visual appearance** independently of what library you used to construct the network/tree.
 
 `iplotx`'s features' include:
 - per-edge and per-vertex styling using sequences or dictionaries
