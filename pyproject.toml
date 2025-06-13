@@ -49,6 +49,7 @@ test = [
   "cogent3>=2025.5.8a6",
   "ete4>=4.3.0",
   "mypy>=1.15.0",
+  "scikit-bio>=0.6.3",
 ]
 docs = [
   "sphinx",

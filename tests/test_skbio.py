@@ -27,8 +27,10 @@ class TreeTestRunner(unittest.TestCase):
     def small_tree(self):
         from skbio import TreeNode
 
-        tree = TreeNode(
-            "((),((),(((),()),((),()))));",
+        tree = TreeNode.read(
+            StringIO(
+                "((),((),(((),()),((),()))));",
+            )
         )
 
         return tree
