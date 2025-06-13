@@ -569,7 +569,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         auxs = [None, None]
         for i in range(2):
             if ports[i] is not None:
-                der = _get_port_unit_vector(ports[i])
+                der = _get_port_unit_vector(ports[i], trans_inv)
                 auxs[i] = der * edge_straight_length * tension + vcoord_fig[i]
 
         # Both ports defined, just use them and hope for the best
