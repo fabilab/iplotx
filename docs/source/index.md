@@ -112,7 +112,7 @@ We believe graph **analysis**, graph **layouting**, and graph **visualisation** 
 :maxdepth: 2
 :caption: Contents
 
-style
 gallery/index
+style
 API <api>
 ```
