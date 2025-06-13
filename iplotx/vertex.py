@@ -1,4 +1,3 @@
-from copy import deepcopy
 import numpy as np
 import matplotlib as mpl
 from matplotlib.transforms import IdentityTransform
@@ -13,6 +12,7 @@ from matplotlib.patches import (
 from .style import (
     get_style,
     rotate_style,
+    copy_with_deep_values,
 )
 from .utils.matplotlib import (
     _get_label_width_height,
@@ -192,7 +192,9 @@ class VertexCollection(PatchCollection):
         transform = self.get_offset_transform()
 
         style = (
-            deepcopy(self._style.get("label", None)) if self._style is not None else {}
+            copy_with_deep_values(self._style.get("label", None))
+            if self._style is not None
+            else {}
         )
         forbidden_props = ["hpadding", "vpadding"]
         for prop in forbidden_props:

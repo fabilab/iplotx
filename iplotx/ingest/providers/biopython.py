@@ -60,6 +60,8 @@ class BiopythonDataProvider(TreeDataProvider):
         else:
             tree_data["layout_coordinate_system"] = "cartesian"
 
+        from ...style import get_style
+
         # Add edge_df
         edge_data = {"_ipx_source": [], "_ipx_target": []}
         for node in tree.find_clades(order="preorder"):

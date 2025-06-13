@@ -1,13 +1,9 @@
-from typing import Union, Sequence
-from copy import deepcopy
-from collections import defaultdict
+from typing import Union
 import numpy as np
-import pandas as pd
 import matplotlib as mpl
 from matplotlib.collections import PatchCollection
 
 
-from .importing import igraph
 from .typing import (
     GroupingType,
     LayoutType,

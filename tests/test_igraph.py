@@ -35,21 +35,18 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["graph_basic"], remove_text=True)
     def test_basic(self):
-        plt.close("all")
         g = ig.Graph.Ring(5)
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plot(g, ax=ax, layout=self.layout_small_ring)
 
     @image_comparison(baseline_images=["graph_directed"], remove_text=True)
     def test_directed(self):
-        plt.close("all")
         g = ig.Graph.Ring(5, directed=True)
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plot(g, ax=ax, layout=self.layout_small_ring)
 
     @image_comparison(baseline_images=["graph_labels"], remove_text=True)
     def test_labels(self):
-        plt.close("all")
         g = ig.Graph.Ring(5)
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plot(
@@ -70,7 +67,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["igraph_layout_object"], remove_text=True)
     def test_layout_attribute(self):
-        plt.close("all")
         g = ig.Graph.Ring(5)
         layout = g.layout("circle")
         fig, ax = plt.subplots(figsize=(3, 3))
@@ -78,7 +74,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["graph_layout_attribute"], remove_text=True)
     def test_layout_attribute(self):
-        plt.close("all")
         g = ig.Graph.Ring(5)
         g["layout"] = ig.Layout([(x, x) for x in range(g.vcount())])
         fig, ax = plt.subplots(figsize=(3, 3))
@@ -86,7 +81,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["graph_directed_curved_loops"], remove_text=True)
     def test_directed_curved_loops(self):
-        plt.close("all")
         g = ig.Graph.Ring(5, directed=True)
         g.add_edge(0, 0)
         g.add_edge(0, 0)
@@ -110,7 +104,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["graph_squares_directed"], remove_text=True)
     def test_mark_groups_squares(self):
-        plt.close("all")
         g = ig.Graph.Ring(5, directed=True)
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plot(
@@ -124,7 +117,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["graph_edit_children"], remove_text=True)
     def test_edit_children(self):
-        plt.close("all")
         g = ig.Graph.Ring(5)
         fig, ax = plt.subplots(figsize=(4, 4))
         ipx.plot(
@@ -146,7 +138,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["graph_with_curved_edges"])
     def test_graph_with_curved_edges(self):
-        plt.close("all")
         g = ig.Graph.Ring(24, directed=True, mutual=True)
         fig, ax = plt.subplots()
         lo = g.layout("circle")
@@ -174,7 +165,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["multigraph_with_curved_edges_undirected"])
     def test_graph_with_curved_edges(self):
-        plt.close("all")
         g = ig.Graph.Ring(24, directed=False)
         g.add_edges([(0, 1), (1, 2)])
         fig, ax = plt.subplots()
@@ -203,7 +193,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["graph_null"])
     def test_null_graph(self):
-        plt.close("all")
         g = ig.Graph()
         fig, ax = plt.subplots()
         ipx.plot(g, ax=ax)
@@ -284,7 +273,6 @@ class ClusteringTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["clustering_directed"], remove_text=True)
     def test_clustering_directed_small(self):
-        plt.close("all")
         g = ig.Graph.Ring(5, directed=True)
         clu = ig.VertexClustering(g, [0] * 5)
         fig, ax = plt.subplots()
@@ -292,7 +280,6 @@ class ClusteringTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["clustering_directed_large"], remove_text=True)
     def test_clustering_directed_large(self):
-        plt.close("all")
         g = ig.Graph.Ring(50, directed=True)
         clu = ig.VertexClustering(g, [0] * 3 + [1] * 17 + [2] * 30)
         fig, ax = plt.subplots()

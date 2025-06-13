@@ -1,5 +1,5 @@
 from typing import Optional, Sequence, Hashable
-from copy import deepcopy
+import copy
 from contextlib import contextmanager
 import numpy as np
 import pandas as pd
@@ -81,7 +81,19 @@ default = {
     },
 }
 
-hollow = deepcopy(default)
+
+def copy_with_deep_values(style):
+    """Make a deep copy of the style dict but do not create copies of the keys."""
+    newdict = {}
+    for key, value in style.items():
+        if isinstance(value, dict):
+            newdict[key] = copy_with_deep_values(value)
+        else:
+            newdict[key] = copy.copy(value)
+    return newdict
+
+
+hollow = copy_with_deep_values(default)
 hollow["vertex"]["color"] = None
 hollow["vertex"]["facecolor"] = "none"
 hollow["vertex"]["edgecolor"] = "black"
@@ -89,7 +101,7 @@ hollow["vertex"]["linewidth"] = 1.5
 hollow["vertex"]["marker"] = "r"
 hollow["vertex"]["size"] = "label"
 
-tree = deepcopy(default)
+tree = copy_with_deep_values(default)
 tree["vertex"]["size"] = 0
 tree["vertex"]["alpha"] = 0
 tree["edge"]["linewidth"] = 2.5
@@ -114,7 +126,7 @@ styles = {
 stylename = "default"
 
 
-current = deepcopy(styles["default"])
+current = copy_with_deep_values(styles["default"])
 
 
 def get_stylename():
@@ -139,7 +151,7 @@ def get_style(name: str = ""):
             else:
                 raise KeyError(f"Style not found: {name}")
 
-    style = deepcopy(style)
+    style = copy_with_deep_values(style)
     return style
 
 
@@ -185,7 +197,7 @@ def use(style: Optional[str | dict | Sequence] = None, **kwargs):
             else:
                 current[key] = value
 
-    old_style = deepcopy(current)
+    old_style = copy_with_deep_values(current)
 
     try:
         if style is None:
@@ -216,7 +228,7 @@ def use(style: Optional[str | dict | Sequence] = None, **kwargs):
 def reset():
     """Reset to default style."""
     global current
-    current = deepcopy(styles["default"])
+    current = copy_with_deep_values(styles["default"])
 
 
 @contextmanager
@@ -275,21 +287,30 @@ def rotate_style(
             "At least one of 'index' or 'id' must be provided to rotate_style."
         )
 
-    style = deepcopy(style)
+    style = copy_with_deep_values(style)
 
     for prop in props:
         val = style.get(prop, None)
         if val is None:
             continue
+        # Try integer indexing for ordered types
         if (index is not None) and isinstance(
             val, (tuple, list, np.ndarray, pd.Index, pd.Series)
         ):
             style[prop] = np.asarray(val)[index % len(val)]
+        # Try key indexing for unordered, dict-like types
         if (
             (id is not None)
             and (not isinstance(val, (str, tuple, list, np.ndarray)))
             and hasattr(val, "__getitem__")
         ):
-            style[prop] = val[id]
+            # If only a subset of keys is provided, default the other ones
+            # to the empty type constructor (e.g. 0 for ints, 0.0 for floats,
+            # empty strings).
+            if id in val:
+                style[prop] = val[id]
+            else:
+                valtype = type(next(iter(val.values())))
+                style[prop] = valtype()
 
     return style

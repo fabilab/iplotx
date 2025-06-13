@@ -1,9 +1,14 @@
-from copy import deepcopy
+from typing import (
+    Optional,
+    Sequence,
+    Hashable,
+)
 import numpy as np
 import matplotlib as mpl
 
 from .style import (
     rotate_style,
+    copy_with_deep_values,
 )
 from .utils.matplotlib import (
     _stale_wrapper,
@@ -25,9 +30,9 @@ from .utils.matplotlib import (
 class LabelCollection(mpl.artist.Artist):
     def __init__(
         self,
-        labels,
-        style=None,
-        offsets=None,
+        labels: Sequence[str],
+        style: Optional[dict[str, dict]] = None,
+        offsets: Optional[np.ndarray] = None,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
     ):
         self._labels = labels
@@ -51,7 +56,7 @@ class LabelCollection(mpl.artist.Artist):
         return self._margins * dpi / 72.0
 
     def _create_artists(self):
-        style = deepcopy(self._style) if self._style is not None else {}
+        style = copy_with_deep_values(self._style) if self._style is not None else {}
         transform = self.get_transform()
 
         margins = []
@@ -62,8 +67,8 @@ class LabelCollection(mpl.artist.Artist):
                 del style[prop]
 
         arts = []
-        for i, label in enumerate(self._labels):
-            stylei = rotate_style(style, i)
+        for i, (anchor_id, label) in enumerate(self._labels.items()):
+            stylei = rotate_style(style, index=i, id=anchor_id)
             # Margins are handled separately
             hmargin = stylei.pop("hmargin", 0.0)
             vmargin = stylei.pop("vmargin", 0.0)

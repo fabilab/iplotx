@@ -38,7 +38,12 @@ def _evaluate_cubic_bezier_derivative(points, t):
 
 
 def convex_hull(points):
-    """Compute the convex hull of a set of 2D points."""
+    """Compute the convex hull of a set of 2D points.
+
+    This is guaranteed to return the vertices clockwise.
+
+    (Therefore, (v[i+1] - v[i]) rotated *left* by pi/2 points *outwards* of the convex hull.)
+    """
     points = np.asarray(points)
 
     hull_idx = None
@@ -55,7 +60,9 @@ def convex_hull(points):
     try:
         from scipy.spatial import ConvexHull
 
-        hull_idx = ConvexHull(points).vertices
+        # NOTE: scipy guarantees counterclockwise ordering in 2D
+        # https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.ConvexHull.html
+        hull_idx = ConvexHull(points).vertices[::-1]
     except ImportError:
         pass
 
@@ -70,11 +77,10 @@ def convex_hull(points):
 # Compared to that C implementation, this is a bit more vectorised and messes less with memory as usual when
 # optimising Python/numpy code
 def _convex_hull_Graham_scan(points):
-    """Compute the indices for the convex hull of a set of 2D points using Graham's scan algorithm."""
-    if len(points) < 4:
-        # NOTE: for an exact triangle, this does not guarantee chirality. Should be ok anyway
-        return np.arange(len(points))
+    """Compute the indices for the convex hull of a set of 2D points using Graham's scan algorithm.
 
+    NOTE: This works from 3 points upwards, guaranteed clockwise.
+    """
     points = np.asarray(points)
 
     # Find pivot (bottom left corner)

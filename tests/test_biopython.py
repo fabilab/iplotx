@@ -73,6 +73,9 @@ class TreeTestRunner(unittest.TestCase):
     def test_leaf_labels_hmargin(self):
         tree = self.small_tree
         leaf_labels = {leaf: str(i + 1) for i, leaf in enumerate(tree.get_terminals())}
+        vertex_label_hmargin = {
+            key: [2, 20][(int(x) - 1) % 2] for key, x in leaf_labels.items()
+        }
 
         fig, ax = plt.subplots(figsize=(4, 4))
         ipx.plotting.tree(
@@ -80,6 +83,6 @@ class TreeTestRunner(unittest.TestCase):
             ax=ax,
             layout="horizontal",
             vertex_labels=leaf_labels,
-            vertex_label_hmargin=[2, 20],
+            vertex_label_hmargin=vertex_label_hmargin,
             margins=(0.15, 0),
         )
