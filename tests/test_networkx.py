@@ -25,8 +25,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["flat_style"], remove_text=True)
     def test_flat_style(self):
-        plt.close("all")
-
         G = nx.Graph(
             [
                 (4, 1),
@@ -51,8 +49,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["simple_graph"], remove_text=True)
     def test_simple_graph(self):
-        plt.close("all")
-
         G = nx.Graph()
         G.add_edge(1, 2)
         G.add_edge(1, 3)
@@ -88,8 +84,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["cluster-layout"], remove_text=True)
     def test_cluster_layout(self):
-        plt.close("all")
-
         G = nx.davis_southern_women_graph()
         communities = nx.community.greedy_modularity_communities(G)
 
@@ -153,8 +147,6 @@ class GraphTestRunner(unittest.TestCase):
         baseline_images=["directed_graph_with_colorbar"], remove_text=True
     )
     def test_directed_graph(self):
-        plt.close("all")
-
         seed = 13648  # Seed random number generators for reproducibility
         G = nx.random_k_out_graph(10, 3, 0.5, seed=seed)
         pos = nx.spring_layout(G, seed=seed)
@@ -197,7 +189,6 @@ class GraphTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["empty_graph"], remove_text=True)
     def test_display_empty_graph(self):
-        plt.close("all")
         G = nx.empty_graph()
         fig, ax = plt.subplots()
         ipx.plot(G, ax=ax)

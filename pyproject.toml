@@ -62,6 +62,7 @@ docs = [
   "biopython>=1.85",
   "cogent3>=2025.5.8a6",
   "ete4>=4.3.0",
+  "scikit-bio>=0.6.3",
 ]
 typing = ["mypy", "types-requests"]
 typing-test = [{include-group = "typing"}, {include-group = "test"}, "useful-types"]

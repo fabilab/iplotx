@@ -36,8 +36,6 @@ class TreeTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["tree_basic"], remove_text=True)
     def test_basic(self):
-        plt.close("all")
-
         tree = self.small_tree
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plotting.tree(
@@ -48,8 +46,6 @@ class TreeTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["tree_radial"], remove_text=True)
     def test_radial(self):
-        plt.close("all")
-
         tree = self.small_tree
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plotting.tree(
@@ -61,8 +57,6 @@ class TreeTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["leaf_labels"], remove_text=True)
     def test_leaf_labels(self):
-        plt.close("all")
-
         tree = self.small_tree
         leaf_labels = {leaf: str(i + 1) for i, leaf in enumerate(tree.get_terminals())}
 
@@ -77,8 +71,6 @@ class TreeTestRunner(unittest.TestCase):
 
     @image_comparison(baseline_images=["leaf_labels_hmargin"], remove_text=True)
     def test_leaf_labels_hmargin(self):
-        plt.close("all")
-
         tree = self.small_tree
         leaf_labels = {leaf: str(i + 1) for i, leaf in enumerate(tree.get_terminals())}
 

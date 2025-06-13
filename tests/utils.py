@@ -19,6 +19,7 @@ import functools
 try:
     import matplotlib
     from matplotlib.testing.decorators import _collect_new_figures, _ImageComparisonBase
+    import matplotlib.pyplot as plt
 except ImportError:
     matplotlib = None
 
@@ -51,6 +52,7 @@ def _unittest_image_comparison(
             matplotlib.testing.set_font_settings_for_testing()
 
             with _collect_new_figures() as figs:
+                plt.close("all")
                 func(*args, **kwargs)
 
             assert len(figs) == len(
