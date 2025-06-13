@@ -32,6 +32,7 @@ style_leaves = (
     "vpadding",
     "hmargin",
     "vmargin",
+    "ports",
 )
 
 

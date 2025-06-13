@@ -1,6 +1,34 @@
 # iplotx documentation
 
-`iplotx` is a Python library to display graphs or networks using `matplotlib` as a backend. It supports multiple network analysis libraries (currently `networkx` and `igraph`). Independently of what library you used to make your graphs and layouts, `iplotx` guarantees the **exact same visual appearance**.
+`iplotx` is a Python library to display graphs, networks and trees using `matplotlib` as a backend. It supports multiple network analysis libraries including `networkx` and `igraph` for networks and `biopython`, `scikit-bio`, `cogent3`, and `ete4` for trees.
+
+```{important}
+    If you are the maintainer of a network/graph/tree analysis library and would like
+    to propose improvements or see support for it, please reach out with an issue/PR
+    on GitHub!
+```
+
+`iplotx` guarantees the **exact same visual appearance** independently of what library you used to construct the network/tree.
+
+`iplotx`'s features' include:
+- per-edge and per-vertex styling using sequences or dictionaries
+- labels
+- arrows
+- tunable offset for parallel (i.e. multi-) edges
+- ports (a la Graphviz)
+- curved edges and self-loops with controllable tension
+- tree layouts
+- label-based vertex autoscaling
+- node label margins
+- data-driven axes autoscaling
+- consistent behaviour upon zooming and panning
+- correct HiDPI scaling (e.g. retina screens)
+- a consistent `matplotlib` artist hierarchy
+- post-plot editability (e.g. for animations)
+- chainable style contexts
+- vertex clusterings and covers with rounding
+- a plugin mechanism for additional libraries (WIP)
+- ... and probably more by the time you read this.
 
 ## Installation
 ```
@@ -74,7 +102,7 @@ See <project:style.md> for more info.
 See <project:api.md> for reference documentation of all functions and classes in `iplotx`.
 
 ## Rationale
-We believe graph **analysis**, graph **layouting**, and graph **visualisation** to be three separate tasks. `iplotx` currently focuses on visualisation. It might expand towards layouting in the future.
+We believe graph **analysis**, graph **layouting**, and graph **visualisation** to be three separate tasks. `iplotx` currently focuses on visualisation. It can also compute simple tree layouts and might expand towards network layouts in the future.
 
 ```{toctree}
 :maxdepth: 2

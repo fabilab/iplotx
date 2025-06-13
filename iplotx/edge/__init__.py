@@ -19,6 +19,7 @@ from ..style import (
 from ..label import LabelCollection
 from ..vertex import VertexCollection
 from .arrow import EdgeArrowCollection
+from .ports import _get_port_unit_vector
 
 
 @_forwarder(
@@ -245,11 +246,13 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
             # Leaf rotation
             edge_stylei = rotate_style(self._style, index=i, id=(v1, v2))
-            tension = (
-                0
-                if not self._style.get("curved", False)
-                else edge_stylei.get("tension", 5)
-            )
+            if edge_stylei.get("curved", False):
+                tension = edge_stylei.get("tension", 5)
+                ports = edge_stylei.get("ports", (None, None))
+            else:
+                tension = 0
+                ports = None
+
             waypoints = edge_stylei.get("waypoints", "none")
 
             # Compute actual edge path
@@ -261,6 +264,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 trans_inv,
                 tension=tension,
                 waypoints=waypoints,
+                ports=ports,
             )
 
             # Collect angles for this vertex, to be used for loops plotting below
@@ -404,6 +408,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
     ):
         tension = kwargs.pop("tension", 0)
         waypoints = kwargs.pop("waypoints", "none")
+        ports = kwargs.pop("ports", (None, None))
 
         if (waypoints != "none") and (tension != 0):
             raise ValueError("Waypoints not supported for curved edges.")
@@ -414,7 +419,12 @@ class EdgeCollection(mpl.collections.PatchCollection):
         if tension == 0:
             return self._compute_edge_path_straight(*args, **kwargs)
 
-        return self._compute_edge_path_curved(tension, *args, **kwargs)
+        return self._compute_edge_path_curved(
+            tension,
+            *args,
+            ports=ports,
+            **kwargs,
+        )
 
     def _compute_edge_path_waypoints(
         self,
@@ -807,6 +817,7 @@ def make_stub_patch(**kwargs):
         "curved",
         "tension",
         "waypoints",
+        "ports",
         "looptension",
         "loopmaxangle",
         "offset",
