@@ -2,34 +2,6 @@
 
 `iplotx` is a Python library to display graphs, networks and trees using `matplotlib` as a backend. It supports multiple network analysis libraries including `networkx` and `igraph` for networks and `biopython`, `scikit-bio`, `cogent3`, and `ete4` for trees.
 
-```{important}
-    If you are the maintainer of a network/graph/tree analysis library and would like
-    to propose improvements or see support for it, please reach out with an issue/PR
-    on GitHub!
-```
-
-`iplotx` guarantees the **exact same visual appearance** independently of what library you used to construct the network/tree.
-
-`iplotx`'s features' include:
-- per-edge and per-vertex styling using sequences or dictionaries
-- labels
-- arrows
-- tunable offset for parallel (i.e. multi-) edges
-- ports (a la Graphviz)
-- curved edges and self-loops with controllable tension
-- tree layouts
-- label-based vertex autoscaling
-- node label margins
-- data-driven axes autoscaling
-- consistent behaviour upon zooming and panning
-- correct HiDPI scaling (e.g. retina screens)
-- a consistent `matplotlib` artist hierarchy
-- post-plot editability (e.g. for animations)
-- chainable style contexts
-- vertex clusterings and covers with rounding
-- a plugin mechanism for additional libraries (WIP)
-- ... and probably more by the time you read this.
-
 ## Installation
 ```
 pip install iplotx
@@ -78,6 +50,38 @@ Either way, the result is the same:
 
 ## Gallery
 See <project:gallery/index.rst> for examples of plots made with `iplotx`. Feel free to suggest new examples on GitHub by opening a new issue or pull request!
+
+## Features
+```{important}
+    If you are the maintainer of a network/graph/tree analysis library and would like
+    to propose improvements or see support for it, please reach out with an issue/PR
+    on GitHub!
+```
+
+`iplotx` guarantees the **exact same visual appearance** independently of what library you used to construct the network/tree.
+
+`iplotx`'s features' include:
+- per-edge and per-vertex styling using sequences or dictionaries
+- labels
+- arrows
+- tunable offset for parallel (i.e. multi-) edges
+- ports (a la Graphviz)
+- curved edges and self-loops with controllable tension
+- tree layouts
+- label-based vertex autoscaling
+- node label margins and padding
+- export to many formats (e.g. PNG, SVG, PDF, EPS) thanks to `matplotlib`
+- compatibility with many GUI frameworks (e.g. Qt, GTK, Tkinter) thanks to `matplotlib`
+- data-driven axes autoscaling
+- consistent behaviour upon zooming and panning
+- correct HiDPI scaling (e.g. retina screens)
+- a consistent `matplotlib` artist hierarchy
+- post-plot editability (e.g. for animations)
+- plays well with other charting tools (e.g. `seaborn`)
+- chainable style contexts
+- vertex clusterings and covers with convex hulls and rounding
+- a plugin mechanism for additional libraries (WIP)
+- ... and probably more by the time you read this.
 
 ## Styles
 `iplotx` is designed to produce publication-quality figures using **styles**, which are dictionaries specifying the visual properties of each graph element, including vertices, edges, arrows, labels, and groupings.
