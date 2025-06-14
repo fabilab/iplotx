@@ -1,3 +1,7 @@
+"""
+Layout functions, currently limited to trees.
+"""
+
 import numpy as np
 import pandas as pd
 
@@ -7,7 +11,17 @@ def compute_tree_layout(
     layout: str,
     orientation: str,
     **kwargs,
-):
+) -> dict:
+    """Compute the layout for a tree.
+
+    Parameters:
+        tree: The tree to compute the layout for.
+        layout: The name of the layout, e.g. "horizontal" or "radial".
+        orientation: The orientation of the layout, e.g. "right", "left", "descending", or "ascending".
+
+    Returns:
+        A layout dictionary with node positions.
+    """
 
     if layout == "radial":
         layout_dict = _circular_tree_layout(tree, orientation=orientation, **kwargs)
@@ -82,7 +96,6 @@ def _vertical_tree_layout(tree, orientation="descending", **kwargs):
     """Vertical tree layout."""
     sign = 1 if orientation == "descending" else -1
     layout = _horizontal_tree_layout(tree, **kwargs)
-    # FIXME: the data structure might end up differing
     for key, value in layout.items():
         value = value.values @ np.array([[0, sign], [-sign, 0]])
         if orientation == "descending":

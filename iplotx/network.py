@@ -234,8 +234,6 @@ class NetworkArtist(mpl.artist.Artist):
             edgepatches.append(patch)
             adjacent_vertex_ids.append((vid1, vid2))
 
-        # TODO:: deal with "ports" a la graphviz
-
         if "cmap" in edge_style:
             vmin = np.min(colorarray)
             vmax = np.max(colorarray)

@@ -1,8 +1,12 @@
+from typing import (
+    Sequence,
+)
 import numpy as np
 import matplotlib as mpl
 from matplotlib.transforms import IdentityTransform
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import (
+    Patch,
     Ellipse,
     Circle,
     RegularPolygon,
@@ -244,7 +248,9 @@ class VertexCollection(PatchCollection):
             child.draw(renderer)
 
 
-def make_patch(marker: str, size, **kwargs):
+def make_patch(
+    marker: str, size: float | Sequence[float], **kwargs
+) -> tuple[Patch, float]:
     """Make a patch of the given marker shape and size."""
     forbidden_props = ["label", "cmap", "norm"]
     for prop in forbidden_props:
@@ -263,6 +269,7 @@ def make_patch(marker: str, size, **kwargs):
     if size_max > 0:
         size /= size_max
 
+    art: Patch
     if marker in ("o", "c", "circle"):
         art = Circle((0, 0), size[0] / 2, **kwargs)
     elif marker in ("s", "square", "r", "rectangle"):
@@ -270,7 +277,7 @@ def make_patch(marker: str, size, **kwargs):
     elif marker in ("^", "triangle"):
         art = RegularPolygon((0, 0), numVertices=3, radius=size[0] / 2, **kwargs)
     elif marker in ("d", "diamond"):
-        art = make_patch("s", size[0], angle=45, **kwargs)
+        art, _ = make_patch("s", size[0], angle=45, **kwargs)
     elif marker in ("v", "triangle_down"):
         art = RegularPolygon(
             (0, 0), numVertices=3, radius=size[0] / 2, orientation=np.pi, **kwargs
@@ -280,4 +287,4 @@ def make_patch(marker: str, size, **kwargs):
     else:
         raise KeyError(f"Unknown marker: {marker}")
 
-    return art, size_max
+    return (art, size_max)

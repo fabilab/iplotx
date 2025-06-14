@@ -1,4 +1,8 @@
-from typing import Optional, Sequence, Hashable
+from typing import (
+    Optional,
+    Sequence,
+)
+from collections.abc import Hashable
 import copy
 from contextlib import contextmanager
 import numpy as np

@@ -9,9 +9,9 @@ import warnings
 from typing import (
     Optional,
     Sequence,
-    Hashable,
     Protocol,
 )
+from collections.abc import Hashable
 import numpy as np
 import pandas as pd
 

@@ -17,7 +17,7 @@ from .tree import TreeArtist
 from .style import context
 
 
-def plot(
+def network(
     network: Optional[GraphType] = None,
     layout: Optional[LayoutType] = None,
     grouping: Optional[GroupingType] = None,
@@ -30,9 +30,9 @@ def plot(
     margins: float | tuple[float, float] = 0,
     **kwargs,
 ) -> list[mpl.artist.Artist]:
-    """Plot this network using the specified layout.
+    """Plot this network and/or vertex grouping using the specified layout.
 
-    Args:
+    Parameters:
         network: The network to plot. Can be a networkx or igraph graph.
         layout: The layout to use for plotting. If None, a layout will be looked for in the network object and, if none is found, an exception is raised. Defaults to None.
         vertex_labels: The labels for the vertices. If None or False, no vertex labels
@@ -49,7 +49,8 @@ def plot(
             are provided, they are both applied in that order (style, then **kwargs).
 
     Returns:
-        A NetworkArtist object.
+        A list of mpl.artist.Artist objects, set as a direct child of the matplotlib Axes. The list can have one or two elements, depending on whether
+        you are requesting to plot a network, a grouping, or both.
     """
     stylecontext = context(style, **kwargs) if style or kwargs else nullcontext()
 
@@ -124,11 +125,14 @@ def tree(
 ) -> TreeArtist:
     """Plot a tree using the specified layout.
 
-    Args:
+    Parameters:
         tree: The tree to plot. Can be a BioPython.Phylo.Tree object.
         layout: The layout to use for plotting.
         orientation: The orientation of the horizontal layout. Can be "right" or "left". Defaults to "right".
         directed: If False, donot draw arrows. If True or "child", draw arrows from parent to child node. If "parent", draw arrows the other way around.
+
+    Returns:
+        A TreeArtist object, set as a direct child of the matplotlib Axes.
     """
     stylecontext = context(style, **kwargs) if style or kwargs else nullcontext()
 

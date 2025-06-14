@@ -1,8 +1,8 @@
 from typing import (
     Optional,
     Sequence,
-    Hashable,
 )
+from collections.abc import Hashable
 import numpy as np
 import pandas as pd
 
