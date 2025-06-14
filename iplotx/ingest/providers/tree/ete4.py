@@ -14,7 +14,6 @@ from ....typing import (
 from ...typing import (
     TreeDataProvider,
     TreeData,
-    _make_layout_columns,
 )
 from ...heuristics import (
     normalise_tree_layout,

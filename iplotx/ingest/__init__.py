@@ -12,7 +12,6 @@ from typing import (
     Protocol,
 )
 from collections.abc import Hashable
-import numpy as np
 import pandas as pd
 
 from ..typing import (
@@ -46,8 +45,7 @@ for kind in data_providers:
             if key == provider_protocols[kind].__name__:
                 continue
             if key.endswith("DataProvider"):
-                provider = val()
-                data_providers[kind][module_name] = provider
+                data_providers[kind][module_name] = val()
                 break
     del providers_path
 
@@ -144,8 +142,6 @@ def ingest_tree_data(
 # INTERNAL FUNCTIONS
 def _update_data_providers(kind):
     """Update data provieders dynamically from external packages."""
-    global data_providers, provider_protocols
-
     discovered_providers = importlib.metadata.entry_points(
         group=f"iplotx.{kind}_data_providers"
     )

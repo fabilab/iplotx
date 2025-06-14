@@ -8,10 +8,6 @@ from contextlib import contextmanager
 import numpy as np
 import pandas as pd
 
-from iplotx.ingest.heuristics import number_of_vertices
-
-from .importing import igraph, networkx
-
 
 style_leaves = (
     "cmap",
@@ -175,15 +171,20 @@ def use(style: Optional[str | dict | Sequence] = None, **kwargs):
             each style is applied in order.
         **kwargs: Additional style changes to be applied at the end of any style.
     """
+    try:
+        import networkx as nx
+    except ImportError:
+        nx = None
+
     global current
 
     def _sanitize_leaves(style: dict):
         for key, value in style.items():
             if key in style_leaves:
-                if networkx is not None:
-                    if isinstance(value, networkx.classes.reportviews.NodeView):
+                if nx is not None:
+                    if isinstance(value, nx.classes.reportviews.NodeView):
                         style[key] = dict(value)
-                    elif isinstance(value, networkx.classes.reportviews.EdgeViewABC):
+                    elif isinstance(value, nx.classes.reportviews.EdgeViewABC):
                         style[key] = [v for *e, v in value]
             elif isinstance(value, dict):
                 _sanitize_leaves(value)

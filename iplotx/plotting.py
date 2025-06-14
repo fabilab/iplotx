@@ -34,23 +34,33 @@ def network(
 
     Parameters:
         network: The network to plot. Can be a networkx or igraph graph.
-        layout: The layout to use for plotting. If None, a layout will be looked for in the network object and, if none is found, an exception is raised. Defaults to None.
+        layout: The layout to use for plotting. If None, a layout will be looked for in the
+            network object and, if none is found, an exception is raised. Defaults to None.
         vertex_labels: The labels for the vertices. If None or False, no vertex labels
             will be drawn. If a list, the labels are taken from the list. If a dict, the keys
-            should be the vertex IDs and the values should be the labels. If True (a single bool value), the vertex IDs will be used as labels.
-        edge_labels: The labels for the edges. If None, no edge labels will be drawn. Defaults to None.
-        ax: The axis to plot on. If None, a new figure and axis will be created. Defaults to None.
-        style: Apply this style for the objects to plot. This can be a sequence (e.g. list) of styles and they will be applied in order.
+            should be the vertex IDs and the values should be the labels. If True (a single
+            bool value), the vertex IDs will be used as labels.
+        edge_labels: The labels for the edges. If None, no edge labels will be drawn. Defaults
+            to None.
+        ax: The axis to plot on. If None, a new figure and axis will be created. Defaults to
+            None.
+        style: Apply this style for the objects to plot. This can be a sequence (e.g. list)
+            of styles and they will be applied in order.
         title: If not None, set the axes title to this value.
-        aspect: If not None, set the aspect ratio of the axis to this value. The most common value is 1.0, which proportionates x- and y-axes.
-        margins: How much margin to leave around the plot. A higher value (e.g. 0.1) can be used as a quick fix when some vertex shapes reach beyond
-            the plot edge. This is a fraction of the data limits, so 0.1 means 10% of the data limits will be left as margin.
-        **kwargs: Additional arguments are treated as an alternate way to specify style. If both "style" and additional **kwargs
-            are provided, they are both applied in that order (style, then **kwargs).
+        aspect: If not None, set the aspect ratio of the axis to this value. The most common
+            value is 1.0, which proportionates x- and y-axes.
+        margins: How much margin to leave around the plot. A higher value (e.g. 0.1) can be
+            used as a quick fix when some vertex shapes reach beyond the plot edge. This is
+            a fraction of the data limits, so 0.1 means 10% of the data limits will be left
+            as margin.
+        **kwargs: Additional arguments are treated as an alternate way to specify style. If
+            both "style" and additional **kwargs are provided, they are both applied in that
+            order (style, then **kwargs).
 
     Returns:
-        A list of mpl.artist.Artist objects, set as a direct child of the matplotlib Axes. The list can have one or two elements, depending on whether
-        you are requesting to plot a network, a grouping, or both.
+        A list of mpl.artist.Artist objects, set as a direct child of the matplotlib Axes.
+        The list can have one or two elements, depending on whether you are requesting to
+        plot a network, a grouping, or both.
     """
     stylecontext = context(style, **kwargs) if style or kwargs else nullcontext()
 
@@ -128,8 +138,10 @@ def tree(
     Parameters:
         tree: The tree to plot. Can be a BioPython.Phylo.Tree object.
         layout: The layout to use for plotting.
-        orientation: The orientation of the horizontal layout. Can be "right" or "left". Defaults to "right".
-        directed: If False, donot draw arrows. If True or "child", draw arrows from parent to child node. If "parent", draw arrows the other way around.
+        orientation: The orientation of the horizontal layout. Can be "right" or "left". Defaults to
+            "right".
+        directed: If False, donot draw arrows. If True or "child", draw arrows from parent to child
+            node. If "parent", draw arrows the other way around.
 
     Returns:
         A TreeArtist object, set as a direct child of the matplotlib Axes.

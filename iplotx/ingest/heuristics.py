@@ -76,7 +76,7 @@ def normalise_tree_layout(
     layout,
     tree: Optional[TreeType] = None,
     **kwargs,
-):
+) -> pd.DataFrame:
     if isinstance(layout, str):
         layout = compute_tree_layout(tree, layout, **kwargs)
     else:

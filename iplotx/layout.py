@@ -2,8 +2,9 @@
 Layout functions, currently limited to trees.
 """
 
+from collections.abc import Hashable
+
 import numpy as np
-import pandas as pd
 
 
 def compute_tree_layout(
@@ -11,7 +12,7 @@ def compute_tree_layout(
     layout: str,
     orientation: str,
     **kwargs,
-) -> dict:
+) -> dict[Hashable, list[float]]:
     """Compute the layout for a tree.
 
     Parameters:
@@ -42,7 +43,7 @@ def _horizontal_tree_layout_right(
     postorder_fun: callable,
     children_fun: callable,
     branch_length_fun: callable,
-):
+) -> dict[Hashable, list[float]]:
     """Build a tree layout horizontally, left to right.
 
     The strategy is the usual one:
@@ -80,7 +81,12 @@ def _horizontal_tree_layout_right(
     return layout
 
 
-def _horizontal_tree_layout(tree, orientation="right", **kwargs):
+def _horizontal_tree_layout(
+    tree,
+    orientation="right",
+    **kwargs,
+) -> dict[Hashable, list[float]]:
+    """Horizontal tree layout."""
     if orientation not in ("right", "left"):
         raise ValueError("Orientation must be 'right' or 'left'.")
 
@@ -88,20 +94,23 @@ def _horizontal_tree_layout(tree, orientation="right", **kwargs):
 
     if orientation == "left":
         for key, value in layout.items():
-            layout[key].values[:] = value.values * np.array([-1, 1])
+            layout[key][0] *= -1
     return layout
 
 
-def _vertical_tree_layout(tree, orientation="descending", **kwargs):
+def _vertical_tree_layout(
+    tree,
+    orientation="descending",
+    **kwargs,
+) -> dict[Hashable, list[float]]:
     """Vertical tree layout."""
     sign = 1 if orientation == "descending" else -1
     layout = _horizontal_tree_layout(tree, **kwargs)
     for key, value in layout.items():
-        value = value.values @ np.array([[0, sign], [-sign, 0]])
-        if orientation == "descending":
-            value = value * np.array([-1, 1])
-        layout[key].values[:] = value
-        # TODO: we might need to fix right/left if descending
+        # Invert x and y
+        layout[key] = value[::-1]
+        # Orient vertically
+        layout[key][1] *= sign
     return layout
 
 
@@ -111,7 +120,7 @@ def _circular_tree_layout(
     starting_angle=0,
     angular_span=360,
     **kwargs,
-):
+) -> dict[Hashable, list[float]]:
     """Circular tree layout."""
     # Short form
     th = starting_angle * np.pi / 180

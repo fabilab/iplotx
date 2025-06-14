@@ -139,38 +139,6 @@ def _compute_mid_coord_and_rot(path, trans):
     return coord, rot
 
 
-def _compute_group_path_with_vertex_padding(
-    points,
-    transform,
-    vertexpadding=10,
-):
-    """Offset path for a group based on vertex padding.
-
-    At the input, the structure is [v1, v1, v1, v2, v2, v2, ...]
-    """
-
-    # Transform into figure coordinates
-    trans = transform.transform
-    trans_inv = transform.inverted().transform
-    points = trans(points)
-
-    npoints = len(points) // 3
-    vprev = points[-1]
-    mprev = atan2(points[0, 1] - vprev[1], points[0, 0] - vprev[0])
-    for i, vcur in enumerate(points[::3]):
-        vnext = points[(i + 1) * 3]
-        mnext = atan2(vnext[1] - vcur[1], vnext[0] - vcur[0])
-
-        mprev_orth = -1 / mprev
-        points[i * 3] = vcur + vertexpadding * mprev_orth
-
-        vprev = vcur
-        mprev = mnext
-
-    points = trans_inv(points)
-    return points
-
-
 def _build_cmap_fun(values, cmap):
     """Map colormap on top of numerical values."""
     cmap = mpl.cm._ensure_cmap(cmap)

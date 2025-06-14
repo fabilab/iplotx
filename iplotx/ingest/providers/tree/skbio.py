@@ -1,8 +1,8 @@
 from typing import (
     Optional,
     Sequence,
-    Hashable,
 )
+from collections.abc import Hashable
 from operator import attrgetter
 import numpy as np
 import pandas as pd
@@ -14,7 +14,6 @@ from ....typing import (
 from ...typing import (
     TreeDataProvider,
     TreeData,
-    _make_layout_columns,
 )
 from ...heuristics import (
     normalise_tree_layout,

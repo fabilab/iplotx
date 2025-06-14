@@ -1,18 +1,24 @@
+"""
+Typing module for data/object ingestion. This module described the abstract data types that providers need to comply with to be compatible with iplotx.
+
+Networkx and trees are treated separately for practical reasons: many tree analysis libraries rely heavily on recursive data structures, which do not
+work as well on general networks.
+"""
+
 from typing import (
     NotRequired,
     TypedDict,
     Protocol,
     Optional,
     Sequence,
-    Hashable,
 )
+from collections.abc import Hashable
 import pandas as pd
 from ..typing import (
     GraphType,
     LayoutType,
     TreeType,
 )
-from ..utils.internal import _make_layout_columns
 
 
 class NetworkData(TypedDict):
@@ -26,6 +32,8 @@ class NetworkData(TypedDict):
 
 
 class NetworkDataProvider(Protocol):
+    """Protocol for network data ingestion provider for iplotx."""
+
     def __call__(
         self,
         network: GraphType,
@@ -65,6 +73,8 @@ class TreeData(TypedDict):
 
 
 class TreeDataProvider(Protocol):
+    """Protocol for tree data ingestion provider for iplotx."""
+
     def __call__(
         self,
         tree: TreeType,

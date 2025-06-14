@@ -1,7 +1,9 @@
 """
-iplotx is a library for interactive plotting of networks and trees in matplotlib.
+iplotx is a library for interactive plotting of networks and trees in
+matplotlib.
 
-It guarantees the visualisation will look exactly the same no matter what library was used to construct the network.
+It guarantees the visualisation will look exactly the same no matter what
+library was used to construct the network.
 """
 
 from .version import __version__

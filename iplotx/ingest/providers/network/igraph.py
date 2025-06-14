@@ -17,6 +17,8 @@ from ...heuristics import (
 from ...typing import (
     NetworkDataProvider,
     NetworkData,
+)
+from ....utils.internal import (
     _make_layout_columns,
 )
 

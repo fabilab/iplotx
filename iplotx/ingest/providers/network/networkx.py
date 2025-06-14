@@ -17,6 +17,8 @@ from ...heuristics import (
 from ...typing import (
     NetworkDataProvider,
     NetworkData,
+)
+from ....utils.internal import (
     _make_layout_columns,
 )
 
@@ -30,6 +32,8 @@ class NetworkXDataProvider(NetworkDataProvider):
         edge_labels: Optional[Sequence[str] | dict[str]] = None,
     ) -> NetworkData:
         """Create network data object for iplotx from any provider."""
+
+        import networkx as nx
 
         directed = detect_directedness(network)
 
@@ -74,7 +78,7 @@ class NetworkXDataProvider(NetworkDataProvider):
                 raise ValueError(
                     "Vertex labels must be the same length as the number of vertices."
                 )
-            elif isinstance(vertex_labels, networkx.classes.reportviews.NodeDataView):
+            elif isinstance(vertex_labels, nx.classes.reportviews.NodeDataView):
                 vertex_df["label"] = pd.Series(dict(vertex_labels))
             else:
                 vertex_df["label"] = vertex_labels

@@ -119,8 +119,6 @@ class TreeArtist(mpl.artist.Artist):
             pad (float): Padding to add to the limits. Default is 0.05.
                 Units are a fraction of total axis range before padding.
         """
-        import numpy as np
-
         layout = self.get_layout().values
 
         if len(layout) == 0:
@@ -183,8 +181,6 @@ class TreeArtist(mpl.artist.Artist):
 
         labels = self._get_label_series("edge")
         edge_style = get_style(".edge")
-
-        vertex_layout_df = self.get_layout()
 
         if "cmap" in edge_style:
             cmap_fun = _build_cmap_fun(

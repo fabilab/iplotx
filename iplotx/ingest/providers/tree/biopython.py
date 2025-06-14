@@ -14,7 +14,6 @@ from ....typing import (
 from ...typing import (
     TreeDataProvider,
     TreeData,
-    _make_layout_columns,
 )
 from ...heuristics import (
     normalise_tree_layout,
@@ -59,8 +58,6 @@ class BiopythonDataProvider(TreeDataProvider):
             tree_data["layout_coordinate_system"] = "polar"
         else:
             tree_data["layout_coordinate_system"] = "cartesian"
-
-        from ....style import get_style
 
         # Add edge_df
         edge_data = {"_ipx_source": [], "_ipx_target": []}

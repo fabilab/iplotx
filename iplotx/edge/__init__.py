@@ -286,8 +286,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
             while len(parallel_edges) > 0:
                 (v1, v2), indices = parallel_edges.popitem()
                 indices_inv = parallel_edges.pop((v2, v1), [])
-                nparallel = len(indices)
-                nparallel_inv = len(indices_inv)
                 ntot = len(indices) + len(indices_inv)
                 if ntot > 1:
                     self._fix_parallel_edges_straight(
@@ -666,9 +664,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         if transform is None:
             transform = self.get_transform()
         trans = transform.transform
-        trans_inv = transform.inverted().transform
 
-        arrow_offsets = self._arrows._offsets
         for i, epath in enumerate(self.get_paths()):
             # Offset the arrow to point to the end of the edge
             self._arrows._offsets[i] = epath.vertices[-1]

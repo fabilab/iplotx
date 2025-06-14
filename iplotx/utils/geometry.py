@@ -1,4 +1,4 @@
-from math import tan, atan2
+from math import atan2
 import numpy as np
 
 
@@ -186,10 +186,10 @@ def _compute_group_path_with_vertex_padding(
     # Short form
     ppc = points_per_curve
 
-    # No padding, set degenerte path
+    # No padding, set degenerate path
     if vertexpadding == 0:
         for j, point in enumerate(hull):
-            points[cpv * j : ppc * (j + 1)] = point
+            points[ppc * j : ppc * (j + 1)] = point
         points[-1] = points[0]
         return points
 

@@ -1,9 +1,9 @@
 from typing import (
     Sequence,
 )
+import warnings
 import numpy as np
 import matplotlib as mpl
-from matplotlib.transforms import IdentityTransform
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import (
     Patch,
