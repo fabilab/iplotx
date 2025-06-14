@@ -1,4 +1,6 @@
 from typing import (
+    Any,
+    Never,
     Optional,
     Sequence,
 )
@@ -135,7 +137,21 @@ def get_stylename():
     return str(stylename)
 
 
-def get_style(name: str = ""):
+def get_style(name: str = "") -> dict[str, Any]:
+    """Get a *deep copy* of the chosen style.
+
+    Parameters:
+        name: The name of the style to get. If empty, the current style is returned.
+            Substyles can be obtained by using a dot notation, e.g. "default.vertex".
+            If "name" starts with a dot, it means a substyle of the current style.
+    Returns:
+        The requected style or substyle.
+
+    NOTE: The deep copy is a little different from standard deep copies. Here, keys
+        (which need to be hashables) are never copied, but values are. This can be
+        useful for hashables that change hash upon copying, such as Biopython's
+        tree nodes.
+    """
     namelist = name.split(".")
     style = styles
     for i, namei in enumerate(namelist):
@@ -231,7 +247,7 @@ def use(style: Optional[str | dict | Sequence] = None, **kwargs):
         raise
 
 
-def reset():
+def reset() -> Never:
     """Reset to default style."""
     global current
     current = copy_with_deep_values(styles["default"])
@@ -239,6 +255,17 @@ def reset():
 
 @contextmanager
 def context(style: Optional[str | dict | Sequence] = None, **kwargs):
+    """Create a style context for iplotx.
+
+    Parameters:
+        style: A single style specification or a list of style specifications, which are then
+            applied in order. Each style can be a string (for an existing style) or a dictionary
+            with the elements that are to change.
+        **kwargs: Additional style changes to be applied at the end of all styles.
+
+    Yields:
+        A context manager that applies the style and reverts it back to the previous one upon exit.
+    """
     current = get_style()
     try:
         use(style, **kwargs)
@@ -249,8 +276,15 @@ def context(style: Optional[str | dict | Sequence] = None, **kwargs):
 
 def unflatten_style(
     style_flat: dict[str, str | dict | int | float],
-):
-    """Convert a flat or semi-flat style into a fully structured dict."""
+) -> Never:
+    """Convert a flat or semi-flat style into a fully structured dict.
+
+    Parameters:
+        style_flat: A flat dictionary where keys may contain underscores, which are taken to signify
+            subdictionaries.
+
+    NOTE: The dict is changed *in place*.
+    """
 
     def _inner(style_flat: dict):
         keys = list(style_flat.keys())
@@ -285,12 +319,12 @@ def unflatten_style(
 def rotate_style(
     style,
     index: Optional[int] = None,
-    id: Optional[Hashable] = None,
+    key: Optional[Hashable] = None,
     props=style_leaves,
 ):
-    if (index is None) and (id is None):
+    if (index is None) and (key is None):
         raise ValueError(
-            "At least one of 'index' or 'id' must be provided to rotate_style."
+            "At least one of 'index' or 'key' must be provided to rotate_style."
         )
 
     style = copy_with_deep_values(style)
@@ -306,15 +340,15 @@ def rotate_style(
             style[prop] = np.asarray(val)[index % len(val)]
         # Try key indexing for unordered, dict-like types
         if (
-            (id is not None)
+            (key is not None)
             and (not isinstance(val, (str, tuple, list, np.ndarray)))
             and hasattr(val, "__getitem__")
         ):
             # If only a subset of keys is provided, default the other ones
             # to the empty type constructor (e.g. 0 for ints, 0.0 for floats,
             # empty strings).
-            if id in val:
-                style[prop] = val[id]
+            if key in val:
+                style[prop] = val[key]
             else:
                 valtype = type(next(iter(val.values())))
                 style[prop] = valtype()

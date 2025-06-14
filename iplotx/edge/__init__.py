@@ -245,7 +245,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
             vsize_fig = vsizes[i]
 
             # Leaf rotation
-            edge_stylei = rotate_style(self._style, index=i, id=(v1, v2))
+            edge_stylei = rotate_style(self._style, index=i, key=(v1, v2))
             if edge_stylei.get("curved", False):
                 tension = edge_stylei.get("tension", 5)
                 ports = edge_stylei.get("ports", (None, None))

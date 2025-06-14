@@ -1,14 +1,30 @@
 # Reference API
 This is the reference documentation for `iplotx`.
 
-## Entry point
-The main user-facing function is `iplotx.plot`, which can be used to plot graphs and graph groupings (covers and clusterings).
+## Main functions
+The main user-facing function is `iplotx.network`, which can be used to plot graphs and graph groupings (covers and clusterings), and `iplotx.tree` to plot trees. `iplotx.plot` is a synonym for `iplotx.network`.
 
 ```{eval-rst}
-.. autofunction:: iplotx.plot
+.. autofunction:: iplotx.network
+    :noindex:
+
+.. autofunction:: iplotx.tree
     :noindex:
 ```
 
+## Styling
+See also the <project:style.md> for an introduction to styles in `iplotx`.
+
+
+```{eval-rst}
+.. autofunction:: iplotx.style.context
+
+.. autofunction:: iplotx.style.use
+
+.. autofunction:: iplotx.style.reset
+
+.. autofunction:: iplotx.style.get_style
+```
 
 ## Artist hierarchy
 `iplotx.plot` return a list of `matplotlib` artists (1 or 2). When a network is plotted, the first artist is an instance of `iplotx.NetworkArtist`. This class contains the visual elements representing vertices, edges, labels, arrows, etc. and can be used to further edit the plot after `iplotx.plot` returned.

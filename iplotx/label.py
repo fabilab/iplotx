@@ -66,7 +66,7 @@ class LabelCollection(mpl.artist.Artist):
 
         arts = []
         for i, (anchor_id, label) in enumerate(self._labels.items()):
-            stylei = rotate_style(style, index=i, id=anchor_id)
+            stylei = rotate_style(style, index=i, key=anchor_id)
             # Margins are handled separately
             hmargin = stylei.pop("hmargin", 0.0)
             vmargin = stylei.pop("vmargin", 0.0)

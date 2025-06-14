@@ -172,7 +172,7 @@ class VertexCollection(PatchCollection):
                     str(vertex_labels[vid]), **style.get("label", {})
                 )
 
-            stylei = rotate_style(style, index=i, id=vid)
+            stylei = rotate_style(style, index=i, key=vid)
             if cmap_fun is not None:
                 colorarray.append(style["facecolor"])
                 stylei["facecolor"] = cmap_fun(stylei["facecolor"])

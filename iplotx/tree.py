@@ -200,7 +200,7 @@ class TreeArtist(mpl.artist.Artist):
         adjacent_vertex_ids = []
         waypoints = []
         for i, (vid1, vid2) in enumerate(edge_df.index):
-            edge_stylei = rotate_style(edge_style, index=i, id=(vid1, vid2))
+            edge_stylei = rotate_style(edge_style, index=i, key=(vid1, vid2))
 
             # FIXME:: Improve this logic. We have three layers of priority:
             # 1. Explicitely set in the style of "plot"
