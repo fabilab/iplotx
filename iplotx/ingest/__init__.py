@@ -2,70 +2,78 @@
 This module focuses on how to ingest network data into standard data structures no matter what library they come from.
 """
 
-from importlib.metadata import entry_points
+import pathlib
+import pkgutil
+import importlib
 import warnings
 from typing import (
     Optional,
     Sequence,
     Hashable,
+    Protocol,
 )
 import numpy as np
 import pandas as pd
 
-from iplotx.ingest.providers.cogent3 import Cogent3DataProvider
-from iplotx.ingest.providers.ete4 import Ete4DataProvider
-
-from ..importing import igraph, networkx
-from .heuristics import (
-    network_library,
-    tree_library,
-)
 from ..typing import (
     GraphType,
     LayoutType,
     TreeType,
 )
-from .common import (
+from .typing import (
     NetworkDataProvider,
     NetworkData,
     TreeDataProvider,
     TreeData,
 )
-from .providers.networkx import NetworkXDataProvider
-from .providers.igraph import IGraphDataProvider
-from .providers.biopython import BiopythonDataProvider
-from .providers.cogent3 import Cogent3DataProvider
-from .providers.ete4 import Ete4DataProvider
-from .providers.skbio import SkbioDataProvider
 
+provider_protocols = {
+    "network": NetworkDataProvider,
+    "tree": TreeDataProvider,
+}
 
 # Internally supported data providers
-network_data_providers: dict[str, NetworkDataProvider] = {}
-tree_data_providers: dict[str, TreeDataProvider] = {}
+data_providers: dict[str, dict[str, Protocol]] = {
+    kind: {} for kind in provider_protocols
+}
+for kind in data_providers:
+    providers_path = pathlib.Path(__file__).parent.joinpath("providers").joinpath(kind)
+    for importer, module_name, _ in pkgutil.iter_modules([providers_path]):
+        module = importlib.import_module(
+            f"iplotx.ingest.providers.{kind}.{module_name}"
+        )
+        for key, val in module.__dict__.items():
+            if key == provider_protocols[kind].__name__:
+                continue
+            if key.endswith("DataProvider"):
+                provider = val()
+                data_providers[kind][module_name] = provider
+                break
+    del providers_path
 
-provider = NetworkXDataProvider()
-if provider.check_dependencies():
-    network_data_providers["networkx"] = provider
 
-provider = IGraphDataProvider()
-if provider.check_dependencies():
-    network_data_providers["igraph"] = provider
+def network_library(network) -> str:
+    """Guess the network library used to create the network."""
+    for name, provider in data_providers["network"].items():
+        if provider.check_dependencies():
+            graph_type = provider.graph_type()
+            if isinstance(network, graph_type):
+                return name
+    raise ValueError(
+        f"Network {network} did not match any available network library.",
+    )
 
-provider = BiopythonDataProvider()
-if provider.check_dependencies():
-    tree_data_providers["biopython"] = provider
 
-provider = Cogent3DataProvider()
-if provider.check_dependencies():
-    tree_data_providers["cogent3"] = provider
-
-provider = Ete4DataProvider()
-if provider.check_dependencies():
-    tree_data_providers["ete4"] = provider
-
-provider = SkbioDataProvider()
-if provider.check_dependencies():
-    tree_data_providers["skbio"] = provider
+def tree_library(tree) -> str:
+    """Guess the tree library used to create the tree."""
+    for name, provider in data_providers["tree"].items():
+        if provider.check_dependencies():
+            tree_type = provider.tree_type()
+            if isinstance(tree, tree_type):
+                return name
+    raise ValueError(
+        f"Tree {tree} did not match any available tree library.",
+    )
 
 
 # Functions to ingest data from various libraries
@@ -78,12 +86,12 @@ def ingest_network_data(
     """Create internal data for the network."""
     _update_data_providers("network")
 
-    nl = network_library(network, data_providers=network_data_providers)
+    nl = network_library(network)
 
-    if nl in network_data_providers:
-        provider: NetworkDataProvider = network_data_providers[nl]
+    if nl in data_providers["network"]:
+        provider: NetworkDataProvider = data_providers["network"][nl]
     else:
-        sup = ", ".join(network_data_providers.keys())
+        sup = ", ".join(data_providers["network"].keys())
         raise ValueError(
             f"Network library '{nl}' is not installed. "
             f"Currently installed supported libraries: {sup}."
@@ -110,12 +118,12 @@ def ingest_tree_data(
     """Create internal data for the tree."""
     _update_data_providers("tree")
 
-    tl = tree_library(tree, data_providers=tree_data_providers)
+    tl = tree_library(tree)
 
-    if tl in tree_data_providers:
-        provider: TreeDataProvider = tree_data_providers[tl]
+    if tl in data_providers["tree"]:
+        provider: TreeDataProvider = data_providers["tree"][tl]
     else:
-        sup = ", ".join(tree_data_providers.keys())
+        sup = ", ".join(data_providers["tree"].keys())
         raise ValueError(
             f"Tree library '{tl}' is not installed. "
             f"Currently installed supported libraries: {sup}."
@@ -136,23 +144,15 @@ def ingest_tree_data(
 # INTERNAL FUNCTIONS
 def _update_data_providers(kind):
     """Update data provieders dynamically from external packages."""
-    global network_data_providers
-    global tree_data_providers
-    prov_dict = {
-        "network": network_data_providers,
-        "tree": tree_data_providers,
-    }
-    type_dict = {
-        "network": NetworkDataProvider,
-        "tree": TreeDataProvider,
-    }
+    global data_providers, provider_protocols
 
-    discovered_providers = entry_points(group=f"iplotx.{kind}_data_providers")
+    discovered_providers = importlib.metadata.entry_points(
+        group=f"iplotx.{kind}_data_providers"
+    )
     for entry_point in discovered_providers:
-        if entry_point.name not in network_data_providers:
+        if entry_point.name not in data_providers["network"]:
             try:
-                provider: type_dict[kind] = entry_point.load()
-                prov_dict[kind][entry_point.name] = provider
+                data_providers[kind][entry_point.name] = entry_point.load()
             except Exception as e:
                 warnings.warn(
                     f"Failed to load {kind} data provider '{entry_point.name}': {e}"

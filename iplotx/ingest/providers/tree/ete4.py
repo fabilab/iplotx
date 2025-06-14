@@ -7,16 +7,16 @@ from operator import attrgetter
 import numpy as np
 import pandas as pd
 
-from ...typing import (
+from ....typing import (
     TreeType,
     LayoutType,
 )
-from ..common import (
+from ...typing import (
     TreeDataProvider,
     TreeData,
     _make_layout_columns,
 )
-from ..heuristics import (
+from ...heuristics import (
     normalise_tree_layout,
 )
 
@@ -106,3 +106,8 @@ class Ete4DataProvider(TreeDataProvider):
         except ImportError:
             return False
         return True
+
+    def tree_type(self):
+        from ete4 import Tree
+
+        return Tree

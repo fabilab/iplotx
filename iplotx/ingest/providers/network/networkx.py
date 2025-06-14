@@ -6,15 +6,15 @@ from typing import (
 import numpy as np
 import pandas as pd
 
-from ..heuristics import (
+from ....typing import (
+    GraphType,
+    LayoutType,
+)
+from ...heuristics import (
     normalise_layout,
     detect_directedness,
 )
 from ...typing import (
-    GraphType,
-    LayoutType,
-)
-from ..common import (
     NetworkDataProvider,
     NetworkData,
     _make_layout_columns,
@@ -122,3 +122,8 @@ class NetworkXDataProvider(NetworkDataProvider):
         except ImportError:
             return False
         return True
+
+    def graph_type(self):
+        from networkx import Graph
+
+        return Graph

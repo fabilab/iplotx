@@ -12,11 +12,7 @@ from ..typing import (
     LayoutType,
     TreeType,
 )
-
-
-def _make_layout_columns(ndim):
-    columns = [f"_ipx_layout_{i}" for i in range(ndim)]
-    return columns
+from ..utils.internal import _make_layout_columns
 
 
 class NetworkData(TypedDict):
@@ -38,13 +34,19 @@ class NetworkDataProvider(Protocol):
         edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> NetworkData:
         """Create network data object for iplotx from any provider."""
-        pass
+        raise NotImplementedError("Network data providers must implement this method.")
 
     def check_dependencies(
         self,
     ):
         """Check whether the dependencies for this provider are installed."""
-        pass
+        raise NotImplementedError("Network data providers must implement this method.")
+
+    def graph_type(
+        self,
+    ):
+        """Return the graph type from this provider to check for instances."""
+        raise NotImplementedError("Network data providers must implement this method.")
 
 
 class TreeData(TypedDict):
@@ -73,10 +75,16 @@ class TreeDataProvider(Protocol):
         edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> TreeData:
         """Create tree data object for iplotx from any provider."""
-        pass
+        raise NotImplementedError("Tree data providers must implement this method.")
 
     def check_dependencies(
         self,
     ):
         """Check whether the dependencies for this provider are installed."""
-        pass
+        raise NotImplementedError("Tree data providers must implement this method.")
+
+    def tree_type(
+        self,
+    ):
+        """Return the tree type from this provider to check for instances."""
+        raise NotImplementedError("Tree data providers must implement this method.")

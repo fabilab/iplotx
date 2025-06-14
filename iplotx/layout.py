@@ -1,10 +1,9 @@
 import numpy as np
 import pandas as pd
-from .typing import TreeType
 
 
 def compute_tree_layout(
-    tree: TreeType,
+    tree,
     layout: str,
     orientation: str,
     **kwargs,

@@ -13,69 +13,10 @@ from ..typing import (
 )
 
 
-def network_library(
-    network: GraphType,
-    data_providers: Optional[dict] = None,
-) -> str:
-    # NOTE: data_providers is not used yet, but it will be by external plugins. That will require
-    # changes to this function as well.
-
-    if igraph is not None and isinstance(network, igraph.Graph):
-        return "igraph"
-    if networkx is not None:
-        if isinstance(network, networkx.Graph):
-            return "networkx"
-        if isinstance(network, networkx.DiGraph):
-            return "networkx"
-        if isinstance(network, networkx.MultiGraph):
-            return "networkx"
-        if isinstance(network, networkx.MultiDiGraph):
-            return "networkx"
-    raise TypeError("Unsupported graph type. Supported types are igraph and networkx.")
-
-
-def tree_library(
-    tree: TreeType,
-    data_providers: Optional[dict] = None,
-):
-    """Guess the library that provides this tree object."""
-    try:
-        from Bio import Phylo
-
-        if isinstance(tree, Phylo.BaseTree.Tree):
-            return "biopython"
-    except ImportError:
-        pass
-
-    try:
-        from ete4 import Tree as ETE4Tree
-
-        if isinstance(tree, ETE4Tree):
-            return "ete4"
-    except ImportError:
-        pass
-
-    try:
-        from cogent3.core.tree import PhyloNode
-
-        if isinstance(tree, PhyloNode):
-            return "cogent3"
-    except ImportError:
-        pass
-
-    try:
-        from skbio import TreeNode
-
-        if isinstance(tree, TreeNode):
-            return "skbio"
-    except ImportError:
-        pass
-
-    raise ValueError("Tree library not recognised.")
-
-
 def number_of_vertices(network: GraphType) -> int:
     """Get the number of vertices in the network."""
+    from . import network_library
+
     if network_library(network) == "igraph":
         return network.vcount()
     if network_library(network) == "networkx":
@@ -87,6 +28,8 @@ def detect_directedness(
     network: GraphType,
 ) -> np.ndarray:
     """Detect if the network is directed or not."""
+    from . import network_library
+
     if network_library(network) == "igraph":
         return network.is_directed()
     if isinstance(network, (networkx.DiGraph, networkx.MultiDiGraph)):
@@ -96,6 +39,8 @@ def detect_directedness(
 
 def normalise_layout(layout, network=None):
     """Normalise the layout to a pandas.DataFrame."""
+    from . import network_library
+
     if layout is None:
         if (network is not None) and (number_of_vertices(network) == 0):
             return pd.DataFrame(np.zeros((0, 2)))

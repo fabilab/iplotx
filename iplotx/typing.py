@@ -1,42 +1,36 @@
-from typing import Union, Sequence, Never
-from numpy import ndarray
-from pandas import DataFrame
+from typing import (
+    Union,
+    Sequence,
+    Any,
+)
+import numpy as np
+import pandas as pd
 
-from .importing import igraph, networkx
 
+# NOTE: GraphType is supposed to indicate any kind of graph object that is accepted by
+# iplotx's functions, e.g. igraph.Graph or networkx.Graph and subclasses. It is not
+# quite possible to really statically type it because providers can add their own
+# types - together with protocols to process them - at runtime.
+# Nonetheless, for increased readibility we define separately-named types in this
+# module to be used throughout the codebase.
+GraphType = Any
+TreeType = Any
 
-# FIXME: check this mess with static type checkers and see how far it needs to/can go.
-igraphGraph = igraph.Graph if igraph is not None else Never
-if networkx is not None:
-    networkxOmniGraph = Union[
-        networkx.Graph,
-        networkx.DiGraph,
-        networkx.MultiGraph,
-        networkx.MultiDiGraph,
-    ]
-else:
-    networkxOmniGraph = Never
-
-if igraphGraph is not None and networkxOmniGraph is not None:
-    GraphType = Union[igraphGraph, networkxOmniGraph]
-elif igraphGraph is not None:
-    GraphType = igraphGraph
-else:
-    GraphType = networkxOmniGraph
-
-if (igraph is not None) and (networkx is not None):
-    # networkx returns generators of sets, igraph has its own classes
-    # additionally, one can put list of memberships
-    GroupingType = Union[
-        Sequence[set],
-        igraph.clustering.Clustering,
-        igraph.clustering.VertexClustering,
-        igraph.clustering.Cover,
-        igraph.clustering.VertexCover,
-        Sequence[int],
-        Sequence[str],
-    ]
-
-LayoutType = Union[str, Sequence[Sequence[float]], ndarray, DataFrame]
-
-TreeType = dict
+# NOTE: The commented ones are not a mistake: they are supported but cannot be
+# statically typed if the user has no igraph installed (it's a soft dependency).
+LayoutType = Union[
+    str,
+    Sequence[Sequence[float]],
+    np.ndarray,
+    pd.DataFrame,
+    # igraph.Layout,
+]
+GroupingType = Union[
+    Sequence[set],
+    Sequence[int],
+    Sequence[str],
+    # igraph.clustering.Clustering,
+    # igraph.clustering.VertexClustering,
+    # igraph.clustering.Cover,
+    # igraph.clustering.VertexCover,
+]

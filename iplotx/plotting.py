@@ -121,7 +121,7 @@ def tree(
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
     **kwargs,
-) -> list[mpl.artist.Artist]:
+) -> TreeArtist:
     """Plot a tree using the specified layout.
 
     Args:

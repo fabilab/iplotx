@@ -7,21 +7,21 @@ from operator import attrgetter
 import numpy as np
 import pandas as pd
 
-from ...typing import (
+from ....typing import (
     TreeType,
     LayoutType,
 )
-from ..common import (
+from ...typing import (
     TreeDataProvider,
     TreeData,
     _make_layout_columns,
 )
-from ..heuristics import (
+from ...heuristics import (
     normalise_tree_layout,
 )
 
 
-class BiopythonDataProvider(TreeDataProvider):
+class Cogent3DataProvider(TreeDataProvider):
     def __call__(
         self,
         tree: TreeType,
@@ -33,12 +33,19 @@ class BiopythonDataProvider(TreeDataProvider):
         ] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> TreeData:
-        """Create tree data object for iplotx from BioPython.Phylo.Tree classes."""
+        """Create tree data object for iplotx from cogent3.core.tree.PhyloNode classes."""
+
+        root_fun = lambda tree: tree.root()
+        preorder_fun = lambda tree: tree.preorder()
+        postorder_fun = lambda tree: tree.postorder()
+        children_fun = attrgetter("children")
+        branch_length_fun = attrgetter("length")
+        leaves_fun = lambda tree: tree.tips()
 
         tree_data = {
-            "root": tree.root,
-            "leaves": tree.get_terminals(),
-            "rooted": tree.rooted,
+            "root": root_fun(tree),
+            "leaves": leaves_fun(tree),
+            "rooted": True,
             "directed": directed,
             "ndim": 2,
             "layout_name": layout,
@@ -49,23 +56,21 @@ class BiopythonDataProvider(TreeDataProvider):
             layout,
             tree=tree,
             orientation=orientation,
-            root_fun=attrgetter("root"),
-            preorder_fun=lambda tree: tree.find_clades(order="preorder"),
-            postorder_fun=lambda tree: tree.find_clades(order="postorder"),
-            children_fun=attrgetter("clades"),
-            branch_length_fun=attrgetter("branch_length"),
+            root_fun=root_fun,
+            preorder_fun=preorder_fun,
+            postorder_fun=postorder_fun,
+            children_fun=children_fun,
+            branch_length_fun=branch_length_fun,
         )
         if layout in ("radial",):
             tree_data["layout_coordinate_system"] = "polar"
         else:
             tree_data["layout_coordinate_system"] = "cartesian"
 
-        from ...style import get_style
-
         # Add edge_df
         edge_data = {"_ipx_source": [], "_ipx_target": []}
-        for node in tree.find_clades(order="preorder"):
-            for child in node.clades:
+        for node in preorder_fun(tree):
+            for child in node.children:
                 if directed == "parent":
                     edge_data["_ipx_source"].append(child)
                     edge_data["_ipx_target"].append(node)
@@ -97,7 +102,12 @@ class BiopythonDataProvider(TreeDataProvider):
 
     def check_dependencies(self) -> bool:
         try:
-            from Bio import Phylo
+            import cogent3
         except ImportError:
             return False
         return True
+
+    def tree_type(self):
+        from cogent3.core.tree import PhyloNode
+
+        return PhyloNode
