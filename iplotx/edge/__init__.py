@@ -131,10 +131,13 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
     def set_figure(self, fig) -> Never:
         super().set_figure(fig)
-        for child in self.get_children():
-            child.set_figure(fig)
         self._update_paths()
+        # NOTE: This sets the correct offsets in the arrows,
+        # but not the correct sizes (see below)
         self._update_children()
+        for child in self.get_children():
+            # NOTE: This sets the sizes with correct dpi scaling in the arrows
+            child.set_figure(fig)
 
     def _update_children(self):
         self._update_arrows()
@@ -651,10 +654,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
         path.vertices = trans_inv(path.vertices)
         return path, tuple(thetas)
 
-    def _update_arrows(self):
-        # TODO: update the arrow locations/sizes based on dpi etc without drawing
-        pass
-
     def _update_labels(self):
         if self._labels is None:
             return
@@ -676,17 +675,23 @@ class EdgeCollection(mpl.collections.PatchCollection):
         if not style.get("rotate", True):
             self._label_collection.set_rotations(rotations)
 
-    def _set_edge_info_for_arrows(
+    def _update_arrows(
         self,
-        which="end",
-        transform=None,
-    ):
-        """Extract the start and/or end angles of the paths to compute arrows."""
+        which: str = "end",
+    ) -> None:
+        """Extract the start and/or end angles of the paths to compute arrows.
+
+        Parameters:
+            which: Which end of the edge to put an arrow on. Currently only "end" is accepted.
+
+        NOTE: This function does *not* update the arrow sizes/_transforms to the correct dpi scaling.
+        That's ok since the correct dpi scaling is set whenever there is a different figure (before
+        first draw) and whenever a draw is called.
+        """
         if not hasattr(self, "_arrows"):
             return
 
-        if transform is None:
-            transform = self.get_transform()
+        transform = self.get_transform()
         trans = transform.transform
 
         for i, epath in enumerate(self.get_paths()):
@@ -709,17 +714,17 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
     @_stale_wrapper
     def draw(self, renderer):
-        # Visibility of the edges affects also the children
+        # Visibility affects the children too
         if not self.get_visible():
             return
 
         self._update_paths()
+        # This sets the arrow offsets
+        self._update_children()
 
         super().draw(renderer)
-        self._set_edge_info_for_arrows(which="end")
-        self._update_labels()
-
         for child in self.get_children():
+            # This sets the arrow sizes with dpi scaling
             child.draw(renderer)
 
     @property

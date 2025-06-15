@@ -1,3 +1,6 @@
+from typing import (
+    Never,
+)
 import numpy as np
 import matplotlib as mpl
 from matplotlib.patches import PathPatch
@@ -74,28 +77,15 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
     get_size = get_sizes
     set_size = set_sizes
 
+    def set_figure(self, fig) -> Never:
+        """Set the figure for this artist and all children."""
+        super().set_figure(fig)
+        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+        for child in self.get_children():
+            child.set_figure(fig)
+
     def get_offset_transform(self):
         return self._edge_collection.get_transform()
-
-    def set_sizes(self, sizes, dpi=72.0):
-        """Set vertex sizes.
-
-        This rescales the current vertex symbol/path linearly, using this
-        value as the largest of width and height.
-
-        @param sizes: A sequence of vertex sizes or a single size.
-        """
-        if sizes is None:
-            self._sizes = np.array([])
-            self._transforms = np.empty((0, 3, 3))
-        else:
-            self._sizes = np.asarray(sizes)
-            self._transforms = np.zeros((len(self._sizes), 3, 3))
-            scale = self._sizes * dpi / 72.0 * self._factor
-            self._transforms[:, 0, 0] = scale
-            self._transforms[:, 1, 1] = scale
-            self._transforms[:, 2, 2] = 1.0
-        self.stale = True
 
     get_size = get_sizes
     set_size = set_sizes
