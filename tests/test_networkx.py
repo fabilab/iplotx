@@ -1,3 +1,4 @@
+from ast import Import
 import os
 import unittest
 import pytest
@@ -8,14 +9,13 @@ mpl.use("agg")
 import matplotlib.pyplot as plt
 
 import iplotx as ipx
-from iplotx.importing import networkx as nx
 
-# FIXME: find a better way to do this that works for both direct call and module
-# import e.g. tox
 try:
-    from .utils import image_comparison
+    import networkx as nx
 except ImportError:
-    from utils import image_comparison
+    nx = None
+
+from utils import image_comparison
 
 
 class GraphTestRunner(unittest.TestCase):

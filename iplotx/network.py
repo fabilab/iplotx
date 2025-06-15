@@ -86,10 +86,10 @@ class NetworkArtist(mpl.artist.Artist):
     def get_children(self):
         return (self._vertices, self._edges)
 
-    def set_figure(self, figure):
-        super().set_figure(figure)
+    def set_figure(self, fig):
+        super().set_figure(fig)
         for child in self.get_children():
-            child.set_figure(figure)
+            child.set_figure(fig)
 
     def get_offset_transform(self):
         """Get the offset transform (for vertices/edges)."""
@@ -162,10 +162,10 @@ class NetworkArtist(mpl.artist.Artist):
 
         self._vertices = VertexCollection(
             layout=self.get_layout(),
-            offset_transform=self.get_offset_transform(),
-            transform=self.get_transform(),
             style=get_style(".vertex"),
             labels=self._get_label_series("vertex"),
+            transform=self.get_transform(),
+            offset_transform=self.get_offset_transform(),
         )
 
     def _add_edges(self):

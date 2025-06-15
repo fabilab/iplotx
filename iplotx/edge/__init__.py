@@ -1,6 +1,14 @@
+"""
+Module defining the main matplotlib Artist for network/tree edges, EdgeCollection.
+
+Some supporting functions are also defined here.
+"""
+
 from typing import (
     Sequence,
     Optional,
+    Never,
+    Any,
 )
 from math import atan2, tan, cos, pi, sin
 from collections import defaultdict
@@ -33,20 +41,53 @@ from .ports import _get_port_unit_vector
     )
 )
 class EdgeCollection(mpl.collections.PatchCollection):
+    """Artist for a collection of edges within a network/tree.
+
+    This artist is derived from PatchCollection with a few notable differences:
+      - It udpdates ends of each edge based on the vertex borders.
+      - It may contain edge labels as a child (a LabelCollection).
+      - For directed graphs, it contains arrows as a child (an EdgeArrowCollection).
+
+    This class is not designed to be instantiated directly but rather by internal
+    iplotx functions such as iplotx.network. However, some of its methods can be
+    called directly to edit edge style after the initial draw.
+    """
+
     def __init__(
         self,
-        patches,
+        patches: Sequence[mpl.patches.Patch],
         vertex_ids: Sequence[tuple],
         vertex_collection: VertexCollection,
         layout: pd.DataFrame,
+        *args,
         layout_coordinate_system: str = "cartesian",
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         arrow_transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         directed: bool = False,
-        style: Optional[dict] = None,
-        *args,
+        style: Optional[dict[str, Any]] = None,
         **kwargs,
-    ):
+    ) -> Never:
+        """Initialise an EdgeCollection.
+
+        Parameters:
+            patches: A sequence (usually, list) of matplotlib `Patch`es describing the edges.
+            vertex_ids: A sequence of pairs `(v1, v2)`, each defining the ids of vertices at the
+                end of an edge.
+            vertex_collection: The VertexCollection instance containing the Artist for the
+                vertices. This is needed to compute vertex borders and adjust edges accordingly.
+            layout: The vertex layout.
+            layout_coordinate_system: The coordinate system the previous parameter is in. For
+                certain layouts, this might not be "cartesian" (e.g. "polar" layour for radial
+                trees).
+            transform: The matplotlib transform for the edges, usually transData.
+            arrow_transform: The matplotlib transform for the arrow patches. This is not the
+                *offset_transform* of arrows, which is set equal to the edge transform (previous
+                parameter). Instead, it specifies how arrow size scales, similar to vertex size.
+                This is usually the identity transform.
+            directed: Whether the graph is directed (in which case arrows are drawn, possibly
+                with zero size or opacity to obtain an "arrowless" effect).
+            style: The edge style (subdictionary: "edge") to use at creation.
+        """
         kwargs["match_original"] = True
         self._vertex_ids = vertex_ids
 
@@ -80,86 +121,69 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 transform=transform,
             )
 
-    def get_children(self):
+    def get_children(self) -> tuple:
         children = []
         if hasattr(self, "_arrows"):
             children.append(self._arrows)
         if hasattr(self, "_label_collection"):
             children.append(self._label_collection)
-        return children
+        return tuple(children)
 
-    def set_figure(self, figure):
-        ret = super().set_figure(figure)
+    def set_figure(self, fig) -> Never:
+        super().set_figure(fig)
         for child in self.get_children():
-            child.set_figure(figure)
+            child.set_figure(fig)
         self._update_paths()
         self._update_children()
-        return ret
 
     def _update_children(self):
         self._update_arrows()
         self._update_labels()
 
     @property
-    def directed(self):
+    def directed(self) -> bool:
+        """Whether the network is directed."""
         return self._directed
 
     @directed.setter
-    def directed(self, value):
+    def directed(self, value) -> Never:
+        """Setter for the directed property.
+
+        Changing this property triggers the addition/removal of arrows from the plot.
+        """
         value = bool(value)
-        if self._directed == value:
-            return
+        if self._directed != value:
+            # Moving to undirected, remove arrows
+            if not value:
+                self._arrows.remove()
+                del self._arrows
+            # Moving to directed, create arrows
+            else:
+                self._arrows = EdgeArrowCollection(
+                    self,
+                    transform=self._arrow_transform,
+                )
 
-        # Moving to undirected, remove arrows
-        if not value:
-            self._arrows.remove()
-            del self._arrows
-        # Moving to directed, create arrows
-        else:
-            self._arrows = EdgeArrowCollection(
-                self,
-                transform=self._arrow_transform,
-            )
+            self._directed = value
+            # NOTE: setting stale to True should trigger a redraw as soon as needed
+            # and that will update children. We might need to verify that.
+            self.stale = True
 
-        self._directed = value
-        # NOTE: setting stale to True should trigger a redraw as soon as needed
-        # and that will update children. We might need to verify that.
-        self.stale = True
-
-    def set_array(self, array):
+    def set_array(self, A) -> Never:
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
-        super().set_array(array)
+        super().set_array(A)
         if self._arrows is not None:
-            self._arrows.set_array(array)
+            self._arrows.set_array(A)
 
-    def get_labels(self):
+    def get_labels(self) -> Optional[LabelCollection]:
+        """Get LabelCollection artist for labels if present."""
         if hasattr(self, "_label_collection"):
             return self._label_collection
-        else:
-            return None
+        return None
 
     def get_mappable(self):
         """Return mappable for colorbar."""
         return self
-
-    @staticmethod
-    def _compute_edge_angles(path, size, trans):
-        """Compute edge angles for both starting and ending vertices.
-
-        NOTE: The domain of atan2 is (-pi, pi].
-        """
-        positions = trans(path.vertices)
-
-        # first angle
-        x1, y1 = positions[0]
-        x2, y2 = positions[1]
-        angle1 = atan2(y2 - y1, x2 - x1)
-
-        # second angle
-        x1, y1 = positions[-1]
-        x2, y2 = positions[-2]
-        angle2 = atan2(y2 - y1, x2 - x1)
-        return (angle1, angle2)
 
     def _get_adjacent_vertices_info(self):
         index = self._vertex_collection.get_index()

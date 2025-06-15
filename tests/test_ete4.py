@@ -15,10 +15,7 @@ import matplotlib.pyplot as plt
 
 import iplotx as ipx
 
-try:
-    from .utils import image_comparison
-except ImportError:
-    from utils import image_comparison
+from utils import image_comparison
 
 
 class TreeTestRunner(unittest.TestCase):

@@ -1,8 +1,16 @@
+"""
+Module containing code to manipulate vertex visualisations, especially the VertexCollection class.
+"""
+
 from typing import (
+    Optional,
     Sequence,
+    Any,
+    Never,
 )
 import warnings
 import numpy as np
+import pandas as pd
 import matplotlib as mpl
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import (
@@ -37,32 +45,35 @@ from .label import LabelCollection
     )
 )
 class VertexCollection(PatchCollection):
-    """Collection of vertex patches for plotting.
-
-    This class takes additional keyword arguments compared to PatchCollection:
-
-    @param vertex_builder: A list of vertex builders to construct the visual
-        vertices. This is updated if the size of the vertices is changed.
-    @param size_callback: A function to be triggered after vertex sizes are
-        changed. Typically this redraws the edges.
-    """
+    """Collection of vertex patches for plotting."""
 
     _factor = 1.0
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        layout: pd.DataFrame,
+        *args,
+        layout_coordinate_system: str = "cartesian",
+        style: Optional[dict[str, Any]] = None,
+        labels: Optional[Sequence[str]] = None,
+        **kwargs,
+    ):
+        """Initialise the VertexCollection.
 
-        layout_df = kwargs.pop("layout")
-        layout_coordinate_system = kwargs.pop(
-            "layout_coordinate_system",
-            "cartesian",
-        )
-        self._index = layout_df.index
-        self._style = kwargs.pop("style", None)
-        self._labels = kwargs.pop("labels", None)
+        Parameters:
+            layout: The vertex layout.
+            layout_coordinate_system: The coordinate system for the layout, usually "cartesian").
+            style: The vertex style (subdictionary "vertex") to apply.
+            labels: The vertex labels, if present.
+        """
+
+        self._index = layout.index
+        self._style = style
+        self._labels = labels
 
         # Create patches from structured data
         patches, offsets, sizes, kwargs2 = self._init_vertex_patches(
-            layout_df,
+            layout,
             layout_coordinate_system=layout_coordinate_system,
         )
 
@@ -79,24 +90,29 @@ class VertexCollection(PatchCollection):
         if self._labels is not None:
             self._compute_label_collection()
 
-    def get_children(self):
+    def get_children(self) -> tuple[mpl.artist.Artist]:
+        """Get the children artists.
+
+        This can include the labels as a LabelCollection.
+        """
         children = []
         if hasattr(self, "_label_collection"):
             children.append(self._label_collection)
         return tuple(children)
 
-    def set_figure(self, figure):
-        ret = super().set_figure(figure)
+    def set_figure(self, fig) -> Never:
+        """Set the figure for this artist and all children."""
+        super().set_figure(fig)
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
         for child in self.get_children():
-            child.set_figure(figure)
-        return ret
+            child.set_figure(fig)
 
     def get_index(self):
-        """Get the vertex index."""
+        """Get the VertexCollection index."""
         return self._index
 
     def get_vertex_id(self, index):
+        """Get the id of a single vertex at a positional index."""
         return self._index[index]
 
     def get_sizes(self):
@@ -104,6 +120,7 @@ class VertexCollection(PatchCollection):
         return self._sizes
 
     def get_sizes_dpi(self):
+        """Get vertex sizes (max of width and height), scaled by dpi."""
         return self._transforms[:, 0, 0]
 
     def set_sizes(self, sizes, dpi=72.0):

@@ -1,3 +1,7 @@
+"""
+Module for vertex groupings code, especially the GroupingArtist class.
+"""
+
 from typing import Union
 import numpy as np
 import matplotlib as mpl
@@ -20,6 +24,10 @@ from .utils.geometry import (
 
 
 class GroupingArtist(PatchCollection):
+    """Matplotlib artist for a vertex grouping (clustering/cover).
+
+    This class is used to plot patches surrounding groups of vertices in a network.
+    """
 
     _factor = 1.0
 

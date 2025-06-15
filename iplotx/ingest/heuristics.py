@@ -1,9 +1,16 @@
-from typing import Optional
+"""
+Heuristics module to funnel certain variable inputs (e.g. layouts) into a standard format.
+"""
+
+from typing import (
+    Optional,
+    Any,
+)
+from collections.abc import Hashable
 from collections import defaultdict
 import numpy as np
 import pandas as pd
 
-from ..importing import igraph, networkx
 from ..layout import compute_tree_layout
 from ..typing import (
     GraphType,
@@ -26,20 +33,30 @@ def number_of_vertices(network: GraphType) -> int:
 
 def detect_directedness(
     network: GraphType,
-) -> np.ndarray:
+) -> bool:
     """Detect if the network is directed or not."""
     from . import network_library
 
-    if network_library(network) == "igraph":
+    nl = network_library(network)
+
+    if nl == "igraph":
         return network.is_directed()
-    if isinstance(network, (networkx.DiGraph, networkx.MultiDiGraph)):
-        return True
+    if nl == "networkx":
+        import networkx as nx
+
+        if isinstance(network, (nx.DiGraph, nx.MultiDiGraph)):
+            return True
     return False
 
 
 def normalise_layout(layout, network=None):
     """Normalise the layout to a pandas.DataFrame."""
     from . import network_library
+
+    try:
+        import igraph as ig
+    except ImportError:
+        ig = None
 
     if layout is None:
         if (network is not None) and (number_of_vertices(network) == 0):
@@ -57,7 +74,7 @@ def normalise_layout(layout, network=None):
         if network_library(network) == "networkx":
             layout = dict(network.nodes.data(layout))
 
-    if (igraph is not None) and isinstance(layout, igraph.layout.Layout):
+    if (ig is not None) and isinstance(layout, ig.layout.Layout):
         return pd.DataFrame(layout.coords)
     if isinstance(layout, dict):
         return pd.DataFrame(layout).T
@@ -73,10 +90,23 @@ def normalise_layout(layout, network=None):
 
 
 def normalise_tree_layout(
-    layout,
+    layout: str | Any,
     tree: Optional[TreeType] = None,
     **kwargs,
 ) -> pd.DataFrame:
+    """Normalise tree layout from a variety of inputs.
+
+    Parameters:
+        layout: The tree layout to normalise.
+        tree: The correcponding tree object.
+        **kwargs: Additional arguments for the subroutines.
+
+    Returns:
+        A pandas DataFrame with the normalised tree layout.
+
+    NOTE: This function currently only accepts strings and computes
+        the layout internally. This might change in the future.
+    """
     if isinstance(layout, str):
         layout = compute_tree_layout(tree, layout, **kwargs)
     else:
@@ -107,7 +137,22 @@ def normalise_tree_layout(
 def normalise_grouping(
     grouping: GroupingType,
     layout: LayoutType,
-) -> dict[set]:
+) -> dict[Hashable, set]:
+    """Normalise network grouping from a variery of inputs.
+
+    Parameters:
+        grouping: Network grouping (e.g. vertex cover).
+        layout: Network layout.
+
+    Returns:
+        A dictionary of sets. Each key is the index of a group, each value is a set of vertices
+        included in that group. If all sets are mutually exclusive, this is a vertex clustering,
+        otherwise it's only a vertex cover.
+    """
+    try:
+        import igraph as ig
+    except ImportError:
+        ig = None
 
     if len(grouping) == 0:
         return {}
@@ -127,15 +172,15 @@ def normalise_grouping(
             return group_dic
 
     # If an igraph object, convert to a dict of sets
-    if igraph is not None:
-        if isinstance(grouping, igraph.clustering.Clustering):
+    if ig is not None:
+        if isinstance(grouping, ig.clustering.Clustering):
             layout = normalise_layout(layout)
             group_dic = defaultdict(set)
             for i, member in enumerate(grouping.membership):
                 group_dic[member].add(i)
             return group_dic
 
-        if isinstance(grouping, igraph.clustering.Cover):
+        if isinstance(grouping, ig.clustering.Cover):
             layout = normalise_layout(layout)
             group_dic = defaultdict(set)
             for i, members in enumerate(grouping.membership):
@@ -149,8 +194,7 @@ def normalise_grouping(
     # If the values are already sets, assume group indices are integers
     # and values are as is
     if isinstance(grouping[0], set):
-        group_dic = {i: val for i, val in enumerate(grouping)}
-        return group_dic
+        return dict(enumerate(grouping))
 
     # If the values are integers or strings, assume each key is a vertex id and each value is a
     # group, convert to dict of sets

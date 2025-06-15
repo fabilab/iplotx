@@ -7,14 +7,13 @@ mpl.use("agg")
 import matplotlib.pyplot as plt
 
 import iplotx as ipx
-from iplotx.importing import igraph as ig
 
-# FIXME: find a better way to do this that works for both direct call and module
-# import e.g. tox
 try:
-    from .utils import image_comparison
+    import igraph as ig
 except ImportError:
-    from utils import image_comparison
+    ig = None
+
+from utils import image_comparison
 
 
 class GraphTestRunner(unittest.TestCase):

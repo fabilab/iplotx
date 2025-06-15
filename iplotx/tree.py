@@ -158,14 +158,14 @@ class TreeArtist(mpl.artist.Artist):
         """Add vertices to the tree."""
         self._vertices = VertexCollection(
             layout=self.get_layout(),
-            offset_transform=self.get_offset_transform(),
-            transform=self.get_transform(),
             style=get_style(".vertex"),
             labels=self._get_label_series("vertex"),
             layout_coordinate_system=self._ipx_internal_data.get(
                 "layout_coordinate_system",
                 "catesian",
             ),
+            transform=self.get_transform(),
+            offset_transform=self.get_offset_transform(),
         )
 
     def _add_edges(self):
