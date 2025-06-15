@@ -284,6 +284,12 @@ def unflatten_style(
             subdictionaries.
 
     NOTE: The dict is changed *in place*.
+
+    Example:
+        >>> style = {'vertex_size': 20}
+        >>> unflatten_style(style)
+        >>> print(style)
+        {'vertex': {'size': 20}}
     """
 
     def _inner(style_flat: dict):
@@ -317,11 +323,28 @@ def unflatten_style(
 
 
 def rotate_style(
-    style,
+    style: dict[str, Any],
     index: Optional[int] = None,
     key: Optional[Hashable] = None,
-    props=style_leaves,
-):
+    props: Sequence[str] = style_leaves,
+) -> dict[str, Any]:
+    """Rotate leaves of a style for a certain index or key.
+
+    Parameters:
+        style: The style to rotate.
+        index: The integer to rotate the style leaves into.
+        key: For dict-like leaves (e.g. vertex properties specified as a dict-like object over the
+            vertices themselves), the key to use for rotation (e.g. the vertex itself).
+        props: The properties to rotate, usually all leaf properties.
+
+    Returns:
+        A style with rotated leaves, which describes the properties of a single element (e.g. vertex).
+
+    Example:
+        >>> style = {'vertex': {'size': [10, 20]}}
+        >>> rotate_style(style, index=0)
+        {'vertex': {'size': 10}}
+    """
     if (index is None) and (key is None):
         raise ValueError(
             "At least one of 'index' or 'key' must be provided to rotate_style."

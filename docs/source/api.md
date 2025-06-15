@@ -26,6 +26,14 @@ See also the <project:style.md> for an introduction to styles in `iplotx`.
 .. autofunction:: iplotx.style.get_style
 ```
 
+The following functions are reported for completeness but are rarely used by users directly:
+
+```{eval-rst}
+.. autofunction:: iplotx.style.unflatten_style
+
+.. autofunction:: iplotx.style.rotate_style
+```
+
 ## Artist hierarchy
 `iplotx.plot` return a list of `matplotlib` artists (1 or 2). When a network is plotted, the first artist is an instance of `iplotx.NetworkArtist`. This class contains the visual elements representing vertices, edges, labels, arrows, etc. and can be used to further edit the plot after `iplotx.plot` returned.
 
