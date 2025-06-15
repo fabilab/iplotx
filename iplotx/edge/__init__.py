@@ -177,7 +177,11 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
     def set_array(self, A) -> Never:
         """Set the array for cmap/norm coloring."""
+        # Preserve the alpha channel
         super().set_array(A)
+        # Alpha needs to be kept separately
+        if self.get_alpha() is None:
+            self.set_alpha(self.get_edgecolor()[:, 3])
         # This is necessary to ensure edgecolors are bool-flagged correctly
         self.set_edgecolor(None)
 
