@@ -116,9 +116,15 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
     def set_array(self, array):
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
-        fcs = self.get_facecolors()
-        super().set_array(array)
-        self.set_facecolors(fcs)
+        raise ValueError("Setting an array for arrows directly is not supported.")
+
+    def set_colors(self, colors):
+        """Set arrow colors (edge and/or face) based on a colormap."""
+        # NOTE: facecolors is always an array because we come from patches
+        # It can have zero alpha (i.e. if we choose "none", or a hollow marker)
+        self.set_edgecolors(colors)
+        has_facecolor = self._facecolors[:, 3] > 0
+        self._facecolors[has_facecolor] = colors[has_facecolor]
 
     @property
     def stale(self):

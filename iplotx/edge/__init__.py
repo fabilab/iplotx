@@ -108,6 +108,9 @@ class EdgeCollection(mpl.collections.PatchCollection):
         # NOTE: This should also set the transform
         super().__init__(patches, transform=transform, *args, **kwargs)
 
+        # This is important because it prepares the right flags for scalarmappable
+        self.set_facecolor("none")
+
         if self.directed:
             self._arrows = EdgeArrowCollection(
                 self,
@@ -173,10 +176,22 @@ class EdgeCollection(mpl.collections.PatchCollection):
             self.stale = True
 
     def set_array(self, A) -> Never:
-        """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
+        """Set the array for cmap/norm coloring."""
         super().set_array(A)
-        if self._arrows is not None:
-            self._arrows.set_array(A)
+        # This is necessary to ensure edgecolors are bool-flagged correctly
+        self.set_edgecolor(None)
+
+    def update_scalarmappable(self) -> Never:
+        """Update colors from the scalar mappable array, if any.
+
+        Assign edge colors from a numerical array, and match arrow colors
+        if the graph is directed.
+        """
+        # NOTE: The superclass also sets stale = True
+        super().update_scalarmappable()
+        # Now self._edgecolors has the correct colorspace values
+        if hasattr(self, "_arrows"):
+            self._arrows.set_colors(self.get_edgecolors())
 
     def get_labels(self) -> Optional[LabelCollection]:
         """Get LabelCollection artist for labels if present."""
@@ -832,7 +847,10 @@ def make_stub_patch(**kwargs):
     kwargs["clip_on"] = kwargs.get("clip_on", True)
     if ("color" in kwargs) and ("edgecolor" not in kwargs):
         kwargs["edgecolor"] = kwargs.pop("color")
+
     # Edges are always hollow, because they are not closed paths
+    # NOTE: This is supposed to cascade onto what boolean flags are set
+    # for color mapping (Colorizer)
     kwargs["facecolor"] = "none"
 
     # Forget specific properties that are not supported here

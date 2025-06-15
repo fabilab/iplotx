@@ -216,7 +216,7 @@ class NetworkArtist(mpl.artist.Artist):
             _update_from_internal(edge_stylei, edge_df.iloc[i], kind="edge")
 
             if cmap_fun is not None:
-                colorarray.append(edge_style["color"])
+                colorarray.append(edge_stylei["color"])
                 edge_stylei["color"] = cmap_fun(edge_stylei["color"])
 
             # These are not the actual edges drawn, only stubs to establish
@@ -245,6 +245,8 @@ class NetworkArtist(mpl.artist.Artist):
             style=edge_style,
             directed=self._ipx_internal_data["directed"],
         )
+        if "cmap" in edge_style:
+            self._edges.set_array(colorarray)
 
     @_stale_wrapper
     def draw(self, renderer):
