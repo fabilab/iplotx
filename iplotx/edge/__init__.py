@@ -297,6 +297,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 ports = None
 
             waypoints = edge_stylei.get("waypoints", "none")
+            if waypoints != "none":
+                ports = edge_stylei.get("ports", (None, None))
 
             # Compute actual edge path
             path, angles = _compute_edge_path(

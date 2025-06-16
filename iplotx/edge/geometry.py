@@ -210,6 +210,7 @@ def _compute_edge_path_waypoints(
     trans_inv,
     layout_coordinate_system: str = "cartesian",
     points_per_curve: int = 30,
+    ports: Pair[Optional[str]] = (None, None),
     **kwargs,
 ):
 
@@ -225,22 +226,76 @@ def _compute_edge_path_waypoints(
             waypoint = np.array([vcoord_fig[1][0], vcoord_fig[0][1]])
 
         # Angles of the straight lines
-        theta0 = atan2(*((waypoint - vcoord_fig[0])[::-1]))
-        theta1 = atan2(*((waypoint - vcoord_fig[1])[::-1]))
+        thetas = [None, None]
+        vshorts = [None, None]
+        for i in range(2):
+            if ports[i] is None:
+                thetas[i] = atan2(*((waypoint - vcoord_fig[i])[::-1]))
+            else:
+                thetas[i] = atan2(*(_get_port_unit_vector(ports[i], trans_inv)[::-1]))
 
-        # Shorten at starting vertex
-        vs = (
-            _get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta0) + vcoord_fig[0]
-        )
+            # Shorten at vertex border
+            vshorts[i] = (
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i])
+                + vcoord_fig[i]
+            )
 
-        # Shorten at end vertex
-        ve = (
-            _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta1) + vcoord_fig[1]
-        )
+        # Shorten waypoints to keep the angles right
+        if waypoints == "x0y1":
+            waypoint[0] = vshorts[0][0]
+            waypoint[1] = vshorts[1][1]
+        else:
+            waypoint[1] = vshorts[0][1]
+            waypoint[0] = vshorts[1][0]
 
-        points = [vs, waypoint, ve]
+        points = [vshorts[0], waypoint, vshorts[1]]
         codes = ["MOVETO", "LINETO", "LINETO"]
-        angles = (theta0, theta1)
+        angles = tuple(thetas)
+    elif waypoints in ("xmidy0,xmidy1", "x0ymid,x1ymid"):
+        # S-shaped orthogonal line
+        assert layout_coordinate_system == "cartesian"
+
+        # Coordinates in figure (default) coords
+        vcoord_fig = trans(vcoord_data)
+
+        if waypoints == "xmidy0,xmidy1":
+            xmid = 0.5 * (vcoord_fig[0][0] + vcoord_fig[1][0])
+            waypoint_array = np.array(
+                [
+                    [xmid, vcoord_fig[0][1]],
+                    [xmid, vcoord_fig[1][1]],
+                ]
+            )
+        else:
+            ymid = 0.5 * (vcoord_fig[0][1] + vcoord_fig[1][1])
+            waypoint_array = np.array(
+                [
+                    [vcoord_fig[0][0], ymid],
+                    [vcoord_fig[1][0], ymid],
+                ]
+            )
+
+        # Angles of the straight lines
+        thetas = []
+        vshorts = []
+        for i in range(2):
+            if ports[i] is None:
+                theta = atan2(*((waypoint_array[i] - vcoord_fig[i])[::-1]))
+            else:
+                theta = atan2(*(_get_port_unit_vector(ports[i], trans_inv)[::-1]))
+
+            # Shorten at vertex border
+            vshort = (
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], theta)
+                + vcoord_fig[i]
+            )
+            thetas.append(theta)
+            vshorts.append(vshort)
+
+        points = [vshorts[0], waypoint_array[0], waypoint_array[1], vshorts[1]]
+        codes = ["MOVETO", "LINETO", "LINETO", "LINETO"]
+        angles = tuple(thetas)
+
     elif waypoints == "r0a1":
         assert layout_coordinate_system == "polar"
 
@@ -283,7 +338,7 @@ def _compute_edge_path_curved(
     vsize_fig,
     trans,
     trans_inv,
-    ports=(None, None),
+    ports: Pair[Optional[str]] = (None, None),
 ):
     """Shorten the edge path along a cubic Bezier between the vertex centres.
 
@@ -378,6 +433,7 @@ def _compute_edge_path(
             waypoints,
             *args,
             layout_coordinate_system=layout_coordinate_system,
+            ports=ports,
             **kwargs,
         )
 
