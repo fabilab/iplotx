@@ -6,7 +6,7 @@
 # iplotx
 Plotting networks from igraph and networkx.
 
-**NOTE**: This is currently alpha quality software. The API and functionality will break constantly, so use at your own risk. That said, if you have things you would like to see improved, please open a GitHub issue.
+**NOTE**: This is currently beta quality software. The API and functionality are settling in and might break occasionally.
 
 ## Installation
 ```bash
