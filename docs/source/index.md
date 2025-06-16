@@ -74,7 +74,7 @@ See <project:gallery/index.rst> for examples of plots made with `iplotx`. Feel f
 - compatibility with many GUI frameworks (e.g. Qt, GTK, Tkinter) thanks to `matplotlib`
 - data-driven axes autoscaling
 - consistent behaviour upon zooming and panning
-- correct HiDPI scaling (e.g. retina screens)
+- correct HiDPI scaling (e.g. retina screens) including for vertex sizes, arrow sizes, and edge offsets
 - a consistent `matplotlib` artist hierarchy
 - post-plot editability (e.g. for animations)
 - plays well with other charting tools (e.g. `seaborn`)
