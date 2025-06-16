@@ -32,9 +32,11 @@ layout = {
     "Employee 3": [2, 0],
     "Employee 4": [2, 0.5],
 }
+fig, ax = plt.subplots()
 ipx.network(
     g,
     layout=layout,
+    ax=ax,
     vertex_labels=True,
     style="hollow",
     vertex_marker="r",
@@ -43,3 +45,5 @@ ipx.network(
     edge_tension=[0.65] * 3 + [0.6] * 5,
     margins=(0.08, 0.05),
 )
+# Show the layout top to bottom for clarity
+ax.invert_yaxis()
