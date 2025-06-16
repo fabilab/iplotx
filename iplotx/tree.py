@@ -190,12 +190,12 @@ class TreeArtist(mpl.artist.Artist):
         """Add vertices to the tree."""
         self._vertices = VertexCollection(
             layout=self.get_layout(),
-            style=get_style(".vertex"),
-            labels=self._get_label_series("vertex"),
             layout_coordinate_system=self._ipx_internal_data.get(
                 "layout_coordinate_system",
                 "catesian",
             ),
+            style=get_style(".vertex"),
+            labels=self._get_label_series("vertex"),
             transform=self.get_transform(),
             offset_transform=self.get_offset_transform(),
         )
@@ -288,11 +288,6 @@ class TreeArtist(mpl.artist.Artist):
             edgepatches,
             vertex_ids=adjacent_vertex_ids,
             vertex_collection=self._vertices,
-            layout=self.get_layout(kind="vertex"),
-            layout_coordinate_system=self._ipx_internal_data.get(
-                "layout_coordinate_system",
-                "cartesian",
-            ),
             labels=labels,
             transform=self.get_offset_transform(),
             style=edge_style,

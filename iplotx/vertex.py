@@ -69,19 +69,20 @@ class VertexCollection(PatchCollection):
         self._index = layout.index
         self._style = style
         self._labels = labels
+        self._layout = layout
+        self._layout_coordinate_system = layout_coordinate_system
 
         # Create patches from structured data
-        patches, offsets, sizes, kwargs2 = self._init_vertex_patches(
-            layout,
-            layout_coordinate_system=layout_coordinate_system,
-        )
+        patches, sizes, kwargs2 = self._init_vertex_patches()
 
         kwargs.update(kwargs2)
-        kwargs["offsets"] = offsets
         kwargs["match_original"] = True
 
         # Pass to PatchCollection constructor
         super().__init__(patches, *args, **kwargs)
+
+        # Set offsets in coordinate system
+        self._update_offsets_from_layout()
 
         # Compute _transforms like in _CollectionWithScales for dpi issues
         self.set_sizes(sizes)
@@ -145,11 +146,70 @@ class VertexCollection(PatchCollection):
     get_size = get_sizes
     set_size = set_sizes
 
-    def _init_vertex_patches(
-        self,
-        vertex_layout_df,
-        layout_coordinate_system="cartesian",
-    ):
+    def get_layout(self) -> pd.DataFrame:
+        """Get the vertex layout.
+
+        Returns:
+            The vertex layout as a DataFrame.
+        """
+        return self._layout
+
+    def get_layout_coordinate_system(self) -> str:
+        """Get the layout coordinate system.
+
+        Returns:
+            Name of the layout coordinate system, e.g. "cartesian" or "polar".
+        """
+        return self._layout_coordinate_system
+
+    def get_offsets(self, ignore_layout: bool = True) -> np.ndarray:
+        """Get the vertex offsets.
+
+        Parameters:
+            ignore_layout: If True, return the matplotlib Artist._offsets directly, ignoring the
+                layout coordinate system. If False, it's equivalent to get_layout().values.
+
+        Returns:
+            The vertex offsets as a 2D numpy array.
+
+        Note: It is best for users to *not* ignore the layout coordinate system, as it may lead
+        to inconsistencies. However, some internal matplotlib functions require the default
+        signature of this function to look at the vanilla offsets, hence the default parameters.
+        """
+        if not ignore_layout:
+            return self.get_layout().values
+        else:
+            return self._offsets
+
+    def _update_offsets_from_layout(self) -> None:
+        """Update offsets in matplotlib coordinates from the layout DataFrame."""
+        if self._layout_coordinate_system == "cartesian":
+            self._offsets = self._layout.values
+        elif self._layout_coordinate_system == "polar":
+            # Convert polar coordinates (r, theta) to cartesian (x, y)
+            r = self._layout.iloc[:, 0].values
+            theta = self._layout.iloc[:, 1].values
+            if self._offsets is None:
+                self._offsets = np.zeros((len(r), 2))
+            self._offsets[:, 0] = r * np.cos(theta)
+            self._offsets[:, 1] = r * np.sin(theta)
+        else:
+            raise ValueError(
+                f"Layout coordinate system not supported: {self._layout_coordinate_system}."
+            )
+
+    def set_offsets(self, offsets: np.ndarray) -> None:
+        """Set the vertex positions/offsets in layout coordinates.
+
+        Parameters:
+            offsets: Array of coordinates in the layout coordinate system. For polar layouts,
+                these should be in the form of (r, theta) pairs.
+        """
+        self._layout.values[:] = offsets
+        self._update_offsets_from_layout()
+        self.stale = True
+
+    def _init_vertex_patches(self):
         style = self._style or {}
         if "cmap" in style:
             cmap_fun = _build_cmap_fun(
@@ -169,19 +229,8 @@ class VertexCollection(PatchCollection):
         if "cmap" in style:
             colorarray = []
         patches = []
-        offsets = []
         sizes = []
-        for i, (vid, row) in enumerate(vertex_layout_df.iterrows()):
-            # Centre of the vertex
-            offset = list(row.values)
-
-            # Transform to cartesian coordinates if needed
-            if layout_coordinate_system == "polar":
-                r, theta = offset
-                offset = [r * np.cos(theta), r * np.sin(theta)]
-
-            offsets.append(offset)
-
+        for i, (vid, row) in enumerate(self._layout.iterrows()):
             if style.get("size", 20) == "label":
                 # NOTE: it's ok to overwrite the dict here
                 style["size"] = _get_label_width_height(
@@ -206,7 +255,7 @@ class VertexCollection(PatchCollection):
             kwargs["cmap"] = style["cmap"]
             kwargs["norm"] = norm
 
-        return patches, offsets, sizes, kwargs
+        return patches, sizes, kwargs
 
     def _compute_label_collection(self):
         transform = self.get_offset_transform()

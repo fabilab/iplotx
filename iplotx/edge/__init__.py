@@ -66,9 +66,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         patches: Sequence[mpl.patches.Patch],
         vertex_ids: Sequence[tuple],
         vertex_collection: VertexCollection,
-        layout: pd.DataFrame,
         *args,
-        layout_coordinate_system: str = "cartesian",
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         arrow_transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         directed: bool = False,
@@ -83,10 +81,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 end of an edge.
             vertex_collection: The VertexCollection instance containing the Artist for the
                 vertices. This is needed to compute vertex borders and adjust edges accordingly.
-            layout: The vertex layout.
-            layout_coordinate_system: The coordinate system the previous parameter is in. For
-                certain layouts, this might not be "cartesian" (e.g. "polar" layour for radial
-                trees).
             transform: The matplotlib transform for the edges, usually transData.
             arrow_transform: The matplotlib transform for the arrow patches. This is not the
                 *offset_transform* of arrows, which is set equal to the edge transform (previous
@@ -100,11 +94,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
         self._vertex_ids = vertex_ids
 
         self._vertex_collection = vertex_collection
-        # NOTE: the layout is needed for non-cartesian coordinate systems
-        # for which information is lost upon cartesianisation (e.g. polar,
-        # for which multiple angles are degenerate in cartesian space).
-        self._layout = layout
-        self._layout_coordinate_system = layout_coordinate_system
         self._style = style if style is not None else {}
         self._labels = kwargs.pop("labels", None)
         self._directed = directed
@@ -228,8 +217,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
         for v1, v2 in self._vertex_ids:
             # NOTE: these are in the original layout coordinate system
             # not cartesianised yet.
-            offset1 = self._layout.values[index[v1]]
-            offset2 = self._layout.values[index[v2]]
+            offset1 = self._vertex_collection.get_layout().values[index[v1]]
+            offset2 = self._vertex_collection.get_layout().values[index[v2]]
             voffsets.append((offset1, offset2))
 
             path1 = self._vertex_collection.get_paths()[index[v1]]
@@ -319,7 +308,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 tension=tension,
                 waypoints=waypoints,
                 ports=ports,
-                layout_coordinate_system=self._layout_coordinate_system,
+                layout_coordinate_system=self._vertex_collection.get_layout_coordinate_system(),
             )
 
             # Collect angles for this vertex, to be used for loops plotting below

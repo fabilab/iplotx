@@ -128,12 +128,12 @@ class NetworkArtist(mpl.artist.Artist):
         if len(layout) == 0:
             return mpl.transforms.Bbox([[0, 0], [1, 1]])
 
-        if self._vertices is not None:
-            bbox = self._vertices.get_datalim(transData)
-
-        if self._edges is not None:
-            edge_bbox = self._edges.get_datalim(transData)
-            bbox = mpl.transforms.Bbox.union([bbox, edge_bbox])
+        bbox = mpl.transforms.Bbox.union(
+            [
+                self._vertices.get_datalim(transData),
+                self._edges.get_datalim(transData),
+            ]
+        )
 
         bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
         return bbox
@@ -162,6 +162,9 @@ class NetworkArtist(mpl.artist.Artist):
 
         self._vertices = VertexCollection(
             layout=self.get_layout(),
+            layout_coordinate_system=self._ipx_internal_data.get(
+                "layout_coordinate_system", "cartesian"
+            ),
             style=get_style(".vertex"),
             labels=self._get_label_series("vertex"),
             transform=self.get_transform(),
@@ -238,8 +241,6 @@ class NetworkArtist(mpl.artist.Artist):
             edgepatches,
             vertex_ids=adjacent_vertex_ids,
             vertex_collection=self._vertices,
-            layout=self.get_layout(),
-            layout_coordinate_system="cartesian",
             labels=labels,
             transform=self.get_offset_transform(),
             style=edge_style,
