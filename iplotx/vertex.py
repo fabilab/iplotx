@@ -231,13 +231,11 @@ class VertexCollection(PatchCollection):
         patches = []
         sizes = []
         for i, (vid, row) in enumerate(self._layout.iterrows()):
-            if style.get("size", 20) == "label":
-                # NOTE: it's ok to overwrite the dict here
-                style["size"] = _get_label_width_height(
+            stylei = rotate_style(style, index=i, key=vid)
+            if stylei.get("size", 20) == "label":
+                stylei["size"] = _get_label_width_height(
                     str(self._labels[vid]), **style.get("label", {})
                 )
-
-            stylei = rotate_style(style, index=i, key=vid)
             if cmap_fun is not None:
                 colorarray.append(style["facecolor"])
                 stylei["facecolor"] = cmap_fun(stylei["facecolor"])

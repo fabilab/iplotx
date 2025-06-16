@@ -111,6 +111,7 @@ hollow["vertex"]["edgecolor"] = "black"
 hollow["vertex"]["linewidth"] = 1.5
 hollow["vertex"]["marker"] = "r"
 hollow["vertex"]["size"] = "label"
+hollow["vertex"]["label"]["color"] = "black"
 
 tree = copy_with_deep_values(default)
 tree["vertex"]["size"] = 0

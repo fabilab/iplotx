@@ -81,6 +81,8 @@ See <project:gallery/index.rst> for examples of plots made with `iplotx`. Feel f
 - chainable style contexts
 - vertex clusterings and covers with convex hulls and rounding
 - a plugin mechanism for additional libraries (WIP)
+- animations (see <project:gallery/plot_animation.rst>)
+- mouse/keyboard interaction and events (e.g. hover, click, see <project:gallery/plot_mouse_hover.rst>)
 - ... and probably more by the time you read this.
 
 ## Styles
