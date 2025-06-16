@@ -7,15 +7,18 @@ Some supporting functions are also defined here.
 from typing import (
     Sequence,
     Optional,
-    Never,
     Any,
 )
-from math import atan2, tan, cos, pi, sin
+from math import atan2, cos, pi, sin
 from collections import defaultdict
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
+from ..typing import (
+    Pair,
+    LeafProperty,
+)
 from ..utils.matplotlib import (
     _compute_mid_coord_and_rot,
     _stale_wrapper,
@@ -27,7 +30,12 @@ from ..style import (
 from ..label import LabelCollection
 from ..vertex import VertexCollection
 from .arrow import EdgeArrowCollection
-from .ports import _get_port_unit_vector
+from .geometry import (
+    _compute_loops_per_angle,
+    _fix_parallel_edges_straight,
+    _compute_loop_path,
+    _compute_edge_path,
+)
 
 
 @_forwarder(
@@ -66,7 +74,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         directed: bool = False,
         style: Optional[dict[str, Any]] = None,
         **kwargs,
-    ) -> Never:
+    ) -> None:
         """Initialise an EdgeCollection.
 
         Parameters:
@@ -132,7 +140,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
             children.append(self._label_collection)
         return tuple(children)
 
-    def set_figure(self, fig) -> Never:
+    def set_figure(self, fig) -> None:
         super().set_figure(fig)
         self._update_paths()
         # NOTE: This sets the correct offsets in the arrows,
@@ -152,7 +160,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         return self._directed
 
     @directed.setter
-    def directed(self, value) -> Never:
+    def directed(self, value) -> None:
         """Setter for the directed property.
 
         Changing this property triggers the addition/removal of arrows from the plot.
@@ -175,7 +183,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
             # and that will update children. We might need to verify that.
             self.stale = True
 
-    def set_array(self, A) -> Never:
+    def set_array(self, A) -> None:
         """Set the array for cmap/norm coloring."""
         # Preserve the alpha channel
         super().set_array(A)
@@ -185,7 +193,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         # This is necessary to ensure edgecolors are bool-flagged correctly
         self.set_edgecolor(None)
 
-    def update_scalarmappable(self) -> Never:
+    def update_scalarmappable(self) -> None:
         """Update colors from the scalar mappable array, if any.
 
         Assign edge colors from a numerical array, and match arrow colors
@@ -195,7 +203,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         super().update_scalarmappable()
         # Now self._edgecolors has the correct colorspace values
         if hasattr(self, "_arrows"):
-            self._arrows.set_colors(self.get_edgecolors())
+            self._arrows.set_colors(self.get_edgecolor())
 
     def get_labels(self) -> Optional[LabelCollection]:
         """Get LabelCollection artist for labels if present."""
@@ -257,7 +265,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         vcenters = vinfo["offsets"]
         vpaths = vinfo["paths"]
         vsizes = vinfo["sizes"]
-        loopmaxangle = pi / 180.0 * self._style.get("loopmaxangle", pi / 3)
+        loopmaxangle = pi / 180.0 * self._style.get("loopmaxangle", 60.0)
 
         if transform is None:
             transform = self.get_transform()
@@ -302,7 +310,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
             waypoints = edge_stylei.get("waypoints", "none")
 
             # Compute actual edge path
-            path, angles = self._compute_edge_path(
+            path, angles = _compute_edge_path(
                 vcoord_data,
                 vpath_fig,
                 vsize_fig,
@@ -311,6 +319,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 tension=tension,
                 waypoints=waypoints,
                 ports=ports,
+                layout_coordinate_system=self._layout_coordinate_system,
             )
 
             # Collect angles for this vertex, to be used for loops plotting below
@@ -334,7 +343,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 indices_inv = parallel_edges.pop((v2, v1), [])
                 ntot = len(indices) + len(indices_inv)
                 if ntot > 1:
-                    self._fix_parallel_edges_straight(
+                    _fix_parallel_edges_straight(
                         paths,
                         indices,
                         indices_inv,
@@ -353,7 +362,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
             # The space between the existing angles is where we can fit the loops
             # One loop we can fit in the largest wedge, multiple loops we need
-            nloops_per_angle = self._compute_loops_per_angle(nloops, edge_angles)
+            nloops_per_angle = _compute_loops_per_angle(nloops, edge_angles)
 
             idx = 0
             for theta1, theta2, nloops in nloops_per_angle:
@@ -366,7 +375,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                     thetaj2 = thetaj1 + min(delta, loopmaxangle)
 
                     # Get the path for this loop
-                    path = self._compute_loop_path(
+                    path = _compute_loop_path(
                         vcoord_fig,
                         vpath,
                         vsize,
@@ -379,299 +388,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
                     idx += 1
 
         self._paths = paths
-
-    def _fix_parallel_edges_straight(
-        self,
-        paths,
-        indices,
-        indices_inv,
-        trans,
-        trans_inv,
-        offset=3,
-    ):
-        """Offset parallel edges along the same path."""
-        ntot = len(indices) + len(indices_inv)
-
-        # This is straight so two vertices anyway
-        # NOTE: all paths will be the same, which is why we need to offset them
-        vs, ve = trans(paths[indices[0]].vertices)
-
-        # Move orthogonal to the line
-        fracs = (
-            (vs - ve) / np.sqrt(((vs - ve) ** 2).sum()) @ np.array([[0, 1], [-1, 0]])
-        )
-
-        # NOTE: for now treat both direction the same
-        for i, idx in enumerate(indices + indices_inv):
-            # Offset the path
-            paths[idx].vertices = trans_inv(
-                trans(paths[idx].vertices) + fracs * offset * (i - ntot / 2)
-            )
-
-    def _compute_loop_path(
-        self,
-        vcoord_fig,
-        vpath,
-        vsize,
-        angle1,
-        angle2,
-        trans_inv,
-        looptension,
-    ):
-        # Shorten at starting angle
-        start = self._get_shorter_edge_coords(vpath, vsize, angle1) + vcoord_fig
-        # Shorten at end angle
-        end = self._get_shorter_edge_coords(vpath, vsize, angle2) + vcoord_fig
-
-        aux1 = (start - vcoord_fig) * looptension + vcoord_fig
-        aux2 = (end - vcoord_fig) * looptension + vcoord_fig
-
-        vertices = np.vstack(
-            [
-                start,
-                aux1,
-                aux2,
-                end,
-            ]
-        )
-        codes = ["MOVETO"] + ["CURVE4"] * 3
-
-        # Offset to place and transform to data coordinates
-        vertices = trans_inv(vertices)
-        codes = [getattr(mpl.path.Path, x) for x in codes]
-        path = mpl.path.Path(
-            vertices,
-            codes=codes,
-        )
-        return path
-
-    def _compute_edge_path(
-        self,
-        *args,
-        **kwargs,
-    ):
-        tension = kwargs.pop("tension", 0)
-        waypoints = kwargs.pop("waypoints", "none")
-        ports = kwargs.pop("ports", (None, None))
-
-        if (waypoints != "none") and (tension != 0):
-            raise ValueError("Waypoints not supported for curved edges.")
-
-        if waypoints != "none":
-            return self._compute_edge_path_waypoints(waypoints, *args, **kwargs)
-
-        if tension == 0:
-            return self._compute_edge_path_straight(*args, **kwargs)
-
-        return self._compute_edge_path_curved(
-            tension,
-            *args,
-            ports=ports,
-            **kwargs,
-        )
-
-    def _compute_edge_path_waypoints(
-        self,
-        waypoints,
-        vcoord_data,
-        vpath_fig,
-        vsize_fig,
-        trans,
-        trans_inv,
-        points_per_curve=30,
-        **kwargs,
-    ):
-
-        if waypoints in ("x0y1", "y0x1"):
-            assert self._layout_coordinate_system == "cartesian"
-
-            # Coordinates in figure (default) coords
-            vcoord_fig = trans(vcoord_data)
-
-            if waypoints == "x0y1":
-                waypoint = np.array([vcoord_fig[0][0], vcoord_fig[1][1]])
-            else:
-                waypoint = np.array([vcoord_fig[1][0], vcoord_fig[0][1]])
-
-            # Angles of the straight lines
-            theta0 = atan2(*((waypoint - vcoord_fig[0])[::-1]))
-            theta1 = atan2(*((waypoint - vcoord_fig[1])[::-1]))
-
-            # Shorten at starting vertex
-            vs = (
-                self._get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta0)
-                + vcoord_fig[0]
-            )
-
-            # Shorten at end vertex
-            ve = (
-                self._get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta1)
-                + vcoord_fig[1]
-            )
-
-            points = [vs, waypoint, ve]
-            codes = ["MOVETO", "LINETO", "LINETO"]
-            angles = (theta0, theta1)
-        elif waypoints == "r0a1":
-            assert self._layout_coordinate_system == "polar"
-
-            r0, alpha0 = vcoord_data[0]
-            r1, alpha1 = vcoord_data[1]
-            idx_inner = np.argmin([r0, r1])
-            idx_outer = 1 - idx_inner
-            alpha_outer = [alpha0, alpha1][idx_outer]
-
-            # FIXME: this is aware of chirality as stored by the layout function
-            betas = np.linspace(alpha0, alpha1, points_per_curve)
-            waypoints = [r0, r1][idx_inner] * np.vstack(
-                [np.cos(betas), np.sin(betas)]
-            ).T
-            endpoint = [r0, r1][idx_outer] * np.array(
-                [np.cos(alpha_outer), np.sin(alpha_outer)]
-            )
-            points = np.array(list(waypoints) + [endpoint])
-            points = trans(points)
-            codes = ["MOVETO"] + ["LINETO"] * len(waypoints)
-            # FIXME: same as previus comment
-            angles = (alpha0 + pi / 2, alpha1)
-
-        else:
-            raise NotImplementedError(
-                f"Edge shortening with waypoints not implemented yet: {waypoints}.",
-            )
-
-        path = mpl.path.Path(
-            points,
-            codes=[getattr(mpl.path.Path, x) for x in codes],
-        )
-
-        path.vertices = trans_inv(path.vertices)
-        return path, angles
-
-    def _compute_edge_path_straight(
-        self,
-        vcoord_data,
-        vpath_fig,
-        vsize_fig,
-        trans,
-        trans_inv,
-        **kwargs,
-    ):
-
-        # Coordinates in figure (default) coords
-        vcoord_fig = trans(vcoord_data)
-
-        points = []
-
-        # Angle of the straight line
-        theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
-
-        # Shorten at starting vertex
-        vs = (
-            self._get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta)
-            + vcoord_fig[0]
-        )
-        points.append(vs)
-
-        # Shorten at end vertex
-        ve = (
-            self._get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi)
-            + vcoord_fig[1]
-        )
-        points.append(ve)
-
-        codes = ["MOVETO", "LINETO"]
-        path = mpl.path.Path(
-            points,
-            codes=[getattr(mpl.path.Path, x) for x in codes],
-        )
-        path.vertices = trans_inv(path.vertices)
-        return path, (theta, theta + np.pi)
-
-    def _compute_edge_path_curved(
-        self,
-        tension,
-        vcoord_data,
-        vpath_fig,
-        vsize_fig,
-        trans,
-        trans_inv,
-        ports=(None, None),
-    ):
-        """Shorten the edge path along a cubic Bezier between the vertex centres.
-
-        The most important part is that the derivative of the Bezier at the start
-        and end point towards the vertex centres: people notice if they do not.
-        """
-
-        # Coordinates in figure (default) coords
-        vcoord_fig = trans(vcoord_data)
-
-        dv = vcoord_fig[1] - vcoord_fig[0]
-        edge_straight_length = np.sqrt((dv**2).sum())
-
-        auxs = [None, None]
-        for i in range(2):
-            if ports[i] is not None:
-                der = _get_port_unit_vector(ports[i], trans_inv)
-                auxs[i] = der * edge_straight_length * tension + vcoord_fig[i]
-
-        # Both ports defined, just use them and hope for the best
-        # Obviously, if the user specifies ports that make no sense,
-        # this is going to be a (technically valid) mess.
-        if all(aux is not None for aux in auxs):
-            pass
-
-        # If no ports are specified (the most common case), compute
-        # the Bezier and shorten it
-        elif all(aux is None for aux in auxs):
-            # Put auxs along the way
-            auxs = np.array(
-                [
-                    vcoord_fig[0] + 0.33 * dv,
-                    vcoord_fig[1] - 0.33 * dv,
-                ]
-            )
-            # Right rotation from the straight edge
-            dv_rot = -0.1 * dv @ np.array([[0, 1], [-1, 0]])
-            # Shift the auxs orthogonal to the straight edge
-            auxs += dv_rot * tension
-
-        # First port is defined
-        elif (auxs[0] is not None) and (auxs[1] is None):
-            auxs[1] = auxs[0]
-
-        # Second port is defined
-        else:
-            auxs[0] = auxs[1]
-
-        vs = [None, None]
-        thetas = [None, None]
-        for i in range(2):
-            thetas[i] = atan2(*((auxs[i] - vcoord_fig[i])[::-1]))
-            vs[i] = (
-                self._get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i])
-                + vcoord_fig[i]
-            )
-
-        path = {
-            "vertices": [
-                vs[0],
-                auxs[0],
-                auxs[1],
-                vs[1],
-            ],
-            "codes": ["MOVETO"] + ["CURVE4"] * 3,
-        }
-
-        path = mpl.path.Path(
-            path["vertices"],
-            codes=[getattr(mpl.path.Path, x) for x in path["codes"]],
-        )
-
-        # Return to data transform
-        path.vertices = trans_inv(path.vertices)
-        return path, tuple(thetas)
 
     def _update_labels(self):
         if self._labels is None:
@@ -696,16 +412,15 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
     def _update_arrows(
         self,
-        which: str = "end",
     ) -> None:
         """Extract the start and/or end angles of the paths to compute arrows.
 
         Parameters:
             which: Which end of the edge to put an arrow on. Currently only "end" is accepted.
 
-        NOTE: This function does *not* update the arrow sizes/_transforms to the correct dpi scaling.
-        That's ok since the correct dpi scaling is set whenever there is a different figure (before
-        first draw) and whenever a draw is called.
+        NOTE: This function does *not* update the arrow sizes/_transforms to the correct dpi
+        scaling. That's ok since the correct dpi scaling is set whenever there is a different
+        figure (before first draw) and whenever a draw is called.
         """
         if not hasattr(self, "_arrows"):
             return
@@ -746,104 +461,141 @@ class EdgeCollection(mpl.collections.PatchCollection):
             # This sets the arrow sizes with dpi scaling
             child.draw(renderer)
 
-    @property
-    def stale(self):
-        return super().stale
+    def get_ports(self) -> Optional[LeafProperty[Pair[Optional[str]]]]:
+        """Get the ports for all edges.
 
-    @stale.setter
-    def stale(self, val):
-        mpl.collections.PatchCollection.stale.fset(self, val)
-        if val and hasattr(self, "stale_callback_post"):
-            self.stale_callback_post(self)
+        Returns:
+            The ports for the edges, as a pair of strings or None for each edge. If None, it
+            means all edges are free.
+        """
+        return self._style.get("ports", None)
 
-    @staticmethod
-    def _compute_loops_per_angle(nloops, angles):
-        if len(angles) == 0:
-            return [(0, 2 * pi, nloops)]
+    def set_ports(self, ports: Optional[LeafProperty[Pair[Optional[str]]]]) -> None:
+        """Set new ports for the edges.
 
-        angles_sorted_closed = list(sorted(angles))
-        angles_sorted_closed.append(angles_sorted_closed[0] + 2 * pi)
-        deltas = np.diff(angles_sorted_closed)
-
-        # Now we have the deltas and the total number of loops
-        # 1. Assign all loops to the largest wedge
-        idx_dmax = deltas.argmax()
-        if nloops == 1:
-            return [
-                (
-                    angles_sorted_closed[idx_dmax],
-                    angles_sorted_closed[idx_dmax + 1],
-                    nloops,
-                )
-            ]
-
-        # 2. Check if any other wedges are larger than this
-        # If not, we are done (this is the algo in igraph)
-        dsplit = deltas[idx_dmax] / nloops
-        if (deltas > dsplit).sum() < 2:
-            return [
-                (
-                    angles_sorted_closed[idx_dmax],
-                    angles_sorted_closed[idx_dmax + 1],
-                    nloops,
-                )
-            ]
-
-            # 3. Check how small the second-largest wedge would become
-        idx_dsort = np.argsort(deltas)
-        return [
-            (
-                angles_sorted_closed[idx_dmax],
-                angles_sorted_closed[idx_dmax + 1],
-                nloops - 1,
-            ),
-            (
-                angles_sorted_closed[idx_dsort[-2]],
-                angles_sorted_closed[idx_dsort[-2] + 1],
-                1,
-            ),
-        ]
-
-    @staticmethod
-    def _get_shorter_edge_coords(vpath, vsize, theta):
-        # Bound theta from -pi to pi (why is that not guaranteed?)
-        theta = (theta + pi) % (2 * pi) - pi
-
-        # Size zero vertices need no shortening
-        if vsize == 0:
-            return np.array([0, 0])
-
-        for i in range(len(vpath)):
-            v1 = vpath.vertices[i]
-            v2 = vpath.vertices[(i + 1) % len(vpath)]
-            theta1 = atan2(*((v1)[::-1]))
-            theta2 = atan2(*((v2)[::-1]))
-
-            # atan2 ranges ]-3.14, 3.14]
-            # so it can be that theta1 is -3 and theta2 is +3
-            # therefore we need two separate cases, one that cuts at pi and one at 0
-            cond1 = theta1 <= theta <= theta2
-            cond2 = (
-                (theta1 + 2 * pi) % (2 * pi)
-                <= (theta + 2 * pi) % (2 * pi)
-                <= (theta2 + 2 * pi) % (2 * pi)
-            )
-            if cond1 or cond2:
-                break
+        Parameters:
+            ports: A pair of ports strings for each edge. Each port can be None to mean free
+                edge end.
+        """
+        if ports is None:
+            del self._style["ports"]
         else:
-            raise ValueError("Angle for patch not found")
+            self._style["ports"] = ports
+        self.stale = True
 
-        # The edge meets the patch of the vertex on the v1-v2 size,
-        # at angle theta from the center
-        mtheta = tan(theta)
-        if v2[0] == v1[0]:
-            xe = v1[0]
+    def get_tension(self) -> Optional[LeafProperty[float]]:
+        """Get the tension for the edges.
+
+        Returns:
+            The tension for the edges. If None, the edges are straight.
+        """
+        return self._style.get("tension", None)
+
+    def set_tension(self, tension: Optional[LeafProperty[float]]) -> None:
+        """Set new tension for the edges.
+
+        Parameters:
+            tension: The tension to use for curved edges. If None, the edges become straight.
+
+        Note: This function does not set self.set_curved(True) automatically. If you are
+        unsure whether that property is set already, you should call both functions.
+
+        Example:
+            # Set curved edges with different tensions
+            >>> network.get_edges().set_curved(True)
+            >>> network.get_edges().set_tension([1, 0.5])
+
+            # Set straight edges
+            # (the latter call is optional but helps readability)
+            >>> network.get_edges().set_curved(False)
+            >>> network.get_edges().set_tension(None)
+
+        """
+        if tension is None:
+            del self._style["tension"]
         else:
-            m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
-            xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
-        ye = mtheta * xe
-        ve = np.array([xe, ye])
-        return ve * vsize
+            self._style["tension"] = tension
+        self.stale = True
+
+    get_tensions = get_tension
+    set_tensions = set_tension
+
+    def get_curved(self) -> bool:
+        """Get whether the edges are curved or not.
+
+        Returns:
+            A bool that is True if the edges are curved, False if they are straight.
+        """
+        return self._style.get("curved", False)
+
+    def set_curved(self, curved: bool) -> None:
+        """Set whether the edges are curved or not.
+
+        Parameters:
+            curved: Whether the edges should be curved (True) or straight (False).
+
+        Note: If you want only some edges to be curved, set curved to True and set tensions to
+        0 for the straight edges.
+        """
+        self._style["curved"] = bool(curved)
+        self.stale = True
+
+    def get_loopmaxangle(self) -> Optional[float]:
+        """Get the maximum angle for loops.
+
+        Returns:
+            The maximum angle in degrees that a loop can take. If None, the default is 60.
+        """
+        return self._style.get("loopmaxangle", 60)
+
+    def set_loopmaxangle(self, loopmaxangle: float) -> None:
+        """Set the maximum angle for loops.
+
+        Parameters:
+            loopmaxangle: The maximum angle in degrees that a loop can take.
+        """
+        self._style["loopmaxangle"] = loopmaxangle
+        self.stale = True
+
+    def get_looptension(self) -> Optional[float]:
+        """Get the tension for loops.
+
+        Returns:
+            The tension for loops. If None, the default is 2.5.
+        """
+        return self._style.get("looptension", 2.5)
+
+    def set_looptension(self, looptension: Optional[float]) -> None:
+        """Set new tension for loops.
+
+        Parameters:
+            looptension: The tension to use for loops. If None, the default is 2.5.
+        """
+        if looptension is None:
+            del self._style["looptension"]
+        else:
+            self._style["looptension"] = looptension
+        self.stale = True
+
+    def get_offset(self) -> Optional[float]:
+        """Get the offset for parallel straight edges.
+
+        Returns:
+            The offset in points for parallel straight edges. If None, the default is 3.
+        """
+        return self._style.get("offset", 3)
+
+    def set_offset(self, offset: Optional[float]) -> None:
+        """Set the offset for parallel straight edges.
+
+        Parameters:
+            offset: The offset in points for parallel straight edges. If None, the default is 3.
+        """
+        if offset is None:
+            del self._style["offset"]
+        else:
+            self._style["offset"] = offset
+        self.stale = True
 
 
 def make_stub_patch(**kwargs):

@@ -18,7 +18,8 @@ def compute_tree_layout(
     Parameters:
         tree: The tree to compute the layout for.
         layout: The name of the layout, e.g. "horizontal" or "radial".
-        orientation: The orientation of the layout, e.g. "right", "left", "descending", or "ascending".
+        orientation: The orientation of the layout, e.g. "right", "left", "descending", or
+            "ascending".
 
     Returns:
         A layout dictionary with node positions.
@@ -71,7 +72,6 @@ def _horizontal_tree_layout_right(
     # Set the x values for vertices
     layout[root_fun(tree)][0] = 0
     for node in preorder_fun(tree):
-        x0, y0 = layout[node]
         for child in children_fun(node):
             bl = branch_length_fun(child)
             if bl is None:
@@ -93,7 +93,7 @@ def _horizontal_tree_layout(
     layout = _horizontal_tree_layout_right(tree, **kwargs)
 
     if orientation == "left":
-        for key, value in layout.items():
+        for key in layout:
             layout[key][0] *= -1
     return layout
 

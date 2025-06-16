@@ -1,3 +1,7 @@
+"""
+Module for handling edge ports in iplotx.
+"""
+
 import numpy as np
 
 sq2 = np.sqrt(2) / 2
@@ -19,8 +23,9 @@ def _get_port_unit_vector(
     trans_inv,
 ):
     """Get the tangent unit vector from a port string."""
-    # The only tricky bit is if the port says e.g. north but the y axis is inverted, in which case the port should go south.
-    # We can figure it out by checking the sign of the monotonic trans_inv from figure to data coordinates.
+    # The only tricky bit is if the port says e.g. north but the y axis is inverted, in which
+    # case the port should go south. We can figure it out by checking the sign of the monotonic
+    # trans_inv from figure to data coordinates.
     v12 = trans_inv(
         np.array(
             [

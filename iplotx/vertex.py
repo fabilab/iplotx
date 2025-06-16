@@ -6,7 +6,6 @@ from typing import (
     Optional,
     Sequence,
     Any,
-    Never,
 )
 import warnings
 import numpy as np
@@ -100,7 +99,7 @@ class VertexCollection(PatchCollection):
             children.append(self._label_collection)
         return tuple(children)
 
-    def set_figure(self, fig) -> Never:
+    def set_figure(self, fig) -> None:
         """Set the figure for this artist and all children."""
         super().set_figure(fig)
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
@@ -123,7 +122,7 @@ class VertexCollection(PatchCollection):
         """Get vertex sizes (max of width and height), scaled by dpi."""
         return self._transforms[:, 0, 0]
 
-    def set_sizes(self, sizes, dpi=72.0):
+    def set_sizes(self, sizes, dpi: float = 72.0) -> None:
         """Set vertex sizes.
 
         This rescales the current vertex symbol/path linearly, using this
@@ -147,7 +146,9 @@ class VertexCollection(PatchCollection):
     set_size = set_sizes
 
     def _init_vertex_patches(
-        self, vertex_layout_df, layout_coordinate_system="cartesian"
+        self,
+        vertex_layout_df,
+        layout_coordinate_system="cartesian",
     ):
         style = self._style or {}
         if "cmap" in style:
@@ -164,8 +165,6 @@ class VertexCollection(PatchCollection):
                     "No labels found, cannot resize vertices based on labels."
                 )
                 style["size"] = get_style("default.vertex")["size"]
-            else:
-                vertex_labels = self._labels
 
         if "cmap" in style:
             colorarray = []
@@ -183,10 +182,10 @@ class VertexCollection(PatchCollection):
 
             offsets.append(offset)
 
-            if style.get("size") == "label":
+            if style.get("size", 20) == "label":
                 # NOTE: it's ok to overwrite the dict here
                 style["size"] = _get_label_width_height(
-                    str(vertex_labels[vid]), **style.get("label", {})
+                    str(self._labels[vid]), **style.get("label", {})
                 )
 
             stylei = rotate_style(style, index=i, key=vid)
@@ -230,6 +229,12 @@ class VertexCollection(PatchCollection):
         )
 
     def get_labels(self):
+        """Get the vertex labels.
+
+        Returns:
+            The artist with the LabelCollection.
+        """
+
         if hasattr(self, "_label_collection"):
             return self._label_collection
         else:
@@ -280,7 +285,8 @@ def make_patch(
 
     # Size of vertices is determined in self._transforms, which scales with dpi, rather than here,
     # so normalise by the average dimension (btw x and y) to keep the ratio of the marker.
-    # If you check in get_sizes, you will see that rescaling also happens with the max of width and height.
+    # If you check in get_sizes, you will see that rescaling also happens with the max of width
+    # and height.
     size = np.asarray(size, dtype=float)
     size_max = size.max()
     if size_max > 0:

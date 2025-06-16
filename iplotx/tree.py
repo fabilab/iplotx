@@ -2,6 +2,7 @@ from typing import (
     Optional,
     Sequence,
 )
+from collections.abc import Hashable
 
 import numpy as np
 import pandas as pd
@@ -25,6 +26,9 @@ from .vertex import (
 from .edge import (
     EdgeCollection,
     make_stub_patch as make_undirected_edge_patch,
+)
+from .label import (
+    LabelCollection,
 )
 from .network import (
     _update_from_internal,
@@ -50,13 +54,31 @@ class TreeArtist(mpl.artist.Artist):
         layout="horizontal",
         orientation="right",
         directed: bool | str = False,
-        vertex_labels: Optional[list | dict | pd.Series] = None,
+        vertex_labels: Optional[
+            bool | list[str] | dict[Hashable, str] | pd.Series
+        ] = None,
         edge_labels: Optional[Sequence] = None,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         offset_transform: Optional[mpl.transforms.Transform] = None,
     ):
-        self.tree = tree
+        """Initialize the TreeArtist.
 
+        Parameters:
+            tree: The tree to plot.
+            layout: The layout to use for the tree. Can be "horizontal", "vertical", or "radial".
+            orientation: The orientation of the tree layout. Can be "right" or "left" (for
+                horizontal and radial layouts) and "descending" or "ascending" (for vertical
+                layouts).
+            directed: Whether the tree is directed. Can be a boolean or a string with the
+                following choices: "parent" or "child".
+            vertex_labels: Labels for the vertices. Can be a list, dictionary, or pandas Series.
+            edge_labels: Labels for the edges. Can be a sequence of strings.
+            transform: The transform to apply to the tree artist. This is usually the identity.
+            offset_transform: The offset transform to apply to the tree artist. This is
+                usually `ax.transData`.
+        """
+
+        self.tree = tree
         self._ipx_internal_data = ingest_tree_data(
             tree,
             layout,
@@ -80,13 +102,23 @@ class TreeArtist(mpl.artist.Artist):
         self._add_vertices()
         self._add_edges()
 
-    def get_children(self):
+    def get_children(self) -> tuple[mpl.artist.Artist]:
+        """Get the children of this artist.
+
+        Returns:
+            The artists for vertices and edges.
+        """
         return (self._vertices, self._edges)
 
-    def set_figure(self, figure):
-        super().set_figure(figure)
+    def set_figure(self, fig) -> None:
+        """Set the figure for this artist and its children.
+
+        Parameters:
+            fig: the figure to set for this artist and its children.
+        """
+        super().set_figure(fig)
         for child in self.get_children():
-            child.set_figure(figure)
+            child.set_figure(fig)
 
     def get_offset_transform(self):
         """Get the offset transform (for vertices/edges)."""
@@ -132,29 +164,29 @@ class TreeArtist(mpl.artist.Artist):
         bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
         return bbox
 
-    def _get_label_series(self, kind):
+    def _get_label_series(self, kind: str) -> Optional[pd.Series]:
         if "label" in self._ipx_internal_data[f"{kind}_df"].columns:
             return self._ipx_internal_data[f"{kind}_df"]["label"]
         else:
             return None
 
-    def get_vertices(self):
+    def get_vertices(self) -> VertexCollection:
         """Get VertexCollection artist."""
         return self._vertices
 
-    def get_edges(self):
+    def get_edges(self) -> EdgeCollection:
         """Get EdgeCollection artist."""
         return self._edges
 
-    def get_vertex_labels(self):
+    def get_vertex_labels(self) -> LabelCollection:
         """Get list of vertex label artists."""
         return self._vertices.get_labels()
 
-    def get_edge_labels(self):
+    def get_edge_labels(self) -> LabelCollection:
         """Get list of edge label artists."""
         return self._edges.get_labels()
 
-    def _add_vertices(self):
+    def _add_vertices(self) -> None:
         """Add vertices to the tree."""
         self._vertices = VertexCollection(
             layout=self.get_layout(),
@@ -168,7 +200,7 @@ class TreeArtist(mpl.artist.Artist):
             offset_transform=self.get_offset_transform(),
         )
 
-    def _add_edges(self):
+    def _add_edges(self) -> None:
         """Add edges to the network artist.
 
         NOTE: UndirectedEdgeCollection and ArrowCollection are both subclasses of
@@ -270,7 +302,7 @@ class TreeArtist(mpl.artist.Artist):
             self._edges.set_array(colorarray)
 
     @_stale_wrapper
-    def draw(self, renderer):
+    def draw(self, renderer) -> None:
         """Draw each of the children, with some buffering mechanism."""
         if not self.get_visible():
             return

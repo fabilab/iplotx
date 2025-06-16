@@ -1,6 +1,7 @@
-from typing import (
-    Never,
-)
+"""
+Module for edge arrows in iplotx.
+"""
+
 import numpy as np
 import matplotlib as mpl
 from matplotlib.patches import PathPatch
@@ -19,10 +20,17 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
     def __init__(
         self,
         edge_collection,
-        transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         *args,
+        transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         **kwargs,
-    ):
+    ) -> None:
+        """Initialize the edge arrow collection.
+
+        Parameters:
+            edge_collection: The edge collection to which these arrows belong.
+            transform: The transform to apply to the arrows. This related to the arrow size
+                scaling, not the arrow tip position which is controlled by set_offset_transform.
+        """
 
         self._edge_collection = edge_collection
         self._style = get_style(".edge.arrow")
@@ -48,10 +56,11 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
         self.set_sizes(sizes)
 
     def get_sizes(self):
-        """Get vertex sizes (max of width and height), not scaled by dpi."""
+        """Get arrow sizes (max of width and height), not scaled by dpi."""
         return self._sizes
 
     def get_sizes_dpi(self):
+        """Get arrow sizes (max of width and height) scaled by dpi."""
         return self._transforms[:, 0, 0]
 
     def set_sizes(self, sizes, dpi=72.0):
@@ -77,7 +86,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
     get_size = get_sizes
     set_size = set_sizes
 
-    def set_figure(self, fig) -> Never:
+    def set_figure(self, fig) -> None:
         """Set the figure for this artist and all children."""
         super().set_figure(fig)
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
@@ -85,6 +94,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
             child.set_figure(fig)
 
     def get_offset_transform(self):
+        """Get offset transform for the edge arrows. This sets the tip of each arrow."""
         return self._edge_collection.get_transform()
 
     get_size = get_sizes
@@ -95,7 +105,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
         patches = []
         sizes = []
-        for i, (vid1, vid2) in enumerate(self._edge_collection._vertex_ids):
+        for i in range(len(self._edge_collection._vertex_ids)):
             stylei = rotate_style(style, index=i)
             if ("facecolor" not in stylei) and ("color" not in stylei):
                 stylei["facecolor"] = self._edge_collection.get_edgecolors()[i][:3]
@@ -114,7 +124,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
         return patches, sizes
 
-    def set_array(self, array):
+    def set_array(self, A):
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
         raise ValueError("Setting an array for arrows directly is not supported.")
 
@@ -122,19 +132,9 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
         """Set arrow colors (edge and/or face) based on a colormap."""
         # NOTE: facecolors is always an array because we come from patches
         # It can have zero alpha (i.e. if we choose "none", or a hollow marker)
-        self.set_edgecolors(colors)
+        self.set_edgecolor(colors)
         has_facecolor = self._facecolors[:, 3] > 0
         self._facecolors[has_facecolor] = colors[has_facecolor]
-
-    @property
-    def stale(self):
-        return super().stale
-
-    @stale.setter
-    def stale(self, val):
-        mpl.collections.PatchCollection.stale.fset(self, val)
-        if val and hasattr(self, "stale_callback_post"):
-            self.stale_callback_post(self)
 
     @mpl.artist.allow_rasterization
     def draw(self, renderer):

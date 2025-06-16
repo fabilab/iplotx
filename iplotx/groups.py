@@ -40,7 +40,7 @@ class GroupingArtist(PatchCollection):
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         *args,
         **kwargs,
-    ):
+    ) -> None:
         """Container artist for vertex groupings, e.g. covers or clusterings.
 
         Parameters:
@@ -65,7 +65,10 @@ class GroupingArtist(PatchCollection):
 
         network = kwargs.pop("network", None)
         patches, grouping, coords_hulls = self._create_patches(
-            grouping, layout, network, **kwargs
+            grouping,
+            layout,
+            network,
+            **kwargs,
         )
         if "network" in kwargs:
             del kwargs["network"]
@@ -80,17 +83,17 @@ class GroupingArtist(PatchCollection):
 
         self.set_transform(transform)
 
-    def set_figure(self, figure):
+    def set_figure(self, figure) -> None:
         """Set the figure for the grouping, recomputing the paths depending on the figure's dpi."""
         ret = super().set_figure(figure)
         self._compute_paths(self.get_figure(root=True).dpi)
         return ret
 
-    def get_vertexpadding(self):
+    def get_vertexpadding(self) -> float:
         """Get the vertex padding of each group."""
         return self._vertexpadding
 
-    def get_vertexpadding_dpi(self, dpi=72.0):
+    def get_vertexpadding_dpi(self, dpi: float = 72.0) -> float:
         """Get vertex padding of each group, scaled by dpi of the figure."""
         return self.get_vertexpadding() * dpi / 72.0 * self._factor
 
@@ -126,7 +129,7 @@ class GroupingArtist(PatchCollection):
             patches.append(patch)
         return patches, grouping, coords_hulls
 
-    def _compute_paths(self, dpi=72.0):
+    def _compute_paths(self, dpi: float = 72.0) -> None:
         ppc = self._points_per_curve
         for i, hull in enumerate(self._coords_hulls):
             self._paths[i].vertices = _compute_group_path_with_vertex_padding(
@@ -137,16 +140,23 @@ class GroupingArtist(PatchCollection):
                 points_per_curve=ppc,
             )
 
-    def _process(self):
+    def _process(self) -> None:
         self._compute_paths()
 
-    def draw(self, renderer):
-        # FIXME: this kind of breaks everything since the vertices' magical "_transforms" does not really
-        # scale from 72 pixels but rather from the screen's or something. Conclusion: using this keeps
-        # consistency across dpis but breaks proportionality of vertexpadding and vertex_size (for now).
-        # NOTE: this might be less bad than initially thought in the sense that even perfect scaling
-        # does not seem to align the center of the perimeter of the group with the center of the perimeter
-        # of the vertex when of the same exact size. So we are probably ok winging it as users will adapt.
+    def draw(self, renderer) -> None:
+        """Draw or re-draw the grouping patches.
+
+        Parameters:
+            renderer: The renderer to use for drawing the patches.
+        """
+        # FIXME: this kind of breaks everything since the vertices' magical "_transforms" does
+        # not really scale from 72 pixels but rather from the screen's or something.
+        # Conclusion: using this keeps consistency across dpis but breaks proportionality of
+        # vertexpadding and vertex_size (for now).
+        # NOTE: this might be less bad than initially thought in the sense that even perfect
+        # scaling does not seem to align the center of the perimeter of the group with the
+        # center of the perimeter of the vertex when of the same exact size. So we are
+        # probably ok winging it as users will adapt.
         self._compute_paths(self.get_figure(root=True).dpi)
         super().draw(renderer)
 

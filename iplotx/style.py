@@ -1,6 +1,5 @@
 from typing import (
     Any,
-    Never,
     Optional,
     Sequence,
 )
@@ -23,7 +22,7 @@ style_leaves = (
     "zorder",
     "tension",
     "looptension",
-    "lloopmaxangle",
+    "loopmaxangle",
     "rotate",
     "marker",
     "waypoints",
@@ -35,6 +34,15 @@ style_leaves = (
     "hmargin",
     "vmargin",
     "ports",
+)
+
+# These properties are not allowed to be rotated (global throughout the graph).
+# This might change in the future as the API improves.
+nonrotating_leaves = (
+    "offset",
+    "looptension",
+    "loopmaxangle",
+    "vertexpadding",
 )
 
 
@@ -247,7 +255,7 @@ def use(style: Optional[str | dict | Sequence] = None, **kwargs):
         raise
 
 
-def reset() -> Never:
+def reset() -> None:
     """Reset to default style."""
     global current
     current = copy_with_deep_values(styles["default"])
@@ -276,7 +284,7 @@ def context(style: Optional[str | dict | Sequence] = None, **kwargs):
 
 def unflatten_style(
     style_flat: dict[str, str | dict | int | float],
-) -> Never:
+) -> None:
     """Convert a flat or semi-flat style into a fully structured dict.
 
     Parameters:
@@ -326,7 +334,7 @@ def rotate_style(
     style: dict[str, Any],
     index: Optional[int] = None,
     key: Optional[Hashable] = None,
-    props: Sequence[str] = style_leaves,
+    props: Optional[Sequence[str]] = None,
 ) -> dict[str, Any]:
     """Rotate leaves of a style for a certain index or key.
 
@@ -338,7 +346,8 @@ def rotate_style(
         props: The properties to rotate, usually all leaf properties.
 
     Returns:
-        A style with rotated leaves, which describes the properties of a single element (e.g. vertex).
+        A style with rotated leaves, which describes the properties of a single element (e.g.
+        vertex).
 
     Example:
         >>> style = {'vertex': {'size': [10, 20]}}
@@ -349,6 +358,9 @@ def rotate_style(
         raise ValueError(
             "At least one of 'index' or 'key' must be provided to rotate_style."
         )
+
+    if props is None:
+        props = tuple(prop for prop in style_leaves if prop not in nonrotating_leaves)
 
     style = copy_with_deep_values(style)
 

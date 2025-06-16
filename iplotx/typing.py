@@ -1,8 +1,17 @@
+"""
+Typing hints for iplotx.
+
+Some of these types are legit, others are just Any but renamed to improve readability throughout
+the codebase.
+"""
+
 from typing import (
     Union,
     Sequence,
     Any,
+    TypeVar,
 )
+from collections.abc import Hashable
 import numpy as np
 import pandas as pd
 
@@ -34,3 +43,13 @@ GroupingType = Union[
     # igraph.clustering.Cover,
     # igraph.clustering.VertexCover,
 ]
+
+
+T = TypeVar("T")
+LeafProperty = Union[
+    T,
+    Sequence[T],
+    dict[Hashable, T],
+]
+
+Pair = tuple[T, T]

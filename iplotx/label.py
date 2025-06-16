@@ -1,3 +1,7 @@
+"""
+Module for label collection in iplotx.
+"""
+
 from typing import (
     Optional,
     Sequence,
@@ -26,13 +30,28 @@ from .utils.matplotlib import (
     )
 )
 class LabelCollection(mpl.artist.Artist):
+    """Collection of labels for iplotx with styles.
+
+    NOTE: This class is not a subclass of `mpl.collections.Collection`, although in some ways items
+    behaves like one. It is named LabelCollection quite literally to indicate it contains a list of
+    labels for vertices, edges, etc.
+    """
+
     def __init__(
         self,
         labels: Sequence[str],
         style: Optional[dict[str, dict]] = None,
         offsets: Optional[np.ndarray] = None,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
-    ):
+    ) -> None:
+        """Initialize a collection of labels.
+
+        Parameters:
+            labels: A sequence of labels to be displayed.
+            style: A dictionary of styles to apply to the labels. The keys are style properties.
+            offsets: A sequence of offsets for each label, specifying the position of the label.
+            transform: A transform to apply to the labels. This is usually ax.transData.
+        """
         self._labels = labels
         self._offsets = offsets if offsets is not None else np.zeros((len(labels), 2))
         self._style = style
@@ -41,19 +60,25 @@ class LabelCollection(mpl.artist.Artist):
         self.set_transform(transform)
         self._create_artists()
 
-    def get_children(self):
+    def get_children(self) -> tuple[mpl.artist.Artist]:
+        """Get the children of this artist, which are the label artists."""
         return tuple(self._labelartists)
 
-    def set_figure(self, figure):
-        super().set_figure(figure)
-        for child in self.get_children():
-            child.set_figure(figure)
-        self._update_offsets(dpi=figure.dpi)
+    def set_figure(self, fig) -> None:
+        """Set the figure of this artist.
 
-    def _get_margins_with_dpi(self, dpi=72.0):
+        Parameters:
+            fig: The figure to set.
+        """
+        super().set_figure(fig)
+        for child in self.get_children():
+            child.set_figure(fig)
+        self._update_offsets(dpi=fig.dpi)
+
+    def _get_margins_with_dpi(self, dpi: float = 72.0) -> np.ndarray:
         return self._margins * dpi / 72.0
 
-    def _create_artists(self):
+    def _create_artists(self) -> None:
         style = copy_with_deep_values(self._style) if self._style is not None else {}
         transform = self.get_transform()
 
@@ -83,12 +108,13 @@ class LabelCollection(mpl.artist.Artist):
         self._labelartists = arts
         self._margins = np.array(margins)
 
-    def _update_offsets(self, dpi=72.0):
+    def _update_offsets(self, dpi: float = 72.0) -> None:
         """Update offsets including margins."""
         offsets = self._adjust_offsets_for_margins(self._offsets, dpi=dpi)
         self.set_offsets(offsets)
 
-    def get_offsets(self):
+    def get_offsets(self) -> np.ndarray:
+        """Get the positions (offsets) of the labels."""
         return self._offsets
 
     def _adjust_offsets_for_margins(self, offsets, dpi=72.0):
@@ -100,13 +126,22 @@ class LabelCollection(mpl.artist.Artist):
             offsets = trans_inv(trans(offsets) + margins)
         return offsets
 
-    def set_offsets(self, offsets):
-        """Set positions (offsets) of the labels."""
+    def set_offsets(self, offsets) -> None:
+        """Set positions (offsets) of the labels.
+
+        Parameters:
+            offsets: A sequence of offsets for each label, specifying the position of the label.
+        """
         self._offsets = np.asarray(offsets)
         for art, offset in zip(self._labelartists, self._offsets):
             art.set_position((offset[0], offset[1]))
 
-    def set_rotations(self, rotations):
+    def set_rotations(self, rotations: Sequence[float]) -> None:
+        """Set the rotations of the labels.
+
+        Parameters:
+            rotations: A sequence of rotations in radians for each label.
+        """
         for art, rotation in zip(self._labelartists, rotations):
             rot_deg = 180.0 / np.pi * rotation
             # Force the font size to be upwards
@@ -114,7 +149,7 @@ class LabelCollection(mpl.artist.Artist):
             art.set_rotation(rot_deg)
 
     @_stale_wrapper
-    def draw(self, renderer):
+    def draw(self, renderer) -> None:
         """Draw each of the children, with some buffering mechanism."""
         if not self.get_visible():
             return
