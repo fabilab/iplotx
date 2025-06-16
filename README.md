@@ -1,6 +1,7 @@
 ![Github Actions](https://github.com/fabilab/iplotx/actions/workflows/test.yml/badge.svg)
 ![PyPI - Version](https://img.shields.io/pypi/v/iplotx)
 ![RTD](https://readthedocs.org/projects/iplotx/badge/?version=latest)
+![pylint](pylint.svg)
 
 # iplotx
 Plotting networks from igraph and networkx.
