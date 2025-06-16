@@ -108,7 +108,7 @@ def _fix_parallel_edges_straight(
     indices_inv,
     trans,
     trans_inv,
-    offset=3,
+    paralleloffset=3,
 ):
     """Offset parallel edges along the same path."""
     ntot = len(indices) + len(indices_inv)
@@ -124,7 +124,7 @@ def _fix_parallel_edges_straight(
     for i, idx in enumerate(indices + indices_inv):
         # Offset the path
         paths[idx].vertices = trans_inv(
-            trans(paths[idx].vertices) + fracs * offset * (i - ntot / 2)
+            trans(paths[idx].vertices) + fracs * paralleloffset * (i - ntot / 2)
         )
 
 

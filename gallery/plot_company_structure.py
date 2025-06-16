@@ -47,3 +47,26 @@ ipx.network(
 )
 # Show the layout top to bottom for clarity
 ax.invert_yaxis()
+
+# %%
+# If you prefer a more squared look, you can use S-style waypoints with per-edge offsets:
+
+fig, ax = plt.subplots()
+ipx.network(
+    g,
+    layout=layout,
+    ax=ax,
+    vertex_labels=True,
+    style="hollow",
+    vertex_marker="r",
+    edge_ports=[("e", "w")] * 8,
+    edge_waypoints="xmidy0,xmidy1",
+    edge_offset=[(0, 0)] * 7 + [(0, -6)],
+    margins=(0.08, 0.05),
+    edge_linestyle=["-"] * 7 + ["--"],
+)
+ax.invert_yaxis()
+
+# %%
+# The `offset` edge style bypasses any layout coordinate system and acts in figure points directly.
+# Combining edge offsets with noncartesian layout coordinate systems (e.g. `polar`) can lead to unexpected results.

@@ -37,7 +37,7 @@ ipx.plot(
         },
         "edge": {
             "linestyle": linestyle,
-            "offset": 0,
+            "paralleloffset": 0,
             "looptension": 3.5,
             "arrow": {
                 "marker": "|>",
@@ -61,7 +61,7 @@ ipx.plot(
         vertex_edgecolor="none",
         vertex_label_color="black",
         edge_linestyle=linestyle,
-        edge_offset=0,
+        edge_paralleloffset=0,
         edge_looptension=3.5,
         edge_arrow_marker="|>",
     ),
@@ -80,7 +80,7 @@ ipx.plot(
     vertex_edgecolor="none",
     vertex_label_color="black",
     edge_linestyle=linestyle,
-    edge_offset=0,
+    edge_paralleloffset=0,
     edge_looptension=3.5,
     edge_arrow_marker="|>",
 )
@@ -94,7 +94,7 @@ with ipx.style.context(
     vertex_edgecolor="none",
     vertex_label_color="black",
     edge_linestyle=linestyle,
-    edge_offset=0,
+    edge_paralleloffset=0,
     edge_looptension=3.5,
     edge_arrow_marker="|>",
 ):

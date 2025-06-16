@@ -23,6 +23,8 @@ style_leaves = (
     "tension",
     "looptension",
     "loopmaxangle",
+    "paralleloffset",
+    "offset",
     "rotate",
     "marker",
     "waypoints",
@@ -39,7 +41,7 @@ style_leaves = (
 # These properties are not allowed to be rotated (global throughout the graph).
 # This might change in the future as the API improves.
 nonrotating_leaves = (
-    "offset",
+    "paralleloffset",
     "looptension",
     "loopmaxangle",
     "vertexpadding",
@@ -64,7 +66,7 @@ default = {
         "linestyle": "-",
         "color": "black",
         "curved": False,
-        "offset": 3,
+        "paralleloffset": 3,
         "tension": 1,
         "looptension": 4,
         "loopmaxangle": 60,

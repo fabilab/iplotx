@@ -174,7 +174,7 @@ class GraphTestRunner(unittest.TestCase):
                     "alpha": edge_alphas,
                     "cmap": cmap,
                     "linewidth": 2,
-                    "offset": 0,
+                    "paralleloffset": 0,
                     "arrow": {
                         "marker": ">",
                         "width": 5,

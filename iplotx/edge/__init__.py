@@ -313,6 +313,22 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 layout_coordinate_system=self._vertex_collection.get_layout_coordinate_system(),
             )
 
+            offset = edge_stylei.get("offset", 0)
+            if np.isscalar(offset):
+                if offset == 0:
+                    offset = (0, 0)
+                else:
+                    vd_fig = trans(vcoord_data[1]) - trans(vcoord_data[0])
+                    vd_fig /= np.linalg.norm(vd_fig)
+                    vrot = vd_fig @ np.array([[0, -1], [1, 0]])
+                    offset = offset * vrot
+            offset = np.asarray(offset, dtype=float)
+            # Scale by dpi
+            dpi = self.figure.dpi if hasattr(self, "figure") else 72.0
+            offset *= dpi / 72.0
+            if (offset != 0).any():
+                path.vertices[:] = trans_inv(trans(path.vertices) + offset)
+
             # Collect angles for this vertex, to be used for loops plotting below
             if v1 in loop_vertex_dict:
                 loop_vertex_dict[v1]["edge_angles"].append(angles[0])
@@ -340,7 +356,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                         indices_inv,
                         trans,
                         trans_inv,
-                        offset=self._style.get("offset", 3),
+                        paralleloffset=self._style.get("paralleloffset", 3),
                     )
 
         # 3. Deal with loops at the end
@@ -611,6 +627,7 @@ def make_stub_patch(**kwargs):
         "looptension",
         "loopmaxangle",
         "offset",
+        "paralleloffset",
         "cmap",
     ]
     for prop in forbidden_props:

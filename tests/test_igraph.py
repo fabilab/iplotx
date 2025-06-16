@@ -150,7 +150,7 @@ class GraphTestRunner(unittest.TestCase):
                     "size": 15,
                 },
                 "edge": {
-                    "offset": 8,
+                    "paralleloffset": 8,
                     "curved": True,
                     "tension": 0.5,
                     "arrow": {
@@ -178,7 +178,7 @@ class GraphTestRunner(unittest.TestCase):
                     "size": 15,
                 },
                 "edge": {
-                    "offset": 8,
+                    "paralleloffset": 8,
                     "curved": True,
                     "tension": 0.5,
                     "arrow": {
