@@ -10,12 +10,12 @@ import iplotx as ipx
 
 G = nx.path_graph(8)
 pos = nx.spring_layout(G, seed=47)  # Seed layout for reproducibility
-ipx.plot(G, layout=pos)
+ipx.network(G, layout=pos)
 
 # %%
 # We can change the color of the vertices and edges with a touch of style:
 
-ipx.plot(
+ipx.network(
     G,
     layout=pos,
     style={

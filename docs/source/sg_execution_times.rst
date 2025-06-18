@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.297** total execution time for 36 files **from all galleries**:
+**00:00.132** total execution time for 36 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_trees_of_trees.py` (``../../gallery/plot_trees_of_trees.py``)
-     - 00:01.297
+   * - :ref:`sphx_glr_gallery_plot_simple_path.py` (``../../gallery/plot_simple_path.py``)
+     - 00:00.132
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -119,9 +119,6 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simple_path.py` (``../../gallery/plot_simple_path.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_gallery_plot_skbio_tree.py` (``../../gallery/plot_skbio_tree.py``)
      - 00:00.000
      - 0.0
@@ -132,6 +129,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_tree_node_background.py` (``../../gallery/plot_tree_node_background.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_trees_of_trees.py` (``../../gallery/plot_trees_of_trees.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_voronoi.py` (``../../gallery/plot_voronoi.py``)
