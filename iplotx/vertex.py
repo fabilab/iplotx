@@ -209,6 +209,10 @@ class VertexCollection(PatchCollection):
         self._update_offsets_from_layout()
         self.stale = True
 
+    def get_style(self) -> Optional[dict[str, Any]]:
+        """Get the style dictionary for the vertices."""
+        return self._style
+
     def _init_vertex_patches(self):
         style = self._style or {}
         if "cmap" in style:

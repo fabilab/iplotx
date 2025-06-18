@@ -72,6 +72,7 @@ class TreeData(TypedDict):
     edge_df: dict[Hashable, Sequence[tuple[float, float]]]
     layout_coordinate_system: str
     layout_name: str
+    orientation: str
     ndim: int
     tree_library: NotRequired[str]
 
@@ -208,6 +209,7 @@ class TreeDataProvider(Protocol):
             "directed": directed,
             "ndim": 2,
             "layout_name": layout,
+            "orientation": orientation,
         }
 
         # Add vertex_df including layout

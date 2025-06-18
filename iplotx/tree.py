@@ -200,6 +200,46 @@ class TreeArtist(mpl.artist.Artist):
             offset_transform=self.get_offset_transform(),
         )
 
+        if "cascading" in self._vertices.get_style():
+            print("Cascading patches")
+            from .ingest import data_providers
+
+            provider = data_providers["tree"][self._ipx_internal_data["tree_library"]]
+            for node, facecolor in self._vertices.get_style()["cascading"][
+                "facecolor"
+            ].items():
+                # FIXME: adjust for coordinate systems
+                x0, y0 = self._vertices.get_layout().T[node].values
+                sign = (
+                    1.0 if self._ipx_internal_data["orientation"] == "right" else -1.0
+                )
+                x0 -= sign * provider(node).get_branch_length_default_to_one(node)
+                leaves_below_node = provider(node).get_leaves()
+                xleaves, yleaves = [], []
+                for leaf in leaves_below_node:
+                    xl, yl = self._vertices.get_layout().T[leaf].values
+                    xleaves.append(xl)
+                    yleaves.append(yl)
+                xmax, xmin = np.max(xleaves), np.min(xleaves)
+                ymax, ymin = np.max(yleaves), np.min(yleaves)
+                ymax = max(y0, ymax)
+                ymin = min(y0, ymin)
+
+                if self._ipx_internal_data["orientation"] == "right":
+                    xleft, xright = x0, xmax
+                else:
+                    xleft, xright = xmin, x0
+                import matplotlib.pyplot as plt
+
+                patch = plt.Rectangle(
+                    (xleft, ymin - 0.5),
+                    xright - xleft,
+                    ymax - ymin + 1,
+                    facecolor=facecolor,
+                    edgecolor="none",
+                )
+                plt.gca().add_patch(patch)
+
     def _add_edges(self) -> None:
         """Add edges to the network artist.
 
