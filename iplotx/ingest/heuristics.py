@@ -15,7 +15,6 @@ from ..layout import compute_tree_layout
 from ..typing import (
     GraphType,
     GroupingType,
-    TreeType,
     LayoutType,
 )
 
@@ -91,7 +90,6 @@ def normalise_layout(layout, network=None):
 
 def normalise_tree_layout(
     layout: str | Any,
-    tree: Optional[TreeType] = None,
     **kwargs,
 ) -> pd.DataFrame:
     """Normalise tree layout from a variety of inputs.
@@ -108,7 +106,7 @@ def normalise_tree_layout(
         the layout internally. This might change in the future.
     """
     if isinstance(layout, str):
-        layout = compute_tree_layout(tree, layout, **kwargs)
+        layout = compute_tree_layout(layout, **kwargs)
     else:
         raise NotImplementedError(
             "Only internally computed tree layout currently accepted."

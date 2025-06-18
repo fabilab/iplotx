@@ -120,14 +120,16 @@ class NetworkXDataProvider(NetworkDataProvider):
         }
         return network_data
 
-    def check_dependencies(self) -> bool:
+    @staticmethod
+    def check_dependencies() -> bool:
         try:
             import networkx
         except ImportError:
             return False
         return True
 
-    def graph_type(self):
+    @staticmethod
+    def graph_type():
         from networkx import Graph
 
         return Graph

@@ -45,7 +45,7 @@ for kind in data_providers:
             if key == provider_protocols[kind].__name__:
                 continue
             if key.endswith("DataProvider"):
-                data_providers[kind][module_name] = val()
+                data_providers[kind][module_name] = val
                 break
     del providers_path
 
@@ -95,7 +95,7 @@ def ingest_network_data(
             f"Currently installed supported libraries: {sup}."
         )
 
-    result = provider(
+    result = provider()(
         network=network,
         layout=layout,
         vertex_labels=vertex_labels,
@@ -129,6 +129,7 @@ def ingest_tree_data(
 
     result = provider(
         tree=tree,
+    )(
         layout=layout,
         orientation=orientation,
         directed=directed,
@@ -136,6 +137,9 @@ def ingest_tree_data(
         edge_labels=edge_labels,
     )
     result["tree_library"] = tl
+
+    # TODO: cascading thing here
+
     return result
 
 

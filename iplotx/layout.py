@@ -2,21 +2,28 @@
 Layout functions, currently limited to trees.
 """
 
-from collections.abc import Hashable
+from typing import Any
+from collections.abc import (
+    Hashable,
+    Callable,
+)
 
 import numpy as np
 
 
 def compute_tree_layout(
-    tree,
     layout: str,
     orientation: str,
+    root: Any,
+    preorder_fun: Callable,
+    postorder_fun: Callable,
+    children_fun: Callable,
+    branch_length_fun: Callable,
     **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Compute the layout for a tree.
 
     Parameters:
-        tree: The tree to compute the layout for.
         layout: The name of the layout, e.g. "horizontal" or "radial".
         orientation: The orientation of the layout, e.g. "right", "left", "descending", or
             "ascending".
@@ -24,13 +31,19 @@ def compute_tree_layout(
     Returns:
         A layout dictionary with node positions.
     """
+    kwargs["root"] = root
+    kwargs["preorder_fun"] = preorder_fun
+    kwargs["postorder_fun"] = postorder_fun
+    kwargs["children_fun"] = children_fun
+    kwargs["branch_length_fun"] = branch_length_fun
+    kwargs["orientation"] = orientation
 
     if layout == "radial":
-        layout_dict = _circular_tree_layout(tree, orientation=orientation, **kwargs)
+        layout_dict = _circular_tree_layout(**kwargs)
     elif layout == "horizontal":
-        layout_dict = _horizontal_tree_layout(tree, orientation=orientation, **kwargs)
+        layout_dict = _horizontal_tree_layout(**kwargs)
     elif layout == "vertical":
-        layout_dict = _vertical_tree_layout(tree, orientation=orientation, **kwargs)
+        layout_dict = _vertical_tree_layout(**kwargs)
     else:
         raise ValueError(f"Tree layout not available: {layout}")
 
@@ -38,12 +51,11 @@ def compute_tree_layout(
 
 
 def _horizontal_tree_layout_right(
-    tree,
-    root_fun: callable,
-    preorder_fun: callable,
-    postorder_fun: callable,
-    children_fun: callable,
-    branch_length_fun: callable,
+    root: Any,
+    preorder_fun: Callable,
+    postorder_fun: Callable,
+    children_fun: Callable,
+    branch_length_fun: Callable,
 ) -> dict[Hashable, list[float]]:
     """Build a tree layout horizontally, left to right.
 
@@ -58,7 +70,7 @@ def _horizontal_tree_layout_right(
 
     # Set the y values for vertices
     i = 0
-    for node in postorder_fun(tree):
+    for node in postorder_fun():
         children = children_fun(node)
         if len(children) == 0:
             layout[node] = [None, i]
@@ -70,8 +82,8 @@ def _horizontal_tree_layout_right(
             ]
 
     # Set the x values for vertices
-    layout[root_fun(tree)][0] = 0
-    for node in preorder_fun(tree):
+    layout[root][0] = 0
+    for node in preorder_fun():
         for child in children_fun(node):
             bl = branch_length_fun(child)
             if bl is None:
@@ -82,7 +94,6 @@ def _horizontal_tree_layout_right(
 
 
 def _horizontal_tree_layout(
-    tree,
     orientation="right",
     **kwargs,
 ) -> dict[Hashable, list[float]]:
@@ -90,7 +101,7 @@ def _horizontal_tree_layout(
     if orientation not in ("right", "left"):
         raise ValueError("Orientation must be 'right' or 'left'.")
 
-    layout = _horizontal_tree_layout_right(tree, **kwargs)
+    layout = _horizontal_tree_layout_right(**kwargs)
 
     if orientation == "left":
         for key in layout:
@@ -99,13 +110,12 @@ def _horizontal_tree_layout(
 
 
 def _vertical_tree_layout(
-    tree,
     orientation="descending",
     **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Vertical tree layout."""
     sign = 1 if orientation == "descending" else -1
-    layout = _horizontal_tree_layout(tree, **kwargs)
+    layout = _horizontal_tree_layout(**kwargs)
     for key, value in layout.items():
         # Invert x and y
         layout[key] = value[::-1]
@@ -115,7 +125,6 @@ def _vertical_tree_layout(
 
 
 def _circular_tree_layout(
-    tree,
     orientation="right",
     starting_angle=0,
     angular_span=360,
@@ -127,7 +136,7 @@ def _circular_tree_layout(
     th_span = angular_span * np.pi / 180
     sign = 1 if orientation == "right" else -1
 
-    layout = _horizontal_tree_layout_right(tree, **kwargs)
+    layout = _horizontal_tree_layout_right(**kwargs)
     ymax = max(point[1] for point in layout.values())
     for key, (x, y) in layout.items():
         r = x
