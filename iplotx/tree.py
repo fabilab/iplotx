@@ -3,6 +3,7 @@ from typing import (
     Sequence,
 )
 from collections.abc import Hashable
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
@@ -329,11 +330,14 @@ class TreeArtist(mpl.artist.Artist):
         if not self.get_visible():
             return
 
-        # FIXME: Callbacks on stale vertices/edges??
-
         # NOTE: looks like we have to manage the zorder ourselves
-        # this is kind of funny actually
+        # this is kind of funny actually. Btw we need to ensure
+        # that cascades are drawn behind (earlier than) vertices
+        # and edges at equal zorder because it looks better that way.
+        z_suborder = defaultdict(int)
+        if hasattr(self, "_cascades"):
+            z_suborder[self._cascades] = -1
         children = list(self.get_children())
-        children.sort(key=lambda x: x.zorder)
+        children.sort(key=lambda x: (x.zorder, z_suborder[x]))
         for art in children:
             art.draw(renderer)

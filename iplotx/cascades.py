@@ -30,6 +30,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
         transform: mpl.transforms.Transform,
     ):
         style = copy_with_deep_values(style)
+        zorder = style.get("zorder", 0)
 
         # NOTE: there is a weird bug in pandas when using generic Hashable-s
         # with .loc. Seems like doing .T[...] works for individual index
@@ -156,4 +157,5 @@ class CascadeCollection(mpl.collections.PatchCollection):
             cascading_patches,
             transform=transform,
             match_original=True,
+            zorder=zorder,
         )
