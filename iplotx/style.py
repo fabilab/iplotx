@@ -36,6 +36,7 @@ style_leaves = (
     "hmargin",
     "vmargin",
     "ports",
+    "extend",
 )
 
 # These properties are not allowed to be rotated (global throughout the graph).
@@ -45,6 +46,7 @@ nonrotating_leaves = (
     "looptension",
     "loopmaxangle",
     "vertexpadding",
+    "extend",
 )
 
 

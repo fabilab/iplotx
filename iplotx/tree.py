@@ -19,6 +19,7 @@ from .utils.matplotlib import (
 )
 from .ingest import (
     ingest_tree_data,
+    data_providers,
 )
 from .vertex import (
     VertexCollection,
@@ -102,13 +103,19 @@ class TreeArtist(mpl.artist.Artist):
         self._add_vertices()
         self._add_edges()
 
+        if "cascading" in self.get_vertices().get_style():
+            self._add_cascades()
+
     def get_children(self) -> tuple[mpl.artist.Artist]:
         """Get the children of this artist.
 
         Returns:
             The artists for vertices and edges.
         """
-        return (self._vertices, self._edges)
+        children = [self._vertices, self._edges]
+        if hasattr(self, "_cascades"):
+            children.append(self._cascades)
+        return tuple(children)
 
     def set_figure(self, fig) -> None:
         """Set the figure for this artist and its children.
@@ -200,45 +207,112 @@ class TreeArtist(mpl.artist.Artist):
             offset_transform=self.get_offset_transform(),
         )
 
-        if "cascading" in self._vertices.get_style():
-            print("Cascading patches")
-            from .ingest import data_providers
+    def _add_cascades(self) -> None:
+        """Add cascading patches."""
 
-            provider = data_providers["tree"][self._ipx_internal_data["tree_library"]]
-            for node, facecolor in self._vertices.get_style()["cascading"][
-                "facecolor"
-            ].items():
-                # FIXME: adjust for coordinate systems
-                x0, y0 = self._vertices.get_layout().T[node].values
-                sign = (
-                    1.0 if self._ipx_internal_data["orientation"] == "right" else -1.0
-                )
-                x0 -= sign * provider(node).get_branch_length_default_to_one(node)
-                leaves_below_node = provider(node).get_leaves()
-                xleaves, yleaves = [], []
-                for leaf in leaves_below_node:
-                    xl, yl = self._vertices.get_layout().T[leaf].values
-                    xleaves.append(xl)
-                    yleaves.append(yl)
-                xmax, xmin = np.max(xleaves), np.min(xleaves)
-                ymax, ymin = np.max(yleaves), np.min(yleaves)
-                ymax = max(y0, ymax)
-                ymin = min(y0, ymin)
+        # NOTE: there is a weird bug in pandas when using generic Hashable-s
+        # with .loc. Seems like doing .T[...] works for individual index
+        # elements only though
+        def get_node_coords(node):
+            return self._vertices.get_layout().T[node].values
 
-                if self._ipx_internal_data["orientation"] == "right":
-                    xleft, xright = x0, xmax
-                else:
-                    xleft, xright = xmin, x0
-                import matplotlib.pyplot as plt
+        def get_leaves_coords(leaves):
+            return np.array(
+                [get_node_coords(leaf) for leaf in leaves],
+            )
 
-                patch = plt.Rectangle(
-                    (xleft, ymin - 0.5),
+        style = self.get_vertices().get_style()["cascading"]
+        provider = data_providers["tree"][self._ipx_internal_data["tree_library"]]
+
+        # FIXME: get the nodes to draw patches from as a single dictionary/list
+        # instead of from facecolor
+        nodes_unordered = list(style["facecolor"].keys())
+
+        # Draw the patches from the closest to the root (earlier drawing)
+        # to the closer to the leaves (later drawing).
+        drawing_order = []
+        for node in provider(self.tree).preorder():
+            if node in nodes_unordered:
+                drawing_order.append(node)
+
+        layout_name = self._ipx_internal_data["layout_name"]
+        orientation = self._ipx_internal_data["orientation"]
+        extend = style.get("extend", False)
+        if layout_name not in ("horizontal", "vertical"):
+            raise NotImplementedError(
+                "Cascading patches not implemented for radial layout.",
+            )
+
+        if layout_name == "horizontal":
+            if orientation == "right":
+                depth_max = self.get_vertices().get_layout().values[:, 0].max()
+            else:
+                depth_max = self.get_vertices().get_layout().values[:, 0].min()
+        elif layout_name == "vertical":
+            if orientation == "descending":
+                depth_max = self.get_vertices().get_layout().values[:, 1].min()
+            else:
+                depth_max = self.get_vertices().get_layout().values[:, 1].max()
+        elif layout_name == "radial":
+            # layout values are: r, theta
+            depth_max = self.get_vertices().get_layout().values[:, 0].max()
+
+        cascading_patches = []
+        for node in drawing_order:
+            stylei = rotate_style(style, key=node)
+            del stylei["extend"]
+            provider_node = provider(node)
+
+            bl = provider_node.get_branch_length_default_to_one(node)
+            node_coords = get_node_coords(node).copy()
+            leaves_coords = get_leaves_coords(provider_node.get_leaves())
+            if len(leaves_coords) == 0:
+                leaves_coords = np.array([node_coords])
+
+            if layout_name in ("horizontal", "vertical"):
+                if layout_name == "horizontal":
+                    ybot = leaves_coords[:, 1].min() - 0.5
+                    ytop = leaves_coords[:, 1].max() + 0.5
+                    if orientation == "right":
+                        xleft = node_coords[0] - bl
+                        xright = depth_max if extend else leaves_coords[:, 0].max()
+                    else:
+                        xleft = depth_max if extend else leaves_coords[:, 0].min()
+                        xright = node_coords[0] + bl
+                elif layout_name == "vertical":
+                    xleft = leaves_coords[:, 0].min() - 0.5
+                    xright = leaves_coords[:, 0].max() + 0.5
+                    if orientation == "descending":
+                        ytop = node_coords[1] + bl
+                        ybot = depth_max if extend else leaves_coords[:, 1].min()
+                    else:
+                        ytop = depth_max if extend else leaves_coords[:, 1].max()
+                        ybot = node_coords[1] - bl
+
+                patch = mpl.patches.Rectangle(
+                    (xleft, ybot),
                     xright - xleft,
-                    ymax - ymin + 1,
-                    facecolor=facecolor,
-                    edgecolor="none",
+                    ytop - ybot,
+                    **stylei,
                 )
-                plt.gca().add_patch(patch)
+            elif layout_name == "radial":
+                points = []
+                path = mpl.path.Path(
+                    points,
+                    codes=[getattr(mpl.path.Path, code) for code in codes],
+                )
+                patch = mpl.patches.PathPath(
+                    path,
+                    **stylei,
+                )
+
+            cascading_patches.append(patch)
+
+        self._cascades = mpl.collections.PatchCollection(
+            cascading_patches,
+            transform=self.get_offset_transform(),
+            match_original=True,
+        )
 
     def _add_edges(self) -> None:
         """Add edges to the network artist.
