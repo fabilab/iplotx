@@ -1,6 +1,6 @@
 """
-Tree with cascading background
-==============================
+Tree cascades
+=============
 
 This example shows how to use `iplotx` to add cascading backgrounds to trees.
 "Cascading" here means that each patch (rectangle/wedge/etc.) will cover a node
@@ -29,7 +29,7 @@ backgrounds = {
 
 ipx.plotting.tree(
     tree,
-    vertex_cascading_facecolor=backgrounds,
+    vertex_cascade_facecolor=backgrounds,
 )
 
 # %%
@@ -37,8 +37,9 @@ ipx.plotting.tree(
 
 ipx.plotting.tree(
     tree,
-    vertex_cascading_facecolor=backgrounds,
-    vertex_cascading_extend=True,
+    layout="vertical",
+    vertex_cascade_facecolor=backgrounds,
+    vertex_cascade_extend=True,
 )
 
 # %%
@@ -48,7 +49,7 @@ ipx.plotting.tree(
 ipx.plotting.tree(
     tree,
     layout="radial",
-    vertex_cascading_facecolor=backgrounds,
-    vertex_cascading_extend=True,
+    vertex_cascade_facecolor=backgrounds,
+    vertex_cascade_extend=True,
     aspect=1,
 )
