@@ -114,7 +114,7 @@ def _vertical_tree_layout(
     **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Vertical tree layout."""
-    sign = 1 if orientation == "descending" else -1
+    sign = -1 if orientation == "descending" else 1
     layout = _horizontal_tree_layout(**kwargs)
     for key, value in layout.items():
         # Invert x and y

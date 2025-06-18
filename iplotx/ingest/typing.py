@@ -193,7 +193,7 @@ class TreeDataProvider(Protocol):
     def __call__(
         self,
         layout: str | LayoutType,
-        orientation: str = "horizontal",
+        orientation: Optional[str],
         directed: bool | str = False,
         vertex_labels: Optional[
             Sequence[str] | dict[Hashable, str] | pd.Series | bool
@@ -201,6 +201,14 @@ class TreeDataProvider(Protocol):
         edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> TreeData:
         """Create tree data object for iplotx from ete4.core.tre.Tree classes."""
+
+        if orientation is None:
+            if layout == "horizontal":
+                orientation = "right"
+            elif layout == "vertical":
+                orientation = "descending"
+            elif layout == "radial":
+                orientation = "clockwise"
 
         tree_data = {
             "root": self.get_root(),

@@ -108,7 +108,7 @@ def ingest_network_data(
 def ingest_tree_data(
     tree: TreeType,
     layout: Optional[str] = "horizontal",
-    orientation: Optional[str] = "right",
+    orientation: Optional[str] = None,
     directed: bool | str = False,
     vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
     edge_labels: Optional[Sequence[str] | dict[str,]] = None,

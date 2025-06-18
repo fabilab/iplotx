@@ -52,8 +52,8 @@ class TreeArtist(mpl.artist.Artist):
     def __init__(
         self,
         tree,
-        layout="horizontal",
-        orientation="right",
+        layout: Optional[str] = "horizontal",
+        orientation: Optional[str] = None,
         directed: bool | str = False,
         vertex_labels: Optional[
             bool | list[str] | dict[Hashable, str] | pd.Series
@@ -168,6 +168,10 @@ class TreeArtist(mpl.artist.Artist):
         edge_bbox = self._edges.get_datalim(transData)
         bbox = mpl.transforms.Bbox.union([bbox, edge_bbox])
 
+        if hasattr(self, "_cascades"):
+            cascades_bbox = self._cascades.get_datalim(transData)
+            bbox = mpl.transforms.Bbox.union([bbox, cascades_bbox])
+
         bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
         return bbox
 
@@ -238,9 +242,9 @@ class TreeArtist(mpl.artist.Artist):
         layout_name = self._ipx_internal_data["layout_name"]
         orientation = self._ipx_internal_data["orientation"]
         extend = style.get("extend", False)
-        if layout_name not in ("horizontal", "vertical"):
+        if layout_name not in ("horizontal", "vertical", "radial"):
             raise NotImplementedError(
-                "Cascading patches not implemented for radial layout.",
+                f"Cascading patches not implemented for layout: {layout_name}.",
             )
 
         if layout_name == "horizontal":
@@ -256,6 +260,7 @@ class TreeArtist(mpl.artist.Artist):
         elif layout_name == "radial":
             # layout values are: r, theta
             depth_max = self.get_vertices().get_layout().values[:, 0].max()
+            nleaves = len(self._ipx_internal_data["leaves"])
 
         cascading_patches = []
         for node in drawing_order:
@@ -296,12 +301,28 @@ class TreeArtist(mpl.artist.Artist):
                     **stylei,
                 )
             elif layout_name == "radial":
-                points = []
+                dtheta = 2 * np.pi / nleaves
+                rmin = node_coords[0] - bl
+                rmax = depth_max if extend else leaves_coords[:, 0].max()
+                thetamin = leaves_coords[:, 1].min() - 0.5 * dtheta
+                thetamax = leaves_coords[:, 1].max() + 0.5 * dtheta
+                thetas = np.linspace(
+                    thetamin, thetamax, max(30, (thetamax - thetamin) // 3)
+                )
+                xs = list(rmin * np.cos(thetas)) + list(rmax * np.cos(thetas[::-1]))
+                ys = list(rmin * np.sin(thetas)) + list(rmax * np.sin(thetas[::-1]))
+                points = list(zip(xs, ys))
+                points.append(points[0])
+                codes = ["MOVETO"] + ["LINETO"] * (len(points) - 2) + ["CLOSEPOLY"]
+
+                if "edgecolor" not in stylei:
+                    stylei["edgecolor"] = "none"
+
                 path = mpl.path.Path(
                     points,
                     codes=[getattr(mpl.path.Path, code) for code in codes],
                 )
-                patch = mpl.patches.PathPath(
+                patch = mpl.patches.PathPatch(
                     path,
                     **stylei,
                 )
@@ -373,7 +394,7 @@ class TreeArtist(mpl.artist.Artist):
                 if layout_name == "horizontal":
                     waypointsi = "x0y1"
                 elif layout_name == "vertical":
-                    waypointsi = "y0y0"
+                    waypointsi = "y0x1"
                 elif layout_name == "radial":
                     waypointsi = "r0a1"
                 else:
