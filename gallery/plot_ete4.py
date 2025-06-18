@@ -30,7 +30,7 @@ ipx.plotting.tree(
         "tree",
         {
             "edge": {
-                "color": "black",
+                "color": "deeppink",
                 "linewidth": 4,
             },
         },
