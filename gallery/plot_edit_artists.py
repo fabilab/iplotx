@@ -33,6 +33,7 @@ artist = ipx.network(
 # %%
 # Now we can change the vertex sizes:
 
+# sphinx_gallery_thumbnail_number = 2
 # SAME BLOCK AS BEFORE, ONLY NEEDED TO MAKE A NEW FIGURE
 artist = ipx.network(
     g,

@@ -226,11 +226,17 @@ class TreeArtist(mpl.artist.Artist):
             )
 
         style = self.get_vertices().get_style()["cascading"]
+        if "color" in style:
+            style["facecolor"] = style["edgecolor"] = style.pop("color")
+
         provider = data_providers["tree"][self._ipx_internal_data["tree_library"]]
 
-        # FIXME: get the nodes to draw patches from as a single dictionary/list
-        # instead of from facecolor
-        nodes_unordered = list(style["facecolor"].keys())
+        # These patches need at least a facecolor (usually) or an edgecolor
+        # so it's safe to make a list from these
+        nodes_unordered = set()
+        for prop in ("facecolor", "edgecolor"):
+            if prop in style:
+                nodes_unordered |= set(style[prop].keys())
 
         # Draw the patches from the closest to the root (earlier drawing)
         # to the closer to the leaves (later drawing).
@@ -265,9 +271,14 @@ class TreeArtist(mpl.artist.Artist):
         cascading_patches = []
         for node in drawing_order:
             stylei = rotate_style(style, key=node)
-            del stylei["extend"]
-            provider_node = provider(node)
+            stylei.pop("extend", None)
+            # Default alpha is 0.5 for simple colors
+            if isinstance(stylei.get("facecolor", None), str) and (
+                "alpha" not in stylei
+            ):
+                stylei["alpha"] = 0.5
 
+            provider_node = provider(node)
             bl = provider_node.get_branch_length_default_to_one(node)
             node_coords = get_node_coords(node).copy()
             leaves_coords = get_leaves_coords(provider_node.get_leaves())

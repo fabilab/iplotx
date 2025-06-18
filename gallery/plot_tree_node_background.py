@@ -24,9 +24,31 @@ tree = next(
 backgrounds = {
     tree.get_nonterminals()[3]: "turquoise",
     tree.get_terminals()[0]: "tomato",
+    tree.get_terminals()[1]: "purple",
 }
 
 ipx.plotting.tree(
     tree,
     vertex_cascading_facecolor=backgrounds,
+)
+
+# %%
+# Cascading patches have a style option "extend" which affects whether the patches extend to the end of the deepest leaf:
+
+ipx.plotting.tree(
+    tree,
+    vertex_cascading_facecolor=backgrounds,
+    vertex_cascading_extend=True,
+)
+
+# %%
+# Cascading patches work with radial layouts as well:
+
+# sphinx_gallery_thumbnail_number = 3
+ipx.plotting.tree(
+    tree,
+    layout="radial",
+    vertex_cascading_facecolor=backgrounds,
+    vertex_cascading_extend=True,
+    aspect=1,
 )

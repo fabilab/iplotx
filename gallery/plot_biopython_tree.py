@@ -28,6 +28,7 @@ ipx.plotting.tree(
 # Moreover, the plot can be customised further using hmargin (horizontal label margin)
 # and some `matplotlib` settings.
 
+# sphinx_gallery_thumbnail_number = 2
 leaf_labels = {leaf: f"Species {i+1}" for i, leaf in enumerate(tree.get_terminals())}
 fig, ax = plt.subplots(figsize=(4, 4))
 ipx.plotting.tree(
