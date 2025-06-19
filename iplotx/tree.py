@@ -62,7 +62,8 @@ class TreeArtist(mpl.artist.Artist):
         vertex_labels: Optional[
             bool | list[str] | dict[Hashable, str] | pd.Series
         ] = None,
-        edge_labels: Optional[Sequence] = None,
+        edge_labels: Optional[Sequence | dict[Hashable, str] | pd.Series] = None,
+        leaf_labels: Optional[Sequence | dict[Hashable, str]] | pd.Series = None,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         offset_transform: Optional[mpl.transforms.Transform] = None,
     ):
@@ -78,6 +79,11 @@ class TreeArtist(mpl.artist.Artist):
                 following choices: "parent" or "child".
             vertex_labels: Labels for the vertices. Can be a list, dictionary, or pandas Series.
             edge_labels: Labels for the edges. Can be a sequence of strings.
+            leaf_labels: Labels for the leaves. Can be a sequence of strings or a pandas Series.
+                These labels are positioned at the depth of the deepest leaf. If you want to
+                label leaves next to each leaf independently of how deep they are, use
+                the "vertex_labels" parameter instead - usually as a dict with the leaves
+                as keys and the labels as values.
             transform: The transform to apply to the tree artist. This is usually the identity.
             offset_transform: The offset transform to apply to the tree artist. This is
                 usually `ax.transData`.
@@ -92,6 +98,7 @@ class TreeArtist(mpl.artist.Artist):
             layout_style=get_style(".layout", {}),
             vertex_labels=vertex_labels,
             edge_labels=edge_labels,
+            leaf_labels=leaf_labels,
         )
 
         super().__init__()
@@ -107,6 +114,7 @@ class TreeArtist(mpl.artist.Artist):
 
         self._add_vertices()
         self._add_edges()
+        self._add_leaf_vertices()
 
         if "cascade" in self.get_vertices().get_style():
             self._add_cascades()
@@ -118,6 +126,8 @@ class TreeArtist(mpl.artist.Artist):
             The artists for vertices and edges.
         """
         children = [self._vertices, self._edges]
+        if hasattr(self, "_leaf_vertices"):
+            children.append(self._leaf_vertices)
         if hasattr(self, "_cascades"):
             children.append(self._cascades)
         return tuple(children)
@@ -148,6 +158,16 @@ class TreeArtist(mpl.artist.Artist):
 
         if kind == "vertex":
             layout = self._ipx_internal_data["vertex_df"][layout_columns]
+            return layout
+        elif kind == "leaf":
+            leaves = self._ipx_internal_data["leaf_df"].index
+            layout = self._ipx_internal_data["vertex_df"][layout_columns]
+            # NOTE: workaround for a pandas bug
+            idxs = []
+            for i, vid in enumerate(layout.index):
+                if vid in leaves:
+                    idxs.append(i)
+            layout = layout.iloc[idxs]
             return layout
 
         elif kind == "edge":
@@ -212,6 +232,37 @@ class TreeArtist(mpl.artist.Artist):
             ),
             style=get_style(".vertex"),
             labels=self._get_label_series("vertex"),
+            transform=self.get_transform(),
+            offset_transform=self.get_offset_transform(),
+        )
+
+    def _add_leaf_vertices(self) -> None:
+        """Add invisible deep vertices as leaf label anchors."""
+        leaf_layout = self.get_layout("leaf").copy()
+        # Set all to max depth
+        depth_idx = int(self._ipx_internal_data["layout_name"] == "vertical")
+        leaf_layout.iloc[:, depth_idx] = leaf_layout.iloc[:, depth_idx].max()
+
+        # Set invisible vertices with visible labels
+        leaf_vertex_style = {
+            "size": 0,
+            "label": get_style(
+                ".vertex.label",
+                {
+                    "verticalalignment": "center",
+                    "hmargin": 5,
+                },
+            ),
+        }
+
+        self._leaf_vertices = VertexCollection(
+            layout=leaf_layout,
+            layout_coordinate_system=self._ipx_internal_data.get(
+                "layout_coordinate_system",
+                "catesian",
+            ),
+            style=leaf_vertex_style,
+            labels=self._get_label_series("leaf"),
             transform=self.get_transform(),
             offset_transform=self.get_offset_transform(),
         )

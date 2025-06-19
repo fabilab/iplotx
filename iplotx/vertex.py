@@ -350,7 +350,9 @@ class VertexCollection(PatchCollection):
 
 
 def make_patch(
-    marker: str, size: float | Sequence[float], **kwargs
+    marker: str = "o",
+    size: float | Sequence[float] = 20,
+    **kwargs,
 ) -> tuple[Patch, float]:
     """Make a patch of the given marker shape and size."""
     forbidden_props = ["label", "cmap", "norm", "cascade"]

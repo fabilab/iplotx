@@ -7,6 +7,7 @@ from typing import (
     Sequence,
 )
 import numpy as np
+import pandas as pd
 import matplotlib as mpl
 
 from .style import (
@@ -39,7 +40,7 @@ class LabelCollection(mpl.artist.Artist):
 
     def __init__(
         self,
-        labels: Sequence[str],
+        labels: pd.Series,
         style: Optional[dict[str, dict]] = None,
         offsets: Optional[np.ndarray] = None,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),

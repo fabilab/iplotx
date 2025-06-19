@@ -112,7 +112,8 @@ def ingest_tree_data(
     directed: bool | str = False,
     layout_style: Optional[dict[str, str | int | float]] = None,
     vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
-    edge_labels: Optional[Sequence[str] | dict[str,]] = None,
+    edge_labels: Optional[Sequence[str] | dict[Hashable, str]] = None,
+    leaf_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
 ) -> TreeData:
     """Create internal data for the tree."""
     _update_data_providers("tree")
@@ -137,6 +138,7 @@ def ingest_tree_data(
         layout_style=layout_style,
         vertex_labels=vertex_labels,
         edge_labels=edge_labels,
+        leaf_labels=leaf_labels,
     )
     result["tree_library"] = tl
 

@@ -67,7 +67,7 @@ class TreeData(TypedDict):
     rooted: bool
     directed: bool | str
     root: Optional[Hashable]
-    leaves: list[Hashable]
+    leaf_df: pd.DataFrame
     vertex_df: dict[Hashable, tuple[float, float]]
     edge_df: dict[Hashable, Sequence[tuple[float, float]]]
     layout_coordinate_system: str
@@ -200,6 +200,7 @@ class TreeDataProvider(Protocol):
             Sequence[str] | dict[Hashable, str] | pd.Series | bool
         ] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
+        leaf_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
     ) -> TreeData:
         """Create tree data object for iplotx from ete4.core.tre.Tree classes."""
 
@@ -216,7 +217,6 @@ class TreeDataProvider(Protocol):
 
         tree_data = {
             "root": self.get_root(),
-            "leaves": self.get_leaves(),
             "rooted": self.is_rooted(),
             "directed": directed,
             "ndim": 2,
@@ -253,12 +253,15 @@ class TreeDataProvider(Protocol):
         edge_df = pd.DataFrame(edge_data)
         tree_data["edge_df"] = edge_df
 
+        # Add leaf_df
+        tree_data["leaf_df"] = pd.DataFrame(index=self.get_leaves())
+
         # Add vertex labels
         if vertex_labels is None:
             vertex_labels = False
         if np.isscalar(vertex_labels) and vertex_labels:
             tree_data["vertex_df"]["label"] = [
-                x.name for x in tree_data["vertices"].index
+                x.name for x in tree_data["vertex_df"].index
             ]
         elif not np.isscalar(vertex_labels):
             # If a dict-like object is passed, it can be incomplete (e.g. only the leaves):
@@ -270,5 +273,31 @@ class TreeDataProvider(Protocol):
                     if vertex not in vertex_labels:
                         vertex_labels[vertex] = ""
             tree_data["vertex_df"]["label"] = pd.Series(vertex_labels)
+
+        # Add leaf labels
+        if leaf_labels is None:
+            leaf_labels = False
+        if np.isscalar(leaf_labels) and leaf_labels:
+            tree_data["leaf_labels"]["label"] = [
+                # FIXME: this is likely broken
+                x.name
+                for x in tree_data["leaf_df"].index
+            ]
+        elif not np.isscalar(leaf_labels):
+            # Leaves are already in the dataframe in a certain order, so sequences are allowed
+            if isinstance(leaf_labels, (list, tuple, np.ndarray)):
+                leaf_labels = {
+                    leaf: label
+                    for leaf, label in zip(tree_data["leaf_df"].index, leaf_labels)
+                }
+            # If a dict-like object is passed, it can be incomplete (e.g. only the leaves):
+            # we fill the rest with empty strings which are not going to show up in the plot.
+            if isinstance(leaf_labels, pd.Series):
+                leaf_labels = dict(leaf_labels)
+            if isinstance(leaf_labels, dict):
+                for leaf in tree_data["leaf_df"].index:
+                    if leaf not in leaf_labels:
+                        leaf_labels[leaf] = ""
+            tree_data["leaf_df"]["label"] = pd.Series(leaf_labels)
 
         return tree_data
