@@ -89,6 +89,7 @@ class TreeArtist(mpl.artist.Artist):
             layout,
             orientation=orientation,
             directed=directed,
+            layout_style=get_style(".layout", {}),
             vertex_labels=vertex_labels,
             edge_labels=edge_labels,
         )

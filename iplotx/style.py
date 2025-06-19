@@ -150,13 +150,17 @@ def get_stylename():
     return str(stylename)
 
 
-def get_style(name: str = "") -> dict[str, Any]:
+def get_style(name: str = "", *args) -> dict[str, Any]:
     """Get a *deep copy* of the chosen style.
 
     Parameters:
         name: The name of the style to get. If empty, the current style is returned.
             Substyles can be obtained by using a dot notation, e.g. "default.vertex".
             If "name" starts with a dot, it means a substyle of the current style.
+        *args: A single argument is accepted. If present, this value (usually a
+            dictionary) is returned if the queried style is not found. For example,
+            get_style(".nonexistent") raises an Exception but
+            get_style("nonexistent", {}) does not, returning an empty dict instead.
     Returns:
         The requected style or substyle.
 
@@ -165,6 +169,9 @@ def get_style(name: str = "") -> dict[str, Any]:
         useful for hashables that change hash upon copying, such as Biopython's
         tree nodes.
     """
+    if len(args) > 1:
+        raise ValueError("get_style() accepts at most one additional argument.")
+
     namelist = name.split(".")
     style = styles
     for i, namei in enumerate(namelist):
@@ -178,6 +185,8 @@ def get_style(name: str = "") -> dict[str, Any]:
             # which will not fail unless the uder tries to enter it
             elif namei not in style_leaves:
                 style = {}
+            elif len(args) > 0:
+                return args[0]
             else:
                 raise KeyError(f"Style not found: {name}")
 

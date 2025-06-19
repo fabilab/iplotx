@@ -24,9 +24,9 @@ def compute_tree_layout(
     """Compute the layout for a tree.
 
     Parameters:
-        layout: The name of the layout, e.g. "horizontal" or "radial".
-        orientation: The orientation of the layout, e.g. "right", "left", "descending", or
-            "ascending".
+        layout: The name of the layout, e.g. "horizontal", "vertial", or "radial".
+        orientation: The orientation of the layout, e.g. "right", "left", "descending",
+            "ascending", "clockwise", "anticlockwise".
 
     Returns:
         A layout dictionary with node positions.
@@ -39,7 +39,7 @@ def compute_tree_layout(
     kwargs["orientation"] = orientation
 
     if layout == "radial":
-        layout_dict = _circular_tree_layout(**kwargs)
+        layout_dict = _radial_tree_layout(**kwargs)
     elif layout == "horizontal":
         layout_dict = _horizontal_tree_layout(**kwargs)
     elif layout == "vertical":
@@ -124,23 +124,35 @@ def _vertical_tree_layout(
     return layout
 
 
-def _circular_tree_layout(
-    orientation="right",
-    starting_angle=0,
-    angular_span=360,
+def _radial_tree_layout(
+    orientation: str = "right",
+    start: float = 180,
+    span: float = 360,
     **kwargs,
-) -> dict[Hashable, list[float]]:
-    """Circular tree layout."""
+) -> dict[Hashable, tuple[float, float]]:
+    """Radial tree layout.
+
+    Parameters:
+        orientation: Whether the layout fans out towards the right (clockwise) or left
+            (anticlockwise).
+        start: The starting angle in degrees, default is -180 (left).
+        span: The angular span in degrees, default is 360 (full circle). When this is
+            360, it leaves a small gap at the end to ensure the first and last leaf
+            are not overlapping.
+    Returns:
+        A dictionary with the radial layout.
+    """
     # Short form
-    th = starting_angle * np.pi / 180
-    th_span = angular_span * np.pi / 180
-    sign = 1 if orientation == "right" else -1
+    th = start * np.pi / 180
+    th_span = span * np.pi / 180
+    pad = int(span == 360)
+    sign = -1 if orientation in ("right", "clockwise") else 1
 
     layout = _horizontal_tree_layout_right(**kwargs)
     ymax = max(point[1] for point in layout.values())
     for key, (x, y) in layout.items():
         r = x
-        theta = sign * th_span * y / (ymax + 1) + th
+        theta = sign * th_span * y / (ymax + pad) + th
         # We export r and theta to ensure theta does not
         # modulo 2pi if we take the tan and then arctan later.
         layout[key] = (r, theta)

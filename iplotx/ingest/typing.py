@@ -194,6 +194,7 @@ class TreeDataProvider(Protocol):
         self,
         layout: str | LayoutType,
         orientation: Optional[str],
+        layout_style: Optional[dict[str, int | float | str]] = None,
         directed: bool | str = False,
         vertex_labels: Optional[
             Sequence[str] | dict[Hashable, str] | pd.Series | bool
@@ -201,6 +202,9 @@ class TreeDataProvider(Protocol):
         edge_labels: Optional[Sequence[str] | dict] = None,
     ) -> TreeData:
         """Create tree data object for iplotx from ete4.core.tre.Tree classes."""
+
+        if layout_style is None:
+            layout_style = {}
 
         if orientation is None:
             if layout == "horizontal":
@@ -229,6 +233,7 @@ class TreeDataProvider(Protocol):
             postorder_fun=self.postorder,
             children_fun=self.get_children,
             branch_length_fun=self.get_branch_length_default_to_one,
+            **layout_style,
         )
         if layout in ("radial",):
             tree_data["layout_coordinate_system"] = "polar"
