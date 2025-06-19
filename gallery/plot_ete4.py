@@ -37,10 +37,16 @@ ipx.plotting.tree(
                 "linewidth": 4,
             },
             "layout": {
-                "start": 140,
-                "span": 120,
+                "start": -180,
+                "span": 180,
+            },
+            "vertex": {
+                "label": {
+                    "hmargin": 15,
+                }
             },
         },
     ],
+    vertex_labels={leaf: str(i + 1) for i, leaf in enumerate(tree.leaves())},
     aspect=1,
 )

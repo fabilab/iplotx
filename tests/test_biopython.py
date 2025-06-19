@@ -71,7 +71,7 @@ class TreeTestRunner(unittest.TestCase):
         tree = self.small_tree
         leaf_labels = {leaf: str(i + 1) for i, leaf in enumerate(tree.get_terminals())}
         vertex_label_hmargin = {
-            key: [2, 20][(int(x) - 1) % 2] for key, x in leaf_labels.items()
+            key: [10, 22][(int(x) - 1) % 2] for key, x in leaf_labels.items()
         }
 
         fig, ax = plt.subplots(figsize=(4, 4))

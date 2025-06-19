@@ -78,6 +78,6 @@ class TreeTestRunner(unittest.TestCase):
             ax=ax,
             layout="horizontal",
             vertex_labels=leaf_labels,
-            vertex_label_hmargin=[2, 20],
+            vertex_label_hmargin=[10, 22],
             margins=(0.15, 0),
         )

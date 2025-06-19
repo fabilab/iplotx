@@ -107,15 +107,20 @@ class LabelCollection(mpl.artist.Artist):
             arts.append(art)
         self._labelartists = arts
         self._margins = np.array(margins)
+        self._rotations = np.zeros(len(self._labels))
 
     def _update_offsets(self, dpi: float = 72.0) -> None:
         """Update offsets including margins."""
-        offsets = self._adjust_offsets_for_margins(self._offsets, dpi=dpi)
-        self.set_offsets(offsets)
+        self.set_offsets(self._offsets, dpi=dpi)
 
-    def get_offsets(self) -> np.ndarray:
+    def get_offsets(self, with_margins: bool = False) -> np.ndarray:
         """Get the positions (offsets) of the labels."""
-        return self._offsets
+        if not with_margins:
+            return self._offsets
+        else:
+            return np.array(
+                [art.get_position() for art in self._labelartists],
+            )
 
     def _adjust_offsets_for_margins(self, offsets, dpi=72.0):
         margins = self._get_margins_with_dpi(dpi=dpi)
@@ -123,18 +128,29 @@ class LabelCollection(mpl.artist.Artist):
             transform = self.get_transform()
             trans = transform.transform
             trans_inv = transform.inverted().transform
-            offsets = trans_inv(trans(offsets) + margins)
+            rotations = self.get_rotations()
+            vrot = [np.cos(rotations), np.sin(rotations)]
+
+            margins_rot = np.empty_like(margins)
+            margins_rot[:, 0] = margins[:, 0] * vrot[0] - margins[:, 1] * vrot[1]
+            margins_rot[:, 1] = margins[:, 0] * vrot[1] + margins[:, 1] * vrot[0]
+            offsets = trans_inv(trans(offsets) + margins_rot)
         return offsets
 
-    def set_offsets(self, offsets) -> None:
+    def set_offsets(self, offsets, dpi: float = 72.0) -> None:
         """Set positions (offsets) of the labels.
 
         Parameters:
             offsets: A sequence of offsets for each label, specifying the position of the label.
         """
         self._offsets = np.asarray(offsets)
-        for art, offset in zip(self._labelartists, self._offsets):
+        offsets_with_margins = self._adjust_offsets_for_margins(offsets, dpi=dpi)
+        for art, offset in zip(self._labelartists, offsets_with_margins):
             art.set_position((offset[0], offset[1]))
+
+    def get_rotations(self) -> np.ndarray:
+        """Get the rotations of the labels in radians."""
+        return self._rotations
 
     def set_rotations(self, rotations: Sequence[float]) -> None:
         """Set the rotations of the labels.
@@ -142,6 +158,7 @@ class LabelCollection(mpl.artist.Artist):
         Parameters:
             rotations: A sequence of rotations in radians for each label.
         """
+        self._rotations = np.asarray(rotations)
         for art, rotation in zip(self._labelartists, rotations):
             rot_deg = 180.0 / np.pi * rotation
             # Force the font size to be upwards

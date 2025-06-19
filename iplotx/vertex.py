@@ -104,6 +104,7 @@ class VertexCollection(PatchCollection):
         """Set the figure for this artist and all children."""
         super().set_figure(fig)
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+        self._update_children()
         for child in self.get_children():
             child.set_figure(fig)
 
@@ -301,6 +302,30 @@ class VertexCollection(PatchCollection):
         if val and hasattr(self, "stale_callback_post"):
             self.stale_callback_post(self)
 
+    def _update_children(self) -> None:
+        """Update children before drawing and before first render."""
+        self._update_labels()
+
+    def _update_labels(self) -> None:
+        """Update labels before drawing.
+
+        NOTE: This needs to work in figure coordinates.
+        """
+        if not hasattr(self, "_label_collection"):
+            return
+
+        if self.get_layout_coordinate_system() != "polar":
+            return
+
+        transform = self.get_offset_transform()
+        trans = transform.transform
+
+        zero_fig = trans(np.array([0, 0]))
+        offsets_fig = trans(self.get_labels().get_offsets())
+        doffsets_fig = offsets_fig - zero_fig
+        rotations = np.arctan2(doffsets_fig[:, 1], doffsets_fig[:, 0])
+        self.get_labels().set_rotations(rotations)
+
     @mpl.artist.allow_rasterization
     def draw(self, renderer):
         if not self.get_visible():
@@ -312,6 +337,9 @@ class VertexCollection(PatchCollection):
             return
 
         self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+
+        # Set the label rotations already, hopefully this is not too early
+        self._update_children()
 
         # NOTE: This draws the vertices first, then the labels.
         # The correct order would be vertex1->label1->vertex2->label2, etc.
