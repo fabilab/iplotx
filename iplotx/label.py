@@ -168,6 +168,12 @@ class LabelCollection(mpl.artist.Artist):
 
     def get_datalim(self, transData=None) -> mpl.transforms.Bbox:
         """Get the data limits of the labels."""
+        bboxes = self.get_datalims_children(transData=transData)
+        bbox = mpl.transforms.Bbox.union(bboxes)
+        return bbox
+
+    def get_datalims_children(self, transData=None) -> Sequence[mpl.transforms.Bbox]:
+        """Get the data limits of the children of this artist."""
         if transData is None:
             transData = self.get_transform()
         trans_inv = transData.inverted().transform_bbox
@@ -176,8 +182,7 @@ class LabelCollection(mpl.artist.Artist):
             bbox_fig = art.get_bbox_patch().get_extents()
             bbox_data = trans_inv(bbox_fig)
             bboxes.append(bbox_data)
-        bbox = mpl.transforms.Bbox.union(bboxes)
-        return bbox
+        return bboxes
 
     @_stale_wrapper
     def draw(self, renderer) -> None:

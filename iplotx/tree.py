@@ -116,6 +116,8 @@ class TreeArtist(mpl.artist.Artist):
         self._add_edges()
         self._add_leaf_vertices()
 
+        # NOTE: cascades need to be created after leaf vertices in case
+        # they are requested to wrap around them.
         if "cascade" in self.get_vertices().get_style():
             self._add_cascades()
 
@@ -284,15 +286,47 @@ class TreeArtist(mpl.artist.Artist):
 
     def _add_cascades(self) -> None:
         """Add cascade patches."""
+        # NOTE: If leaf labels are present and the cascades are requested to wrap around them,
+        # we have to compute the max extend of the cascades from the leaf labels.
+        maxdepth = None
+        style_cascade = self.get_vertices().get_style()["cascade"]
+        if (style_cascade.get("extend", False) == "leaf_labels") and (
+            self.get_leaf_labels() is not None
+        ):
+            layout_name = self.get_layout_name()
+            if layout_name == "radial":
+                maxdepth = 0
+                # These are the text boxes, they must all be included
+                bboxes = self.get_leaf_labels().get_datalims_children(
+                    self.get_offset_transform()
+                )
+                for bbox in bboxes:
+                    r1 = np.linalg.norm(bbox.xmax, bbox.ymax)
+                    r2 = np.linalg.norm(bbox.xmax, bbox.ymin)
+                    r3 = np.linalg.norm(bbox.xmin, bbox.ymax)
+                    r4 = np.linalg.norm(bbox.xmin, bbox.ymin)
+                    maxdepth = max(maxdepth, r1, r2, r3, r4)
+            else:
+                orientation = self.get_orientation()
+                bbox = self.get_leaf_labels().get_datalim(self.get_offset_transform())
+                if (layout_name, orientation) == ("horizontal", "right"):
+                    maxdepth = bbox.xmax
+                elif layout_name == "horizontal":
+                    maxdepth = bbox.xmin
+                elif (layout_name, orientation) == ("vertical", "descending"):
+                    maxdepth = bbox.ymin
+                elif layout_name == "vertical":
+                    maxdepth = bbox.ymax
 
         self._cascades = CascadeCollection(
             tree=self.tree,
             layout=self.get_layout(),
             layout_name=self._ipx_internal_data["layout_name"],
             orientation=self._ipx_internal_data["orientation"],
-            style=self.get_vertices().get_style()["cascade"],
+            style=style_cascade,
             provider=data_providers["tree"][self._ipx_internal_data["tree_library"]],
             transform=self.get_offset_transform(),
+            maxdepth=maxdepth,
         )
 
     def _add_edges(self) -> None:
@@ -390,6 +424,14 @@ class TreeArtist(mpl.artist.Artist):
         )
         if "cmap" in edge_style:
             self._edges.set_array(colorarray)
+
+    def get_layout_name(self) -> str:
+        """Get the layout name."""
+        return self._ipx_internal_data["layout_name"]
+
+    def get_orientation(self) -> Optional[str]:
+        """Get the orientation of the tree layout."""
+        return self._ipx_internal_data.get("orientation", None)
 
     @_stale_wrapper
     def draw(self, renderer) -> None:

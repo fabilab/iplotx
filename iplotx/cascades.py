@@ -1,5 +1,6 @@
 from typing import (
     Any,
+    Optional,
 )
 import numpy as np
 import pandas as pd
@@ -28,6 +29,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
         style: dict[str, Any],
         provider: TreeDataProvider,
         transform: mpl.transforms.Transform,
+        maxdepth: Optional[float] = None,
     ):
         style = copy_with_deep_values(style)
         zorder = style.get("zorder", 0)
@@ -66,20 +68,23 @@ class CascadeCollection(mpl.collections.PatchCollection):
                 f"Cascading patches not implemented for layout: {layout_name}.",
             )
 
-        if layout_name == "horizontal":
-            if orientation == "right":
-                depth_max = layout.values[:, 0].max()
-            else:
-                depth_max = layout.values[:, 0].min()
-        elif layout_name == "vertical":
-            if orientation == "descending":
-                depth_max = layout.values[:, 1].min()
-            else:
-                depth_max = layout.values[:, 1].max()
-        elif layout_name == "radial":
-            # layout values are: r, theta
-            depth_max = layout.values[:, 0].max()
-            nleaves = len(provider(tree).get_leaves())
+        extend_mode = style.get("extend", False)
+        if extend_mode and (extend_mode != "leaf_labels"):
+            if layout_name == "horizontal":
+                if orientation == "right":
+                    maxdepth = layout.values[:, 0].max()
+                else:
+                    maxdepth = layout.values[:, 0].min()
+            elif layout_name == "vertical":
+                if orientation == "descending":
+                    maxdepth = layout.values[:, 1].min()
+                else:
+                    maxdepth = layout.values[:, 1].max()
+            elif layout_name == "radial":
+                # layout values are: r, theta
+                maxdepth = layout.values[:, 0].max()
+                nleaves = len(provider(tree).get_leaves())
+        self._maxdepth = maxdepth
 
         cascading_patches = []
         for node in drawing_order:
@@ -104,18 +109,18 @@ class CascadeCollection(mpl.collections.PatchCollection):
                     ytop = leaves_coords[:, 1].max() + 0.5
                     if orientation == "right":
                         xleft = node_coords[0] - bl
-                        xright = depth_max if extend else leaves_coords[:, 0].max()
+                        xright = maxdepth if extend else leaves_coords[:, 0].max()
                     else:
-                        xleft = depth_max if extend else leaves_coords[:, 0].min()
+                        xleft = maxdepth if extend else leaves_coords[:, 0].min()
                         xright = node_coords[0] + bl
                 elif layout_name == "vertical":
                     xleft = leaves_coords[:, 0].min() - 0.5
                     xright = leaves_coords[:, 0].max() + 0.5
                     if orientation == "descending":
                         ytop = node_coords[1] + bl
-                        ybot = depth_max if extend else leaves_coords[:, 1].min()
+                        ybot = maxdepth if extend else leaves_coords[:, 1].min()
                     else:
-                        ytop = depth_max if extend else leaves_coords[:, 1].max()
+                        ytop = maxdepth if extend else leaves_coords[:, 1].max()
                         ybot = node_coords[1] - bl
 
                 patch = mpl.patches.Rectangle(
@@ -127,7 +132,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
             elif layout_name == "radial":
                 dtheta = 2 * np.pi / nleaves
                 rmin = node_coords[0] - bl
-                rmax = depth_max if extend else leaves_coords[:, 0].max()
+                rmax = maxdepth if extend else leaves_coords[:, 0].max()
                 thetamin = leaves_coords[:, 1].min() - 0.5 * dtheta
                 thetamax = leaves_coords[:, 1].max() + 0.5 * dtheta
                 thetas = np.linspace(
@@ -159,3 +164,25 @@ class CascadeCollection(mpl.collections.PatchCollection):
             match_original=True,
             zorder=zorder,
         )
+
+    def get_maxdepth(self) -> float:
+        """Get the maxdepth of the cascades.
+
+        Returns: The maximum depth of the cascading patches.
+        """
+        return self._maxdepth
+
+    def set_maxdepth(self, maxdepth: float):
+        """Set the maximum depth of the cascading patches.
+
+        Parameters:
+            maxdepth: The new maximum depth for the cascades.
+
+        NOTE: Calling this function might update the cascade patches.
+        """
+        self._maxdepth = maxdepth
+        self._update_maxdepth()
+
+    def _update_maxdepth(self):
+        """Update the cascades with a new max depth."""
+        raise NotImplementedError
