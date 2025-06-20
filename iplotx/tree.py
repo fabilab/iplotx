@@ -197,6 +197,10 @@ class TreeArtist(mpl.artist.Artist):
             cascades_bbox = self._cascades.get_datalim(transData)
             bbox = mpl.transforms.Bbox.union([bbox, cascades_bbox])
 
+        if hasattr(self, "_leaf_vertices"):
+            leaf_labels_bbox = self._leaf_vertices.get_datalim(transData)
+            bbox = mpl.transforms.Bbox.union([bbox, leaf_labels_bbox])
+
         bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
         return bbox
 
@@ -214,6 +218,12 @@ class TreeArtist(mpl.artist.Artist):
         """Get EdgeCollection artist."""
         return self._edges
 
+    def get_leaf_vertices(self) -> Optional[VertexCollection]:
+        """Get leaf VertexCollection artist."""
+        if hasattr(self, "_leaf_vertices"):
+            return self._leaf_vertices
+        return None
+
     def get_vertex_labels(self) -> LabelCollection:
         """Get list of vertex label artists."""
         return self._vertices.get_labels()
@@ -221,6 +231,11 @@ class TreeArtist(mpl.artist.Artist):
     def get_edge_labels(self) -> LabelCollection:
         """Get list of edge label artists."""
         return self._edges.get_labels()
+
+    def get_leaf_labels(self) -> Optional[LabelCollection]:
+        if hasattr(self, "_leaf_vertices"):
+            return self._leaf_vertices.get_labels()
+        return None
 
     def _add_vertices(self) -> None:
         """Add vertices to the tree."""

@@ -166,6 +166,19 @@ class LabelCollection(mpl.artist.Artist):
             rot_deg = ((rot_deg + 90) % 180) - 90
             art.set_rotation(rot_deg)
 
+    def get_datalim(self, transData=None) -> mpl.transforms.Bbox:
+        """Get the data limits of the labels."""
+        if transData is None:
+            transData = self.get_transform()
+        trans_inv = transData.inverted().transform_bbox
+        bboxes = []
+        for art in self._labelartists:
+            bbox_fig = art.get_bbox_patch().get_extents()
+            bbox_data = trans_inv(bbox_fig)
+            bboxes.append(bbox_data)
+        bbox = mpl.transforms.Bbox.union(bboxes)
+        return bbox
+
     @_stale_wrapper
     def draw(self, renderer) -> None:
         """Draw each of the children, with some buffering mechanism."""
