@@ -98,6 +98,11 @@ class LabelCollection(mpl.artist.Artist):
             vmargin = stylei.pop("vmargin", 0.0)
             margins.append((hmargin, vmargin))
 
+            # Initially, ignore autoalignment since we do not know the
+            # rotations
+            if stylei.get("horizontalalignment") == "auto":
+                stylei["horizontalalignment"] = "center"
+
             art = mpl.text.Text(
                 self._offsets[i][0],
                 self._offsets[i][1],
@@ -160,9 +165,15 @@ class LabelCollection(mpl.artist.Artist):
             rotations: A sequence of rotations in radians for each label.
         """
         self._rotations = np.asarray(rotations)
+        ha = self._style.get("horizontalalignment", "center")
         for art, rotation in zip(self._labelartists, rotations):
             rot_deg = 180.0 / np.pi * rotation
             # Force the font size to be upwards
+            if ha == "auto":
+                if -90 <= rot_deg < 90:
+                    art.set_horizontalalignment("left")
+                else:
+                    art.set_horizontalalignment("right")
             rot_deg = ((rot_deg + 90) % 180) - 90
             art.set_rotation(rot_deg)
 

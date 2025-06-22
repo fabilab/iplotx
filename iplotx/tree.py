@@ -279,11 +279,15 @@ class TreeArtist(mpl.artist.Artist):
         leaf_layout.iloc[:, depth_idx] = leaf_layout.iloc[:, depth_idx].max()
 
         # Set invisible vertices with visible labels
-        ha = (
-            "right"
-            if self._ipx_internal_data["orientation"] in ("left", "ascending")
-            else "left"
-        )
+        layout_name = self._ipx_internal_data["layout_name"]
+        orientation = self._ipx_internal_data["orientation"]
+        if layout_name == "radial":
+            ha = "auto"
+        elif orientation in ("left", "ascending"):
+            ha = "right"
+        else:
+            ha = "left"
+
         leaf_vertex_style = {
             "size": 0,
             "label": {
