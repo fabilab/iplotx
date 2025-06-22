@@ -70,6 +70,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
                 f"Cascading patches not implemented for layout: {layout_name}.",
             )
 
+        nleaves = len(provider(tree).get_leaves())
         extend_mode = style.get("extend", False)
         if extend_mode and (extend_mode != "leaf_labels"):
             if layout_name == "horizontal":
@@ -85,7 +86,6 @@ class CascadeCollection(mpl.collections.PatchCollection):
             elif layout_name == "radial":
                 # layout values are: r, theta
                 maxdepth = layout.values[:, 0].max()
-                nleaves = len(provider(tree).get_leaves())
         self._maxdepth = maxdepth
 
         cascading_patches = []

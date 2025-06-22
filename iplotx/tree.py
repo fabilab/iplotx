@@ -347,10 +347,10 @@ class TreeArtist(mpl.artist.Artist):
                 self.get_offset_transform()
             )
             for bbox in bboxes:
-                r1 = np.linalg.norm(bbox.xmax, bbox.ymax)
-                r2 = np.linalg.norm(bbox.xmax, bbox.ymin)
-                r3 = np.linalg.norm(bbox.xmin, bbox.ymax)
-                r4 = np.linalg.norm(bbox.xmin, bbox.ymin)
+                r1 = np.linalg.norm([bbox.xmax, bbox.ymax])
+                r2 = np.linalg.norm([bbox.xmax, bbox.ymin])
+                r3 = np.linalg.norm([bbox.xmin, bbox.ymax])
+                r4 = np.linalg.norm([bbox.xmin, bbox.ymin])
                 maxdepth = max(maxdepth, r1, r2, r3, r4)
         else:
             orientation = self.get_orientation()
