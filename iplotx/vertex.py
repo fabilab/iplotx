@@ -68,6 +68,7 @@ class VertexCollection(PatchCollection):
 
         self._index = layout.index
         self._style = style
+        print(style)
         self._labels = labels
         self._layout = layout
         self._layout_coordinate_system = layout_coordinate_system

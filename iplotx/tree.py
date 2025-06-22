@@ -10,6 +10,7 @@ import pandas as pd
 import matplotlib as mpl
 
 from .style import (
+    context,
     get_style,
     rotate_style,
 )
@@ -144,6 +145,23 @@ class TreeArtist(mpl.artist.Artist):
         for child in self.get_children():
             child.set_figure(fig)
 
+        # At the end, if there are cadcades with extent depending on
+        # leaf edges, we should update them
+        self._update_cascades_extent()
+
+    def _update_cascades_extent(self) -> None:
+        """Update cascades if extent depends on leaf labels."""
+        if not hasattr(self, "_cascades"):
+            return
+
+        style_cascade = self.get_vertices().get_style()["cascade"]
+        extend_to_labels = style_cascade.get("extend", False) == "leaf_labels"
+        if not extend_to_labels:
+            return
+
+        maxdepth = self._get_maxdepth_leaf_labels()
+        self._cascades.set_maxdepth(maxdepth)
+
     def get_offset_transform(self):
         """Get the offset transform (for vertices/edges)."""
         return self._offset_transform
@@ -261,28 +279,35 @@ class TreeArtist(mpl.artist.Artist):
         leaf_layout.iloc[:, depth_idx] = leaf_layout.iloc[:, depth_idx].max()
 
         # Set invisible vertices with visible labels
+        ha = (
+            "right"
+            if self._ipx_internal_data["orientation"] in ("left", "ascending")
+            else "left"
+        )
         leaf_vertex_style = {
             "size": 0,
-            "label": get_style(
-                ".vertex.label",
-                {
-                    "verticalalignment": "center",
-                    "hmargin": 5,
+            "label": {
+                "verticalalignment": "center",
+                "horizontalalignment": ha,
+                "hmargin": 5,
+                "bbox": {
+                    "facecolor": (1, 1, 1, 0),
                 },
-            ),
+            },
         }
-
-        self._leaf_vertices = VertexCollection(
-            layout=leaf_layout,
-            layout_coordinate_system=self._ipx_internal_data.get(
-                "layout_coordinate_system",
-                "catesian",
-            ),
-            style=leaf_vertex_style,
-            labels=self._get_label_series("leaf"),
-            transform=self.get_transform(),
-            offset_transform=self.get_offset_transform(),
-        )
+        with context({"vertex": leaf_vertex_style}):
+            leaf_vertex_style = get_style(".vertex")
+            self._leaf_vertices = VertexCollection(
+                layout=leaf_layout,
+                layout_coordinate_system=self._ipx_internal_data.get(
+                    "layout_coordinate_system",
+                    "catesian",
+                ),
+                style=leaf_vertex_style,
+                labels=self._get_label_series("leaf"),
+                transform=self.get_transform(),
+                offset_transform=self.get_offset_transform(),
+            )
 
     def _add_cascades(self) -> None:
         """Add cascade patches."""
@@ -290,33 +315,13 @@ class TreeArtist(mpl.artist.Artist):
         # we have to compute the max extend of the cascades from the leaf labels.
         maxdepth = None
         style_cascade = self.get_vertices().get_style()["cascade"]
-        if (style_cascade.get("extend", False) == "leaf_labels") and (
-            self.get_leaf_labels() is not None
-        ):
-            layout_name = self.get_layout_name()
-            if layout_name == "radial":
-                maxdepth = 0
-                # These are the text boxes, they must all be included
-                bboxes = self.get_leaf_labels().get_datalims_children(
-                    self.get_offset_transform()
-                )
-                for bbox in bboxes:
-                    r1 = np.linalg.norm(bbox.xmax, bbox.ymax)
-                    r2 = np.linalg.norm(bbox.xmax, bbox.ymin)
-                    r3 = np.linalg.norm(bbox.xmin, bbox.ymax)
-                    r4 = np.linalg.norm(bbox.xmin, bbox.ymin)
-                    maxdepth = max(maxdepth, r1, r2, r3, r4)
-            else:
-                orientation = self.get_orientation()
-                bbox = self.get_leaf_labels().get_datalim(self.get_offset_transform())
-                if (layout_name, orientation) == ("horizontal", "right"):
-                    maxdepth = bbox.xmax
-                elif layout_name == "horizontal":
-                    maxdepth = bbox.xmin
-                elif (layout_name, orientation) == ("vertical", "descending"):
-                    maxdepth = bbox.ymin
-                elif layout_name == "vertical":
-                    maxdepth = bbox.ymax
+        extend_to_labels = style_cascade.get("extend", False) == "leaf_labels"
+        has_leaf_labels = self.get_leaf_labels() is not None
+        if extend_to_labels and not has_leaf_labels:
+            raise ValueError("Cannot extend cascades: no leaf labels.")
+
+        if extend_to_labels and has_leaf_labels:
+            maxdepth = self._get_maxdepth_leaf_labels()
 
         self._cascades = CascadeCollection(
             tree=self.tree,
@@ -328,6 +333,34 @@ class TreeArtist(mpl.artist.Artist):
             transform=self.get_offset_transform(),
             maxdepth=maxdepth,
         )
+
+    def _get_maxdepth_leaf_labels(self):
+        layout_name = self.get_layout_name()
+        if layout_name == "radial":
+            maxdepth = 0
+            # These are the text boxes, they must all be included
+            bboxes = self.get_leaf_labels().get_datalims_children(
+                self.get_offset_transform()
+            )
+            for bbox in bboxes:
+                r1 = np.linalg.norm(bbox.xmax, bbox.ymax)
+                r2 = np.linalg.norm(bbox.xmax, bbox.ymin)
+                r3 = np.linalg.norm(bbox.xmin, bbox.ymax)
+                r4 = np.linalg.norm(bbox.xmin, bbox.ymin)
+                maxdepth = max(maxdepth, r1, r2, r3, r4)
+        else:
+            orientation = self.get_orientation()
+            bbox = self.get_leaf_labels().get_datalim(self.get_offset_transform())
+            if (layout_name, orientation) == ("horizontal", "right"):
+                maxdepth = bbox.xmax
+            elif layout_name == "horizontal":
+                maxdepth = bbox.xmin
+            elif (layout_name, orientation) == ("vertical", "descending"):
+                maxdepth = bbox.ymin
+            elif layout_name == "vertical":
+                maxdepth = bbox.ymax
+
+        return maxdepth
 
     def _add_edges(self) -> None:
         """Add edges to the network artist.
@@ -438,6 +471,10 @@ class TreeArtist(mpl.artist.Artist):
         """Draw each of the children, with some buffering mechanism."""
         if not self.get_visible():
             return
+
+        # At the end, if there are cadcades with extent depending on
+        # leaf edges, we should update them
+        self._update_cascades_extent()
 
         # NOTE: looks like we have to manage the zorder ourselves
         # this is kind of funny actually. Btw we need to ensure

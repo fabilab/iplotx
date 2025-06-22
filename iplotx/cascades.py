@@ -31,6 +31,8 @@ class CascadeCollection(mpl.collections.PatchCollection):
         transform: mpl.transforms.Transform,
         maxdepth: Optional[float] = None,
     ):
+        self._layout_name = layout_name
+        self._orientation = orientation
         style = copy_with_deep_values(style)
         zorder = style.get("zorder", 0)
 
@@ -178,11 +180,44 @@ class CascadeCollection(mpl.collections.PatchCollection):
         Parameters:
             maxdepth: The new maximum depth for the cascades.
 
-        NOTE: Calling this function might update the cascade patches.
+        NOTE: Calling this function updates the cascade patches
+        without chechking whether the extent style requires it.
         """
         self._maxdepth = maxdepth
         self._update_maxdepth()
 
     def _update_maxdepth(self):
-        """Update the cascades with a new max depth."""
-        raise NotImplementedError
+        """Update the cascades with a new max depth.
+
+        Note: This function changes the paths without checking whether
+        the extent is set or not.
+        """
+        layout_name = self._layout_name
+        orientation = self._orientation
+
+        # This being a PatchCollection, we have to touch the paths
+        if layout_name == "radial":
+            for path in self.get_paths():
+                # Old radii
+                r2old = np.linalg.norm(path.vertices[-2])
+                path.vertices[(len(path.vertices) - 1) // 2 :] *= (
+                    self.get_maxdepth() / r2old
+                )
+            return
+
+        if (layout_name, orientation) == ("horizontal", "right"):
+            for path in self.get_paths():
+                path.vertices[[1, 2], 0] = self.get_maxdepth()
+        elif (layout_name, orientation) == ("horizontal", "right"):
+            for path in self.get_paths():
+                path.vertices[[0, 3], 0] = self.get_maxdepth()
+        elif (layout_name, orientation) == ("vertical", "descending"):
+            for path in self.get_paths():
+                path.vertices[[1, 2], 1] = self.get_maxdepth()
+        elif (layout_name, orientation) == ("vertical", "ascending"):
+            for path in self.get_paths():
+                path.vertices[[0, 3], 1] = self.get_maxdepth()
+        else:
+            raise ValueError(
+                f"Layout name and orientation not supported: {layout_name}, {orientation}."
+            )
