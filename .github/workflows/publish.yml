@@ -19,18 +19,31 @@ jobs:
   release-build:
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        python-version: ["3.11"]
+
     steps:
       - uses: actions/checkout@v4
 
-      - uses: actions/setup-python@v5
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
         with:
-          python-version: "3.x"
+          python-version: ${{ matrix.python-version }}
 
-      - name: Build release distributions
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Install the project
         run: |
-          # NOTE: put your own distribution build steps here.
-          python -m pip install build
-          python -m build
+          # Make sure you are in the right environment
+          uv sync
+          # Clean dist/
+          rm -f dist/*
+          # Build into dist/
+          uv build
 
       - name: Upload distributions
         uses: actions/upload-artifact@v4
@@ -51,7 +64,7 @@ jobs:
     environment:
       name: pypi
       # OPTIONAL: uncomment and update to include your PyPI project URL in the deployment status:
-      # url: https://pypi.org/p/YOURPROJECT
+      url: https://pypi.org/p/iplotx
       #
       # ALTERNATIVE: if your GitHub Release name is the PyPI project version string
       # ALTERNATIVE: exactly, uncomment the following line instead:
