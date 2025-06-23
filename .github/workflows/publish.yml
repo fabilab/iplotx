@@ -38,6 +38,8 @@ jobs:
 
       - name: Install the project
         run: |
+          # Copy the release name  into version.py (e.g. v0.3.0 -> 0.3.0)
+          ./scripts/copy_github_release_into_version.sh ${{ github.event.release.name }}
           # Make sure you are in the right environment
           uv sync
           # Clean dist/
