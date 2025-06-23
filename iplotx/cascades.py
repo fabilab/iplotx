@@ -70,7 +70,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
                 f"Cascading patches not implemented for layout: {layout_name}.",
             )
 
-        nleaves = len(provider(tree).get_leaves())
+        nleaves = sum(1 for leaf in provider(tree).get_leaves())
         extend_mode = style.get("extend", False)
         if extend_mode and (extend_mode != "leaf_labels"):
             if layout_name == "horizontal":
