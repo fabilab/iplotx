@@ -84,51 +84,29 @@ ipx.plotting.tree(
 )
 
 # %%
+# .. warning::
+#   Leaf label alignment is still experimental and will improve in the future.
+#
 # This extension also works with other layouts, such as horizontal and vertical:
 
+layout_and_orientations = {
+    "horizontal": ["left", "right"],
+    "vertical": ["descending", "ascending"],
+}
 
 fig, axs = plt.subplots(2, 2, figsize=(9, 9))
-ipx.plotting.tree(
-    tree,
-    ax=axs[0, 0],
-    layout="horizontal",
-    orientation="left",
-    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
-    vertex_cascade_facecolor=backgrounds,
-    vertex_cascade_extend="leaf_labels",
-    aspect=1,
-    margins=0.4,
-)
-ipx.plotting.tree(
-    tree,
-    ax=axs[0, 1],
-    layout="horizontal",
-    orientation="right",
-    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
-    vertex_cascade_facecolor=backgrounds,
-    vertex_cascade_extend="leaf_labels",
-    aspect=1,
-    margins=0.4,
-)
-ipx.plotting.tree(
-    tree,
-    ax=axs[1, 0],
-    layout="vertical",
-    orientation="descending",
-    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
-    vertex_cascade_facecolor=backgrounds,
-    vertex_cascade_extend="leaf_labels",
-    aspect=1,
-    margins=0.4,
-)
-ipx.plotting.tree(
-    tree,
-    ax=axs[1, 1],
-    layout="vertical",
-    orientation="ascending",
-    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
-    vertex_cascade_facecolor=backgrounds,
-    vertex_cascade_extend="leaf_labels",
-    aspect=1,
-    margins=0.4,
-)
+for i, (layout_name, layout_orientations) in enumerate(layout_and_orientations.items()):
+    for j, orientation in enumerate(layout_orientations):
+        ipx.plotting.tree(
+            tree,
+            ax=axs[i, j],
+            layout=layout_name,
+            orientation=orientation,
+            leaf_labels={
+                leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())
+            },
+            vertex_cascade_facecolor=backgrounds,
+            vertex_cascade_extend="leaf_labels",
+            aspect=1,
+            title=f"{layout_name} ({orientation})",
+        )

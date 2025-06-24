@@ -309,22 +309,32 @@ class TreeArtist(mpl.artist.Artist):
         if layout_name == "radial":
             ha = "auto"
             va = "center"
+            hmargin = 0
+            vmargin = 0
             rotation = 0
         elif orientation == "right":
             ha = "left"
             va = "center"
+            hmargin = 5
+            vmargin = 0
             rotation = 0
         elif orientation == "left":
             ha = "right"
             va = "center"
+            hmargin = -5
+            vmargin = 0
             rotation = 0
         elif orientation == "ascending":
-            ha = "right"
-            va = "center"
+            ha = "center"
+            va = "bottom"
+            hmargin = 0
+            vmargin = 5
             rotation = 90
         else:
-            ha = "left"
-            va = "center"
+            ha = "center"
+            va = "top"
+            hmargin = -2
+            vmargin = -5
             rotation = -90
 
         leaf_vertex_style = {
@@ -333,7 +343,8 @@ class TreeArtist(mpl.artist.Artist):
                 "verticalalignment": va,
                 "horizontalalignment": ha,
                 "rotation": rotation,
-                "hmargin": 5,
+                "hmargin": hmargin,
+                "vmargin": vmargin,
                 "bbox": {
                     "facecolor": (1, 1, 1, 0),
                 },
