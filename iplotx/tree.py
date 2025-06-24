@@ -283,26 +283,56 @@ class TreeArtist(mpl.artist.Artist):
 
     def _add_leaf_vertices(self) -> None:
         """Add invisible deep vertices as leaf label anchors."""
-        leaf_layout = self.get_layout("leaf").copy()
-        # Set all to max depth
-        depth_idx = int(self._ipx_internal_data["layout_name"] == "vertical")
-        leaf_layout.iloc[:, depth_idx] = leaf_layout.iloc[:, depth_idx].max()
-
-        # Set invisible vertices with visible labels
         layout_name = self._ipx_internal_data["layout_name"]
         orientation = self._ipx_internal_data["orientation"]
+
+        # Set all to max depth
+        leaf_layout = self.get_layout("leaf").copy()
+        if layout_name == "radial":
+            leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
+        elif layout_name == "horizontal":
+            if orientation == "right":
+                leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
+            else:
+                leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].min()
+        elif layout_name == "vertical":
+            if orientation == "descending":
+                leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].min()
+            else:
+                leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].max()
+        else:
+            raise ValueError(
+                f"Layout and orientation not supported: {layout_name}, {orientation}."
+            )
+
+        # Set invisible vertices with visible labels
         if layout_name == "radial":
             ha = "auto"
-        elif orientation in ("left", "ascending"):
+            va = "center"
+            rotation = 0
+        elif orientation == "right":
+            ha = "left"
+            va = "center"
+            rotation = 0
+        elif orientation == "left":
             ha = "right"
+            va = "center"
+            rotation = 0
+        elif orientation == "ascending":
+            ha = "right"
+            va = "center"
+            rotation = 90
         else:
             ha = "left"
+            va = "center"
+            rotation = -90
 
         leaf_vertex_style = {
             "size": 0,
             "label": {
-                "verticalalignment": "center",
+                "verticalalignment": va,
                 "horizontalalignment": ha,
+                "rotation": rotation,
                 "hmargin": 5,
                 "bbox": {
                     "facecolor": (1, 1, 1, 0),

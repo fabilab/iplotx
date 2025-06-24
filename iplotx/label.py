@@ -186,6 +186,7 @@ class LabelCollection(mpl.artist.Artist):
 
     def get_datalims_children(self, transData=None) -> Sequence[mpl.transforms.Bbox]:
         """Get the data limits  of the children of this artist."""
+        dpi = self.figure.dpi if self.figure is not None else 72.0
         if transData is None:
             transData = self.get_transform()
         trans = transData.transform
@@ -196,19 +197,23 @@ class LabelCollection(mpl.artist.Artist):
             textprops = ("text", "fontsize")
             props = art.properties()
             props = {key: props[key] for key in textprops}
-            props["hpadding"] = 25
+            props["dpi"] = dpi
             width, height = _get_label_width_height(**props)
 
             # These are in data coordinates
             pos_data = art.get_position()
 
             # Four corners
-            dw = width / 2 * np.array([-np.sin(rot), np.cos(rot)])
-            dh = height * np.array([np.cos(rot), np.sin(rot)])
-            c1 = trans_inv(trans(pos_data) + dw)
-            c2 = trans_inv(trans(pos_data) - dw)
-            c3 = trans_inv(trans(pos_data) + dh + dw)
-            c4 = trans_inv(trans(pos_data) + dh - dw)
+            dh = width / 2 * np.array([-np.sin(rot), np.cos(rot)])
+            dw = height * np.array([np.cos(rot), np.sin(rot)])
+            c1 = trans_inv(trans(pos_data) + dh)
+            c2 = trans_inv(trans(pos_data) - dh)
+            if art.get_horizontalalignment() == "right":
+                c3 = trans_inv(trans(pos_data) - dw + dh)
+                c4 = trans_inv(trans(pos_data) - dw - dh)
+            else:
+                c3 = trans_inv(trans(pos_data) + dw + dh)
+                c4 = trans_inv(trans(pos_data) + dw - dh)
             bbox = mpl.transforms.Bbox.null()
             bbox.update_from_data_xy([c1, c2, c3, c4], ignore=True)
             bboxes.append(bbox)

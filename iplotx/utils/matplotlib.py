@@ -74,7 +74,7 @@ def _additional_set_methods(attributes, cls=None):
     return cls
 
 
-def _get_label_width_height(text, hpadding=18, vpadding=12, **kwargs):
+def _get_label_width_height(text, hpadding=18, vpadding=12, dpi=72.0, **kwargs):
     """Get the bounding box size for a text with certain properties.
 
     Parameters:
@@ -117,6 +117,11 @@ def _get_label_width_height(text, hpadding=18, vpadding=12, **kwargs):
 
     width += hpadding
     height += vpadding
+
+    # Scale by dpi
+    width *= dpi / 72.0
+    height *= dpi / 72.0
+
     return (width, height)
 
 

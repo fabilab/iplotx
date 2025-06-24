@@ -60,7 +60,6 @@ ipx.plotting.tree(
 # setting the parameter as follows:
 
 fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(9, 5))
-
 ipx.plotting.tree(
     tree,
     ax=ax1,
@@ -82,4 +81,54 @@ ipx.plotting.tree(
     aspect=1,
     margins=0.4,
     title="Include leaf labels",
+)
+
+# %%
+# This extension also works with other layouts, such as horizontal and vertical:
+
+
+fig, axs = plt.subplots(2, 2, figsize=(9, 9))
+ipx.plotting.tree(
+    tree,
+    ax=axs[0, 0],
+    layout="horizontal",
+    orientation="left",
+    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
+    vertex_cascade_facecolor=backgrounds,
+    vertex_cascade_extend="leaf_labels",
+    aspect=1,
+    margins=0.4,
+)
+ipx.plotting.tree(
+    tree,
+    ax=axs[0, 1],
+    layout="horizontal",
+    orientation="right",
+    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
+    vertex_cascade_facecolor=backgrounds,
+    vertex_cascade_extend="leaf_labels",
+    aspect=1,
+    margins=0.4,
+)
+ipx.plotting.tree(
+    tree,
+    ax=axs[1, 0],
+    layout="vertical",
+    orientation="descending",
+    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
+    vertex_cascade_facecolor=backgrounds,
+    vertex_cascade_extend="leaf_labels",
+    aspect=1,
+    margins=0.4,
+)
+ipx.plotting.tree(
+    tree,
+    ax=axs[1, 1],
+    layout="vertical",
+    orientation="ascending",
+    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
+    vertex_cascade_facecolor=backgrounds,
+    vertex_cascade_extend="leaf_labels",
+    aspect=1,
+    margins=0.4,
 )

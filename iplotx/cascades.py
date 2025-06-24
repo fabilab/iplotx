@@ -208,15 +208,15 @@ class CascadeCollection(mpl.collections.PatchCollection):
         if (layout_name, orientation) == ("horizontal", "right"):
             for path in self.get_paths():
                 path.vertices[[1, 2], 0] = self.get_maxdepth()
-        elif (layout_name, orientation) == ("horizontal", "right"):
+        elif (layout_name, orientation) == ("horizontal", "left"):
             for path in self.get_paths():
                 path.vertices[[0, 3], 0] = self.get_maxdepth()
         elif (layout_name, orientation) == ("vertical", "descending"):
             for path in self.get_paths():
-                path.vertices[[1, 2], 1] = self.get_maxdepth()
+                path.vertices[[0, 1], 1] = self.get_maxdepth()
         elif (layout_name, orientation) == ("vertical", "ascending"):
             for path in self.get_paths():
-                path.vertices[[0, 3], 1] = self.get_maxdepth()
+                path.vertices[[2, 3], 1] = self.get_maxdepth()
         else:
             raise ValueError(
                 f"Layout name and orientation not supported: {layout_name}, {orientation}."
