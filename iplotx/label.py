@@ -17,6 +17,7 @@ from .style import (
 from .utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
+    _get_label_width_height,
 )
 
 
@@ -184,15 +185,33 @@ class LabelCollection(mpl.artist.Artist):
         return bbox
 
     def get_datalims_children(self, transData=None) -> Sequence[mpl.transforms.Bbox]:
-        """Get the data limits of the children of this artist."""
+        """Get the data limits  of the children of this artist."""
         if transData is None:
             transData = self.get_transform()
-        trans_inv = transData.inverted().transform_bbox
+        trans = transData.transform
+        trans_inv = transData.inverted().transform
         bboxes = []
-        for art in self._labelartists:
-            bbox_fig = art.get_bbox_patch().get_extents()
-            bbox_data = trans_inv(bbox_fig)
-            bboxes.append(bbox_data)
+        for art, rot in zip(self._labelartists, self.get_rotations()):
+            # These are in figure points
+            textprops = ("text", "fontsize")
+            props = art.properties()
+            props = {key: props[key] for key in textprops}
+            props["hpadding"] = 25
+            width, height = _get_label_width_height(**props)
+
+            # These are in data coordinates
+            pos_data = art.get_position()
+
+            # Four corners
+            dw = width / 2 * np.array([-np.sin(rot), np.cos(rot)])
+            dh = height * np.array([np.cos(rot), np.sin(rot)])
+            c1 = trans_inv(trans(pos_data) + dw)
+            c2 = trans_inv(trans(pos_data) - dw)
+            c3 = trans_inv(trans(pos_data) + dh + dw)
+            c4 = trans_inv(trans(pos_data) + dh - dw)
+            bbox = mpl.transforms.Bbox.null()
+            bbox.update_from_data_xy([c1, c2, c3, c4], ignore=True)
+            bboxes.append(bbox)
         return bboxes
 
     @_stale_wrapper

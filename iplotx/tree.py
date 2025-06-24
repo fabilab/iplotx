@@ -141,12 +141,22 @@ class TreeArtist(mpl.artist.Artist):
         Parameters:
             fig: the figure to set for this artist and its children.
         """
-        super().set_figure(fig)
-        for child in self.get_children():
-            child.set_figure(fig)
-
         # At the end, if there are cadcades with extent depending on
         # leaf edges, we should update them
+        super().set_figure(fig)
+
+        # The next two are vanilla NetworkArtist
+        self._vertices.set_figure(fig)
+        self._edges.set_figure(fig)
+
+        # For trees, there are a few more elements to coordinate,
+        # including possibly text at the fringes (leaf labels)
+        # which might require a redraw (without rendering) to compute
+        # its actual scren real estate.
+        if hasattr(self, "_leaf_vertices"):
+            self._leaf_vertices.set_figure(fig)
+        if hasattr(self, "_cascades"):
+            self._cascades.set_figure(fig)
         self._update_cascades_extent()
 
     def _update_cascades_extent(self) -> None:
@@ -342,7 +352,6 @@ class TreeArtist(mpl.artist.Artist):
         layout_name = self.get_layout_name()
         if layout_name == "radial":
             maxdepth = 0
-            # These are the text boxes, they must all be included
             bboxes = self.get_leaf_labels().get_datalims_children(
                 self.get_offset_transform()
             )
@@ -476,18 +485,18 @@ class TreeArtist(mpl.artist.Artist):
         if not self.get_visible():
             return
 
-        # At the end, if there are cadcades with extent depending on
-        # leaf edges, we should update them
-        self._update_cascades_extent()
-
         # NOTE: looks like we have to manage the zorder ourselves
         # this is kind of funny actually. Btw we need to ensure
         # that cascades are drawn behind (earlier than) vertices
         # and edges at equal zorder because it looks better that way.
         z_suborder = defaultdict(int)
+        if hasattr(self, "_leaf_vertices"):
+            z_suborder[self._leaf_vertices] = -2
         if hasattr(self, "_cascades"):
             z_suborder[self._cascades] = -1
         children = list(self.get_children())
         children.sort(key=lambda x: (x.zorder, z_suborder[x]))
         for art in children:
+            if isinstance(art, CascadeCollection):
+                self._update_cascades_extent()
             art.draw(renderer)

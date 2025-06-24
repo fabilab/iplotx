@@ -74,13 +74,24 @@ def _additional_set_methods(attributes, cls=None):
     return cls
 
 
-# FIXME: this method appears quite inconsistent, would be better to improve.
-# The issue is that to really know the size of a label on screen, we need to
-# render it first. Therefore, we should render the labels, then render the
-# vertices. Leaving for now, since this can be styled manually which covers
-# many use cases.
 def _get_label_width_height(text, hpadding=18, vpadding=12, **kwargs):
-    """Get the bounding box size for a text with certain properties."""
+    """Get the bounding box size for a text with certain properties.
+
+    Parameters:
+        text: The text to measure.
+        hpadding: Horizontal padding to add to the width.
+        vpadding: Vertical padding to add to the height.
+        **kwargs: Additional keyword arguments for text properties. "fontsize" is accepted,
+            as is "size". Many other properties are not used and will raise and exception.
+
+    Returns:
+        A tuple (width, height) representing the size of the text bounding box. Because
+        some text properties such as weight are not taken into account, ths function is not
+        very accurate. Yet, it is often good enough and easier to implement than a careful
+        orchestration of Figure.draw_without_rendering.
+    """
+    if "fontsize" in kwargs:
+        kwargs["size"] = kwargs.pop("fontsize")
     forbidden_props = [
         "horizontalalignment",
         "verticalalignment",
@@ -99,7 +110,8 @@ def _get_label_width_height(text, hpadding=18, vpadding=12, **kwargs):
     width = boundingbox.width
     height = boundingbox.height
 
-    # Scaling with font size appears broken... try to patch it up linearly here, even though we know it don't work well
+    # Scaling with font size appears broken... try to patch it up linearly here, even though we
+    # know it does not work terribly accurately
     width *= kwargs.get("size", 12) / 12.0
     height *= kwargs.get("size", 12) / 12.0
 
