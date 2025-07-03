@@ -117,4 +117,7 @@ We believe graph **analysis**, graph **layouting**, and graph **visualisation** 
 gallery/index
 style
 API <api>
+Plotting API <api/plotting>
+Styling API <api/style>
+Artist hierarchy <api/artists>
 ```

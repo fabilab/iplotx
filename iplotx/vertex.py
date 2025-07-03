@@ -14,6 +14,7 @@ import matplotlib as mpl
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import (
     Patch,
+    Polygon,
     Ellipse,
     Circle,
     RegularPolygon,
@@ -363,12 +364,12 @@ def make_patch(
     if np.isscalar(size):
         size = float(size)
         size = (size, size)
+    size = np.asarray(size, dtype=float)
 
     # Size of vertices is determined in self._transforms, which scales with dpi, rather than here,
     # so normalise by the average dimension (btw x and y) to keep the ratio of the marker.
     # If you check in get_sizes, you will see that rescaling also happens with the max of width
     # and height.
-    size = np.asarray(size, dtype=float)
     size_max = size.max()
     if size_max > 0:
         size /= size_max
@@ -379,15 +380,69 @@ def make_patch(
     elif marker in ("s", "square", "r", "rectangle"):
         art = Rectangle((-size[0] / 2, -size[1] / 2), size[0], size[1], **kwargs)
     elif marker in ("^", "triangle"):
-        art = RegularPolygon((0, 0), numVertices=3, radius=size[0] / 2, **kwargs)
-    elif marker in ("d", "diamond"):
-        art, _ = make_patch("s", size[0], angle=45, **kwargs)
+        art = RegularPolygon(
+            (0, 0), numVertices=3, radius=size[0] / np.sqrt(2), **kwargs
+        )
     elif marker in ("v", "triangle_down"):
         art = RegularPolygon(
-            (0, 0), numVertices=3, radius=size[0] / 2, orientation=np.pi, **kwargs
+            (0, 0),
+            numVertices=3,
+            radius=size[0] / np.sqrt(2),
+            orientation=np.pi,
+            **kwargs,
+        )
+    elif marker in ("<", "triangle_left"):
+        art = RegularPolygon(
+            (0, 0),
+            numVertices=3,
+            radius=size[0] / np.sqrt(2),
+            orientation=np.pi / 2,
+            **kwargs,
+        )
+    elif marker in (">", "triangle_right"):
+        art = RegularPolygon(
+            (0, 0),
+            numVertices=3,
+            radius=size[0] / np.sqrt(2),
+            orientation=-np.pi / 2,
+            **kwargs,
+        )
+    elif marker in ("d", "diamond"):
+        art = RegularPolygon(
+            (0, 0), numVertices=4, radius=size[0] / np.sqrt(2), **kwargs
+        )
+    elif marker in ("p", "pentagon"):
+        art = RegularPolygon(
+            (0, 0), numVertices=5, radius=size[0] / np.sqrt(2), **kwargs
+        )
+    elif marker in ("h", "hexagon"):
+        art = RegularPolygon(
+            (0, 0), numVertices=6, radius=size[0] / np.sqrt(2), **kwargs
+        )
+    elif marker in ("8", "octagon"):
+        art = RegularPolygon(
+            (0, 0), numVertices=8, radius=size[0] / np.sqrt(2), **kwargs
         )
     elif marker in ("e", "ellipse"):
-        art = Ellipse((0, 0), size[0] / 2, size[1] / 2, **kwargs)
+        art = Ellipse((0, 0), size[0], size[1], **kwargs)
+    elif marker in ("*", "star"):
+        size *= np.sqrt(2)
+        art = Polygon(
+            [
+                (0, size[1] / 2),
+                (size[0] / 7, size[1] / 7),
+                (size[0] / 2, size[1] / 7),
+                (size[0] / 4, -size[1] / 8),
+                (size[0] / 3, -size[1] / 2),
+                (0, -0.27 * size[1]),
+                (-size[0] / 3, -size[1] / 2),
+                (-size[0] / 4, -size[1] / 8),
+                (-size[0] / 2, size[1] / 7),
+                (-size[0] / 7, size[1] / 7),
+                (0, size[1] / 2),
+            ][::-1],
+            **kwargs,
+        )
     else:
         raise KeyError(f"Unknown marker: {marker}")
 

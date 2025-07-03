@@ -145,6 +145,8 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
     """Make a patch of the given marker shape and size."""
     height = kwargs.pop("height", width * 1.3)
+    if height == "width":
+        height = width
 
     # Normalise by the max size, this is taken care of in _transforms
     # subsequently in a way that is nice to dpi scaling

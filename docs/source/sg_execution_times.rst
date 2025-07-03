@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.843** total execution time for 36 files **from all galleries**:
+**00:00.080** total execution time for 38 files **from all galleries**:
 
 .. container::
 
@@ -32,10 +32,13 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_tree_node_background.py` (``../../gallery/plot_tree_node_background.py``)
-     - 00:00.843
+   * - :ref:`sphx_glr_gallery_plot_vertexmarkers.py` (``../../gallery/plot_vertexmarkers.py``)
+     - 00:00.080
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_arrows.py` (``../../gallery/plot_arrows.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
@@ -129,6 +132,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_traveling_salesman.py` (``../../gallery/plot_traveling_salesman.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_tree_node_background.py` (``../../gallery/plot_tree_node_background.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_trees_of_trees.py` (``../../gallery/plot_trees_of_trees.py``)

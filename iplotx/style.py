@@ -4,10 +4,11 @@ from typing import (
     Sequence,
 )
 from collections.abc import Hashable
-import copy
 from contextlib import contextmanager
 import numpy as np
 import pandas as pd
+
+from .utils.style import copy_with_deep_values
 
 
 style_leaves = (
@@ -68,10 +69,10 @@ default = {
         "linestyle": "-",
         "color": "black",
         "curved": False,
-        "paralleloffset": 3,
         "tension": 1,
         "looptension": 4,
         "loopmaxangle": 60,
+        "paralleloffset": 3,
         "label": {
             "horizontalalignment": "center",
             "verticalalignment": "center",
@@ -95,17 +96,6 @@ default = {
         "vertexpadding": 18,
     },
 }
-
-
-def copy_with_deep_values(style):
-    """Make a deep copy of the style dict but do not create copies of the keys."""
-    newdict = {}
-    for key, value in style.items():
-        if isinstance(value, dict):
-            newdict[key] = copy_with_deep_values(value)
-        else:
-            newdict[key] = copy.copy(value)
-    return newdict
 
 
 hollow = copy_with_deep_values(default)
