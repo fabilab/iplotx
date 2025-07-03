@@ -1,6 +1,8 @@
 # Styling
 See also the <project:../style.md> page for an introduction to styles in `iplotx`.
 
+## Functions
+
 
 ```{eval-rst}
 .. autofunction:: iplotx.style.context
@@ -20,7 +22,7 @@ The following functions are reported for completeness but are rarely used by use
 .. autofunction:: iplotx.style.rotate_style
 ```
 
-
+## Commented style specification
 The complete style dictionary specification is as follows:
 
 ```python
@@ -36,8 +38,14 @@ The complete style dictionary specification is as follows:
     f   # s, square, r, rectangle: rectangle (square if only one size specified)
         # ^, triangle: upward triangle
         # v, triangle_down: downward triangle
+        # <, triangle_left: leftward triangle
+        # >, triangle_right: rightward triangle
         # d, diamond: diamond
         # e, ellipse: ellipse
+        # p, pentagon: pentagon
+        # h, hexagon: hexagon
+        # 8, octagon: octagon
+        # *, star: 5-point star, upright
         "marker": str,
         
         "facecolor": str | Any,  # Color of the vertex face (e.g. 'red', '#FF0000')
@@ -145,8 +153,4 @@ The complete style dictionary specification is as follows:
 
     },
 }
-
-```
-```
-
 ```

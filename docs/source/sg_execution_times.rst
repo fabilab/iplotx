@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.080** total execution time for 38 files **from all galleries**:
+**00:00.127** total execution time for 39 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_vertexmarkers.py` (``../../gallery/plot_vertexmarkers.py``)
-     - 00:00.080
+   * - :ref:`sphx_glr_gallery_plot_tension.py` (``../../gallery/plot_tension.py``)
+     - 00:00.127
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -138,6 +138,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_trees_of_trees.py` (``../../gallery/plot_trees_of_trees.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_vertexmarkers.py` (``../../gallery/plot_vertexmarkers.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_voronoi.py` (``../../gallery/plot_voronoi.py``)
