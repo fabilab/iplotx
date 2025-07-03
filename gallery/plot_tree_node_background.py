@@ -84,9 +84,6 @@ ipx.plotting.tree(
 )
 
 # %%
-# .. warning::
-#   Leaf label alignment is still experimental and will improve in the future.
-#
 # This extension also works with other layouts, such as horizontal and vertical:
 
 layout_and_orientations = {
@@ -110,4 +107,5 @@ for i, (layout_name, layout_orientations) in enumerate(layout_and_orientations.i
             vertex_cascade_extend="leaf_labels",
             aspect=1,
             title=f"{layout_name} ({orientation})",
+            margins=0.1,
         )

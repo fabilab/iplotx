@@ -200,11 +200,13 @@ class LabelCollection(mpl.artist.Artist):
             props = art.properties()
             props = {key: props[key] for key in textprops}
             props["dpi"] = dpi
-            props["hpadding"] = 18
-            props["vpadding"] = 18
+            props["hpadding"] = 12
+            props["vpadding"] = 12
             width, height = _get_label_width_height(**props)
 
-            # These are in data coordinates
+            # Positions are in data coordinates
+            # and include the margins (it's the actual position of the
+            # text anchor)
             pos_data = art.get_position()
 
             # Four corners

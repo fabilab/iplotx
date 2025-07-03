@@ -308,28 +308,18 @@ class TreeArtist(mpl.artist.Artist):
         # Set invisible vertices with visible labels
         if layout_name == "radial":
             ha = "auto"
-            hmargin = 5
-            vmargin = 0
             rotation = 0
         elif orientation == "right":
             ha = "left"
-            hmargin = 5
-            vmargin = 0
             rotation = 0
         elif orientation == "left":
             ha = "right"
-            hmargin = 5
-            vmargin = 0
             rotation = 0
         elif orientation == "ascending":
             ha = "left"
-            hmargin = 0
-            vmargin = 0
             rotation = 90
         else:
             ha = "left"
-            hmargin = 0
-            vmargin = 0
             rotation = -90
 
         default_leaf_style = {
@@ -338,8 +328,8 @@ class TreeArtist(mpl.artist.Artist):
                 "verticalalignment": "center_baseline",
                 "horizontalalignment": ha,
                 "rotation": rotation,
-                "hmargin": hmargin,
-                "vmargin": vmargin,
+                "hmargin": 5,
+                "vmargin": 0,
                 "bbox": {
                     "facecolor": (1, 1, 1, 0),
                 },
