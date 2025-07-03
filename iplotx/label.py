@@ -109,12 +109,13 @@ class LabelCollection(mpl.artist.Artist):
                 self._offsets[i][1],
                 label,
                 transform=transform,
+                rotation_mode="anchor",
                 **stylei,
             )
             arts.append(art)
         self._labelartists = arts
         self._margins = np.array(margins)
-        self._rotations = np.zeros(len(self._labels))
+        self._rotations = np.array([np.pi / 180 * art.get_rotation() for art in arts])
 
     def _update_offsets(self, dpi: float = 72.0) -> None:
         """Update offsets including margins."""
@@ -135,10 +136,11 @@ class LabelCollection(mpl.artist.Artist):
             transform = self.get_transform()
             trans = transform.transform
             trans_inv = transform.inverted().transform
+
+            # Add margins *before* applying the rotation
+            margins_rot = np.empty_like(margins)
             rotations = self.get_rotations()
             vrot = [np.cos(rotations), np.sin(rotations)]
-
-            margins_rot = np.empty_like(margins)
             margins_rot[:, 0] = margins[:, 0] * vrot[0] - margins[:, 1] * vrot[1]
             margins_rot[:, 1] = margins[:, 0] * vrot[1] + margins[:, 1] * vrot[0]
             offsets = trans_inv(trans(offsets) + margins_rot)

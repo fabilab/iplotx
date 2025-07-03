@@ -308,39 +308,34 @@ class TreeArtist(mpl.artist.Artist):
         # Set invisible vertices with visible labels
         if layout_name == "radial":
             ha = "auto"
-            va = "center"
-            hmargin = 0
+            hmargin = 5
             vmargin = 0
             rotation = 0
         elif orientation == "right":
             ha = "left"
-            va = "center"
             hmargin = 5
             vmargin = 0
             rotation = 0
         elif orientation == "left":
             ha = "right"
-            va = "center"
-            hmargin = -5
+            hmargin = 5
             vmargin = 0
             rotation = 0
         elif orientation == "ascending":
-            ha = "center"
-            va = "bottom"
+            ha = "left"
             hmargin = 0
-            vmargin = 5
+            vmargin = 0
             rotation = 90
         else:
-            ha = "center"
-            va = "top"
-            hmargin = -2
-            vmargin = -5
+            ha = "left"
+            hmargin = 0
+            vmargin = 0
             rotation = -90
 
-        leaf_vertex_style = {
+        default_leaf_style = {
             "size": 0,
             "label": {
-                "verticalalignment": va,
+                "verticalalignment": "center_baseline",
                 "horizontalalignment": ha,
                 "rotation": rotation,
                 "hmargin": hmargin,
@@ -350,8 +345,20 @@ class TreeArtist(mpl.artist.Artist):
                 },
             },
         }
-        with context({"vertex": leaf_vertex_style}):
+        user_leaf_style = get_style(".leaf", {})
+        with context([{"vertex": default_leaf_style}, {"vertex": user_leaf_style}]):
             leaf_vertex_style = get_style(".vertex")
+            # Left horizontal layout has no rotation of the labels but we need to
+            # reverse hmargin
+            if (
+                layout_name == "horizontal"
+                and orientation == "left"
+                and "label" in leaf_vertex_style
+                and "hmargin" in leaf_vertex_style["label"]
+            ):
+                # Reverse the horizontal margin
+                leaf_vertex_style["label"]["hmargin"] *= -1
+
             self._leaf_vertices = VertexCollection(
                 layout=leaf_layout,
                 layout_coordinate_system=self._ipx_internal_data.get(

@@ -92,9 +92,10 @@ ipx.plotting.tree(
 layout_and_orientations = {
     "horizontal": ["left", "right"],
     "vertical": ["descending", "ascending"],
+    "radial": ["clockwise", "counterclockwise"],
 }
 
-fig, axs = plt.subplots(2, 2, figsize=(9, 9))
+fig, axs = plt.subplots(3, 2, figsize=(9, 13.5))
 for i, (layout_name, layout_orientations) in enumerate(layout_and_orientations.items()):
     for j, orientation in enumerate(layout_orientations):
         ipx.plotting.tree(
