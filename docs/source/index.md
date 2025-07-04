@@ -119,5 +119,6 @@ style
 API <api>
 Plotting API <api/plotting>
 Styling API <api/style>
+Complete style specification <api/complete_style_specification>
 Artist hierarchy <api/artists>
 ```
