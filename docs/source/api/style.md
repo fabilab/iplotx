@@ -22,7 +22,7 @@ The following functions are reported for completeness but are rarely used by use
 .. autofunction:: iplotx.style.rotate_style
 ```
 
-## Commented style specification
+## Complete style specification
 The complete style dictionary specification is as follows:
 
 ```python
@@ -30,8 +30,9 @@ The complete style dictionary specification is as follows:
     # Vertex style
     "vertex": {
         # Size of the vertex in points. If a pair, it indicates width and height
-        # of the marker.
-        "size": float | tuple[float, float],
+        # of the marker. If "label", set the size dynamically based on the vertex
+        # label (a label is needed in this case)
+        "size": float | tuple[float, float] | str,
 
         # Marker style. Currently supported markers:
         # o, c, circle: circle
@@ -68,6 +69,8 @@ The complete style dictionary specification is as follows:
                 ...  # Any other bounding box property
 
             },
+            "hmargin": float,  # Horizontal margin around (usually left of) the label
+            "vmargin": float,  # Vertical margin around (usually below) the label. Rarely used.
         },
     },
 
@@ -75,8 +78,27 @@ The complete style dictionary specification is as follows:
     "edge": {
         "linewidth": float,  # Width of the edge line in points
         "linestyle": str,  # Style of the edge line ('-' for solid, '--' for dashed, etc.)
-        "color": str | Any,  # Color of the edge line (e.g. 'blue', '#0000FF')
-        "alpha": float,  # Opacity of the vertex (0.0 for fully transparent, 1.0 for fully opaque)
+        # Color of the edge line (e.g. 'blue', '#0000FF'). This can be a floating
+        # number (usually set on a per-edge basis) to use color mapping. In that case
+        # the "cmap" property needs to be set too (see next option). In that case,
+        # the min/max values of the floats are used as extremes for the colormap,
+        # unless the "norm" option is used.
+        "color": str | float | Any,
+
+        # Matplotlib color map used to map floating numbers into RGBA colors. Only
+        # used when the previous option "color" is set to floats.
+        "cmap": str | matplotlib.colors.Colormap,
+
+        # Matplotlib norm to connect color map and edge floating-point color values.
+        # This is only used when colors are mapped through a color map. In that case,
+        # this option lets the user finely control what floating number will be mapped
+        # onto what color.
+        "norm": tuple[float, float] | matplotlib.colors.Normalize,
+
+        # Opacity of the vertex (0.0 for fully transparent, 1.0 for fully opaque).
+        # If a colormap is used and this option is also set, this opacity takes
+        # priority and finally determines the transparency of the edges.
+        "alpha": float,
 
         "curved": bool,  # Whether the edge is curved (True) or straight (False)
 
@@ -94,15 +116,37 @@ The complete style dictionary specification is as follows:
         # number quite a bit less than 180 degrees to avoid funny-looking self-loops.
         "loopmaxangle": float,
 
-         # Edge label style
-        "label": {
-            "color": str | Any,  # Color of the vertex label (e.g. 'white', '#FFFFFF')
-            "horizontalalignment": str,  # Horizontal alignment of the label ('left', 'center', 'right')
-            "verticalalignment": str,  # Vertical alignment of the label ('top', 'center', 'bottom', 'baseline', 'center_baseline')
-            "hpadding": float,  # Horizontal padding around the label
-            "vpadding": float,  # Vertical padding around the label
-            "bbox": dict,  # Bounding box properties for the label (see vertex labels)
-        },
+        # xy offset of the edge coordinate in figure points. This is usually set on a
+        # per-edge basis if specific edges are to be shifted laterally slightly. Large
+        # offsets tend to not play well with the rest of the visualisation.
+        "offset": tuple[float, float],
+
+        # How much (in figure points) to offset parallel straight edges (i.e. in a
+        # multigraph only) along the orthogonal direction to make them more visible.
+        # To obtain a double-headed arrow effect, set this to zero. On the flip side,
+        # you will not know how many parallel edges there are between those two nodes.
+        "paralleloffset": float,
+
+        # Edge ports a la Graphviz, which indicate the attack angle of an edge into
+        # its origin (first element) and target (second element) node. "w" (for
+        # "west") means exiting from/entering into the left side, "e" is the right
+        # side, "n" the top, "s" the bottom. "nw" and similar two-letter combinations
+        # are accepted and indicate 45 degree angles (in figure space). None means
+        # that edge side is free (i.e. no special instruction there). This is almost
+        # universally either unset or set on a per-edge basis to finely control the
+        # appearance of the network (e.g. in organisational charts).
+        "ports": tuple[str | None, str | None],
+
+        # Edge waypoints. This option is usually set together with "ports" to
+        # finely control the appearance of edges. For trees, this option is used
+        # internally to create piecewise-straight connections. This option is
+        # currently experimental, but you can try the following settings:
+        # - xmidy0,xmidy1: Two waypoints with the mid-x and the 1st and 2nd y values.
+        # - ymidx0,ymidx1: The xy swap of the previous option.
+        # - x0y1: One waypoint, with x of the first point and y of the second point.
+        # - x1y0: The xy swap of the previous option.
+        # We are looking into ways to generalise this idea.
+        "waypoints": str,
 
         # Edge arrow style for directed graphs
         "arrow": {
@@ -118,6 +162,7 @@ The complete style dictionary specification is as follows:
             # p
             # q
             "marker": str,
+
             "width": float,  # Width of the arrow in points
 
             # Height of the arrow in points. Defaults to 1.3 times the width if not
@@ -132,6 +177,22 @@ The complete style dictionary specification is as follows:
             # If this property is not specified, the color of the edge to which the
             # arrowhead belongs to is used.
             "color": str | Any,
+        },
+
+        # Edge label style
+        "label": {
+
+            # Whether to rotate edge labels to be horizontal (True) or to leave them
+            # parallel to their edge (False). Some users find this boolean
+            # unintuitive and interpret it the other way around, so think carefully.
+            "rotate": bool,
+
+            "color": str | Any,  # Color of the vertex label (e.g. 'white', '#FFFFFF')
+            "horizontalalignment": str,  # Horizontal alignment of the label ('left', 'center', 'right')
+            "verticalalignment": str,  # Vertical alignment of the label ('top', 'center', 'bottom', 'baseline', 'center_baseline')
+            "hpadding": float,  # Horizontal padding around the label
+            "vpadding": float,  # Vertical padding around the label
+            "bbox": dict,  # Bounding box properties for the label (see vertex labels)
 
         },
     },
@@ -146,11 +207,21 @@ The complete style dictionary specification is as follows:
 
     # The following entries are used by trees ONLY (not by networks as plotted by `iplotx.network`)
     "cascade": {
+        # Whether to limit the cascade to the deepest descendant (False),
+        # to the deepest leaf overall (True), or to include the leaf labels
+        # as well "leaf_labels"
+        "extend": bool | str,
 
+        "facecolor": str | Any,  # Color of the cascade face
+        "edgecolor": str | Any,  # Color of the cascade edge
+        "alpha": float,  # Opacity of the cascade patch
     },
 
+    # Leaf styles are currently only used for their labels
     "leaf": {
-
+        "label": {
+            "color": str | Any,  # Color of the label text
+        }
     },
 }
 ```

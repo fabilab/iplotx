@@ -156,7 +156,7 @@ def _compute_mid_coord_and_rot(path, trans):
     return coord, rot
 
 
-def _build_cmap_fun(values, cmap):
+def _build_cmap_fun(values, cmap, norm=None):
     """Map colormap on top of numerical values."""
     cmap = mpl.cm._ensure_cmap(cmap)
 
@@ -166,8 +166,9 @@ def _build_cmap_fun(values, cmap):
     if isinstance(values, dict):
         values = np.array(list(values.values()))
 
-    vmin = np.nanmin(values)
-    vmax = np.nanmax(values)
-    norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+    if norm is None:
+        vmin = np.nanmin(values)
+        vmax = np.nanmax(values)
+        norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     return lambda x: cmap(norm(x))

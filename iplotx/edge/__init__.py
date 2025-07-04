@@ -629,6 +629,7 @@ def make_stub_patch(**kwargs):
         "offset",
         "paralleloffset",
         "cmap",
+        "norm",
     ]
     for prop in forbidden_props:
         if prop in kwargs:

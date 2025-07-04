@@ -189,6 +189,7 @@ class NetworkArtist(mpl.artist.Artist):
             cmap_fun = _build_cmap_fun(
                 edge_style["color"],
                 edge_style["cmap"],
+                edge_style.get("norm", None),
             )
         else:
             cmap_fun = None
@@ -231,7 +232,7 @@ class NetworkArtist(mpl.artist.Artist):
             edgepatches.append(patch)
             adjacent_vertex_ids.append((vid1, vid2))
 
-        if "cmap" in edge_style:
+        if ("cmap" in edge_style) and ("norm" not in edge_style):
             vmin = np.min(colorarray)
             vmax = np.max(colorarray)
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
