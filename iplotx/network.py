@@ -1,4 +1,8 @@
-from typing import Optional, Sequence
+from typing import (
+    Optional,
+    Sequence,
+    Self,
+)
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
@@ -62,12 +66,6 @@ class NetworkArtist(mpl.artist.Artist):
 
         """
         self.network = network
-        self._ipx_internal_data = ingest_network_data(
-            network,
-            layout,
-            vertex_labels=vertex_labels,
-            edge_labels=edge_labels,
-        )
 
         super().__init__()
 
@@ -80,8 +78,65 @@ class NetworkArtist(mpl.artist.Artist):
         zorder = get_style(".network").get("zorder", 1)
         self.set_zorder(zorder)
 
-        self._add_vertices()
-        self._add_edges()
+        if network is not None:
+            self._ipx_internal_data = ingest_network_data(
+                network,
+                layout,
+                vertex_labels=vertex_labels,
+                edge_labels=edge_labels,
+            )
+
+            self._add_vertices()
+            self._add_edges()
+
+    @classmethod
+    def from_other(
+        cls: "NetworkArtist",  # NOTE: This is fixed in Python 3.14
+        other: Self,
+    ) -> Self:
+        """Create a NetworkArtist as a copy of another one.
+
+        Parameters:
+            other: The other NetworkArtist.
+
+        Returns:
+            An instantiated NetworkArtist.
+        """
+        self = cls.from_edgecollection(other._edges)
+        self.network = other.network
+        self._ipx_internal_data = other._ipx_internal_data
+        return self
+
+    @classmethod
+    def from_edgecollection(
+        cls: "NetworkArtist",  # NOTE: This is fixed in Python 3.14
+        edge_collection: EdgeCollection,
+    ) -> Self:
+        """Create a NetworkArtist from iplotx artists.
+
+        Parameters:
+            edge_collection: The edge collection to use to initialise the artist. Vertices will
+              be obtained automatically.
+
+        Returns:
+            The initialised NetworkArtist.
+        """
+        vertex_collection = edge_collection._vertex_collection
+        layout = vertex_collection._layout
+        transform = vertex_collection.get_transform()
+        offset_transform = edge_collection.get_transform()
+
+        # Follow the steps in the normal constructor
+        self = cls(
+            network=None,
+            layout=layout,
+            transform=transform,
+            offset_transform=offset_transform,
+        )
+        self._vertices = vertex_collection
+        self._edges = edge_collection
+
+        return self
 
     def get_children(self):
         return (self._vertices, self._edges)
@@ -259,8 +314,6 @@ class NetworkArtist(mpl.artist.Artist):
 
         if not self.get_visible():
             return
-
-        # FIXME: Callbacks on stale vertices/edges??
 
         # NOTE: looks like we have to manage the zorder ourselves
         # this is kind of funny actually
