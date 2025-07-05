@@ -58,3 +58,15 @@ See <project:gallery/plot_simpledataprovider.md> for the full gallery example in
   library. You'll still need `matplotlib` for plotting and `numpy` and `pandas` for
   internal number crunching.
 ```
+
+
+## Creating a custom data provider
+`iplotx` is able to seek new data providers at runtime, but they need to be registered in a specific way (keyword: `entry point`).
+
+The expected entry point for a `NetworkDataProvider` is: `iplotx.network_data_providers`.
+
+The expected entry point for a `TreeDataProvider` is: `iplotx.tree_data_providers`.
+
+```{note}
+  If you would like to make a library compatible with `iplotx` (by developing a provider), we are here to help! Just reach out on GitHub issues and we will try to help.
+```
