@@ -40,9 +40,19 @@ class NetworkData(TypedDict):
 class NetworkDataProvider(Protocol):
     """Protocol for network data ingestion provider for iplotx."""
 
-    def __call__(
+    def __init__(
         self,
         network: GraphType,
+    ) -> None:
+        """Initialise network data provider.
+
+        Parameters:
+            network: The network to ingest.
+        """
+        self.network = network
+
+    def __call__(
+        self,
         layout: Optional[LayoutType] = None,
         vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
@@ -58,6 +68,14 @@ class NetworkDataProvider(Protocol):
     @staticmethod
     def graph_type():
         """Return the graph type from this provider to check for instances."""
+        raise NotImplementedError("Network data providers must implement this method.")
+
+    def is_directed(self):
+        """Check whether the network is directed."""
+        raise NotImplementedError("Network data providers must implement this method.")
+
+    def number_of_vertices(self):
+        """The number of vertices/nodes in the network."""
         raise NotImplementedError("Network data providers must implement this method.")
 
 
@@ -202,7 +220,10 @@ class TreeDataProvider(Protocol):
         edge_labels: Optional[Sequence[str] | dict] = None,
         leaf_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
     ) -> TreeData:
-        """Create tree data object for iplotx from ete4.core.tre.Tree classes."""
+        """Create tree data object for iplotx from ete4.core.tre.Tree classes.
+
+        NOTE: This function needs NOT be implemented by individual providers.
+        """
 
         if layout_style is None:
             layout_style = {}

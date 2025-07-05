@@ -116,9 +116,11 @@ We believe graph **analysis**, graph **layouting**, and graph **visualisation** 
 
 gallery/index
 style
+Data providers <providers>
 API <api>
 Plotting API <api/plotting>
 Styling API <api/style>
 Complete style specification <api/complete_style_specification>
 Artist hierarchy <api/artists>
+Data provider protocols <api/providers>
 ```

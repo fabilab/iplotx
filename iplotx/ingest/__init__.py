@@ -95,8 +95,7 @@ def ingest_network_data(
             f"Currently installed supported libraries: {sup}."
         )
 
-    result = provider()(
-        network=network,
+    result = provider(network)(
         layout=layout,
         vertex_labels=vertex_labels,
         edge_labels=edge_labels,

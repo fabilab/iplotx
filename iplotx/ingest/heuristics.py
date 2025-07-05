@@ -13,42 +13,13 @@ import pandas as pd
 
 from ..layout import compute_tree_layout
 from ..typing import (
-    GraphType,
     GroupingType,
     LayoutType,
 )
 
 
-def number_of_vertices(network: GraphType) -> int:
-    """Get the number of vertices in the network."""
-    from . import network_library
-
-    if network_library(network) == "igraph":
-        return network.vcount()
-    if network_library(network) == "networkx":
-        return network.number_of_nodes()
-    raise TypeError("Unsupported graph type. Supported types are igraph and networkx.")
-
-
-def detect_directedness(
-    network: GraphType,
-) -> bool:
-    """Detect if the network is directed or not."""
-    from . import network_library
-
-    nl = network_library(network)
-
-    if nl == "igraph":
-        return network.is_directed()
-    if nl == "networkx":
-        import networkx as nx
-
-        if isinstance(network, (nx.DiGraph, nx.MultiDiGraph)):
-            return True
-    return False
-
-
-def normalise_layout(layout, network=None):
+# TODO: some of this logic should be moved into individual providers
+def normalise_layout(layout, network=None, nvertices=None):
     """Normalise the layout to a pandas.DataFrame."""
     from . import network_library
 
@@ -58,7 +29,7 @@ def normalise_layout(layout, network=None):
         ig = None
 
     if layout is None:
-        if (network is not None) and (number_of_vertices(network) == 0):
+        if (network is not None) and (nvertices == 0):
             return pd.DataFrame(np.zeros((0, 2)))
         return None
     if (network is not None) and isinstance(layout, str):

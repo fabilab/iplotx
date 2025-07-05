@@ -12,7 +12,6 @@ from ....typing import (
 )
 from ...heuristics import (
     normalise_layout,
-    detect_directedness,
 )
 from ...typing import (
     NetworkDataProvider,
@@ -26,16 +25,17 @@ from ....utils.internal import (
 class NetworkXDataProvider(NetworkDataProvider):
     def __call__(
         self,
-        network: GraphType,
         layout: Optional[LayoutType] = None,
         vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
         edge_labels: Optional[Sequence[str] | dict[str]] = None,
     ) -> NetworkData:
-        """Create network data object for iplotx from any provider."""
+        """Create network data object for iplotx from a networkx object."""
 
         import networkx as nx
 
-        directed = detect_directedness(network)
+        network = self.network
+
+        directed = self.is_directed()
 
         # Recast vertex_labels=False as vertex_labels=None
         if np.isscalar(vertex_labels) and (not vertex_labels):
@@ -45,6 +45,7 @@ class NetworkXDataProvider(NetworkDataProvider):
         vertex_df = normalise_layout(
             layout,
             network=network,
+            nvertices=self.number_of_vertices(),
         ).loc[pd.Index(network.nodes)]
         ndim = vertex_df.shape[1]
         vertex_df.columns = _make_layout_columns(ndim)
@@ -133,3 +134,12 @@ class NetworkXDataProvider(NetworkDataProvider):
         from networkx import Graph
 
         return Graph
+
+    def is_directed(self):
+        import networkx as nx
+
+        return isinstance(self.network, (nx.DiGraph, nx.MultiDiGraph))
+
+    def number_of_vertices(self):
+        """The number of vertices/nodes in the network."""
+        return self.network.number_of_nodes()

@@ -1,6 +1,7 @@
 from typing import (
     Optional,
     Sequence,
+    Any,
 )
 from collections.abc import Hashable
 import numpy as np
@@ -22,14 +23,14 @@ from ....utils.internal import (
 )
 
 
-class IGraphDataProvider(NetworkDataProvider):
+class SimpleDataProvider(NetworkDataProvider):
     def __call__(
         self,
         layout: Optional[LayoutType] = None,
         vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
         edge_labels: Optional[Sequence[str] | dict[str]] = None,
     ) -> NetworkData:
-        """Create network data object for iplotx from an igraph object."""
+        """Create network data object for iplotx from a simple Python object."""
         network = self.network
         directed = self.is_directed()
 
@@ -38,11 +39,28 @@ class IGraphDataProvider(NetworkDataProvider):
             vertex_labels = None
 
         # Vertices are ordered integers, no gaps
-        vertex_df = normalise_layout(
-            layout,
-            network=network,
-            nvertices=self.number_of_vertices(),
-        )
+        for key in ["nodes", "vertices"]:
+            if key in network:
+                vertices = network[key]
+                break
+        else:
+            # Infer from edge adjacent vertices, singletons will be missed
+            vertices = set()
+            for edge in self.network.get("edges", []):
+                vertices.add(edge[0])
+                vertices.add(edge[1])
+        vertices = list(vertices)
+
+        # NOTE: This is underpowered, but it's ok for a simple educational provider
+        if isinstance(layout, pd.DataFrame):
+            vertex_df = layout.loc[vertices].copy()
+        elif isinstance(layout, dict):
+            vertex_df = pd.DataFrame(layout).T.loc[vertices]
+        else:
+            vertex_df = pd.DataFrame(
+                index=vertices,
+                data=layout,
+            )
         ndim = vertex_df.shape[1]
         vertex_df.columns = _make_layout_columns(ndim)
 
@@ -59,23 +77,14 @@ class IGraphDataProvider(NetworkDataProvider):
 
         # Edges are a list of tuples, because of multiedges
         tmp = []
-        for edge in network.es:
-            row = {"_ipx_source": edge.source, "_ipx_target": edge.target}
-            row.update(edge.attributes())
+        for edge in network.get("edges", []):
+            row = {"_ipx_source": edge[0], "_ipx_target": edge[1]}
             tmp.append(row)
         if len(tmp):
             edge_df = pd.DataFrame(tmp)
         else:
             edge_df = pd.DataFrame(columns=["_ipx_source", "_ipx_target"])
         del tmp
-
-        # Edge labels
-        if edge_labels is not None:
-            if len(edge_labels) != len(edge_df):
-                raise ValueError(
-                    "Edge labels must be the same length as the number of edges."
-                )
-            edge_df["label"] = edge_labels
 
         network_data = {
             "vertex_df": vertex_df,
@@ -87,22 +96,26 @@ class IGraphDataProvider(NetworkDataProvider):
 
     @staticmethod
     def check_dependencies() -> bool:
-        try:
-            import igraph
-        except ImportError:
-            return False
+        """Check dependencies. Returns True since this provider has no dependencies."""
         return True
 
     @staticmethod
     def graph_type():
-        import igraph as ig
-
-        return ig.Graph
+        return dict
 
     def is_directed(self):
         """Whether the network is directed."""
-        return self.network.is_directed()
+        return self.network.get("directed", False)
 
     def number_of_vertices(self):
         """The number of vertices/nodes in the network."""
-        return self.network.vcount()
+        for key in ("nodes", "vertices"):
+            if key in self.network:
+                return len(self.network[key])
+
+        # Default to unique edge adjacent nodes (this will ignore singletons)
+        nodes = set()
+        for edge in self.network.get("edges", []):
+            nodes.add(edge[0])
+            nodes.add(edge[1])
+        return len(nodes)
