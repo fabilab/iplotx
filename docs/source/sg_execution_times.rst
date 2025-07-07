@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.368** total execution time for 41 files **from all galleries**:
+**00:00.048** total execution time for 41 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_multistyle.py` (``../../gallery/plot_multistyle.py``)
-     - 00:00.368
+   * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
+     - 00:00.048
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -110,6 +110,9 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_multipartite_layout.py` (``../../gallery/plot_multipartite_layout.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_plot_multistyle.py` (``../../gallery/plot_multistyle.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
      - 00:00.000
      - 0.0
@@ -129,9 +132,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_skbio_tree.py` (``../../gallery/plot_skbio_tree.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_tension.py` (``../../gallery/plot_tension.py``)

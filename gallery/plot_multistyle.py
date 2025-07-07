@@ -4,6 +4,9 @@ Style library
 
 This example shows the same network plotted with a variery of styles from the
 `iplotx` style library.
+
+.. tip::
+  You can further modify any of these styles with a custom dictionary (see :doc:`plot_style`).
 """
 
 import igraph as ig
