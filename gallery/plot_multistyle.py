@@ -33,7 +33,7 @@ for style, ax in zip(styles, axs.ravel()):
         ax=ax,
         layout=layout,
         style=style,
-        vertex_labels=style in ("hollow", "unicorn", "networkx", "igraph"),
+        vertex_labels=style in ("default", "hollow", "unicorn", "networkx", "igraph"),
         title=style,
         margins=0.1 if style == "unicorn" else 0,
     )
@@ -50,7 +50,7 @@ for style, ax in zip(styles, axs.ravel()):
         ax=ax,
         layout="circle",
         style=style,
-        vertex_labels=style in ("hollow", "unicorn", "networkx", "igraph"),
+        vertex_labels=style in ("default", "hollow", "unicorn", "networkx", "igraph"),
         title=style,
         margins=0.1 if style == "unicorn" else 0,
     )
