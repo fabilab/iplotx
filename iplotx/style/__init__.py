@@ -8,46 +8,11 @@ from contextlib import contextmanager
 import numpy as np
 import pandas as pd
 
-from .utils.style import copy_with_deep_values
-
-
-style_leaves = (
-    "cmap",
-    "color",
-    "size",
-    "edgecolor",
-    "facecolor",
-    "linewidth",
-    "linestyle",
-    "alpha",
-    "zorder",
-    "tension",
-    "looptension",
-    "loopmaxangle",
-    "paralleloffset",
-    "offset",
-    "rotate",
-    "marker",
-    "waypoints",
-    "horizontalalignment",
-    "verticalalignment",
-    "boxstyle",
-    "hpadding",
-    "vpadding",
-    "hmargin",
-    "vmargin",
-    "ports",
-    "extend",
-)
-
-# These properties are not allowed to be rotated (global throughout the graph).
-# This might change in the future as the API improves.
-nonrotating_leaves = (
-    "paralleloffset",
-    "looptension",
-    "loopmaxangle",
-    "vertexpadding",
-    "extend",
+from ..utils.style import copy_with_deep_values
+from .library import style_library
+from .leaf_info import (
+    style_leaves,
+    nonrotating_leaves,
 )
 
 
@@ -98,46 +63,12 @@ default = {
 }
 
 
-hollow = copy_with_deep_values(default)
-hollow["vertex"]["color"] = None
-hollow["vertex"]["facecolor"] = "none"
-hollow["vertex"]["edgecolor"] = "black"
-hollow["vertex"]["linewidth"] = 1.5
-hollow["vertex"]["marker"] = "r"
-hollow["vertex"]["size"] = "label"
-hollow["vertex"]["label"]["color"] = "black"
-
-tree = copy_with_deep_values(default)
-tree["vertex"]["size"] = 0
-tree["vertex"]["alpha"] = 0
-tree["edge"]["linewidth"] = 2.5
-tree["vertex"]["label"]["bbox"] = {
-    "boxstyle": "square,pad=0.5",
-    "facecolor": "white",
-    "edgecolor": "none",
-}
-tree["vertex"]["label"]["color"] = "black"
-tree["vertex"]["label"]["size"] = 12
-tree["vertex"]["label"]["verticalalignment"] = "center"
-tree["vertex"]["label"]["hmargin"] = 10
-
-
 styles = {
     "default": default,
-    "hollow": hollow,
-    "tree": tree,
 }
-
-
-stylename = "default"
 
 
 current = copy_with_deep_values(styles["default"])
-
-
-def get_stylename():
-    """Return the name of the current iplotx style."""
-    return str(stylename)
 
 
 def get_style(name: str = "", *args) -> dict[str, Any]:
@@ -393,3 +324,19 @@ def rotate_style(
                 style[prop] = valtype()
 
     return style
+
+
+def add_style(name: str, style: dict[str, Any]) -> None:
+    """Add a style to the default dictionary of styles.
+
+    Parameters:
+        name: The name of the style to add.
+        style: A dictionary with the style properties to add.
+    """
+    with context(["default", style]):
+        styles[name] = get_style()
+
+
+# Populate style library
+for name, style in style_library.items():
+    add_style(name, style)
