@@ -340,3 +340,4 @@ def add_style(name: str, style: dict[str, Any]) -> None:
 # Populate style library
 for name, style in style_library.items():
     add_style(name, style)
+    del name, style
