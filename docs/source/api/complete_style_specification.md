@@ -135,6 +135,8 @@
         "arrow": {
             # Arrow marker style. Currently supported:
             # |>
+            # |/
+            # |\\ (double slash needed to avoid character escaping)
             # >
             # >>
             # )>

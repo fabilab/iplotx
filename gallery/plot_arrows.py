@@ -9,14 +9,14 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import iplotx as ipx
 
-arrow_markers = ["|>", ">", ">>", ")>", ")", "|", "s", "d", "p", "q"]
+arrow_markers = ["|>", "|/", "|\\", ">", ">>", ")>", ")", "|", "s", "d", "p", "q"]
 n = len(arrow_markers)
 G = nx.DiGraph()
 G.add_edges_from([(f"l{i}", f"r{i}") for i in range(n)])
 layout = {f"l{i}": (0, -i) for i in range(n)}
 layout.update({f"r{i}": (1, -i) for i in range(n)})
 
-fig, ax = plt.subplots(figsize=(3, 6))
+fig, ax = plt.subplots(figsize=(3, 7.5))
 ipx.network(
     G,
     layout=layout,
