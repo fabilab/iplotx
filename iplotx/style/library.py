@@ -41,7 +41,7 @@ style_library = {
             "facecolor": "lightgrey",
             "edgecolor": "#111",
             "marker": ">",
-            "size": 10,
+            "size": 15,
             "linewidth": 0.75,
             "label": {
                 "color": "black",
@@ -59,10 +59,96 @@ style_library = {
             },
         },
     },
+    # Edge highlight
+    "rededge": {
+        "vertex": {
+            "size": 13,
+            "color": None,
+            "facecolor": "none",
+            "edgecolor": "#111",
+            "linewidth": 2,
+            "label": {
+                "color": "#111",
+            },
+        },
+        "edge": {
+            "color": "tomato",
+            "linewidth": 2.5,
+        },
+    },
+    # Vertex highlight
+    "rednode": {
+        "vertex": {
+            "size": 22,
+            "color": None,
+            "facecolor": "tomato",
+            "edgecolor": "firebrick",
+            "linewidth": 2,
+        },
+        "edge": {
+            "color": "#333",
+            "linewidth": 1,
+        },
+    },
+    # Eerie style
+    "eerie": {
+        "vertex": {
+            "color": None,
+            "facecolor": "white",
+            "edgecolor": "#111",
+            "linestyle": "--",
+            "linewidth": 2,
+        },
+        "edge": {
+            "color": "#111",
+            "linestyle": "--",
+            "linewidth": 2,
+            "arrow": {
+                "marker": ")",
+            },
+        },
+    },
+    # Emulate a little networkx
+    "networkx": {
+        "vertex": {
+            "color": None,
+            "facecolor": "steelblue",
+            "edgecolor": "none",
+            "label": {
+                "color": "black",
+            },
+        },
+        "edge": {
+            "color": "black",
+            "linewidth": 1.5,
+            "arrow": {
+                "width": 5,
+            },
+        },
+    },
+    "igraph": {
+        "vertex": {
+            "color": None,
+            "facecolor": "lightblue",
+            "edgecolor": "black",
+            "linewidth": 2,
+            "label": {
+                "color": "black",
+            },
+        },
+        "edge": {
+            "color": "black",
+            "linewidth": 2,
+            "arrow": {
+                "marker": "|>",
+                "width": 6.5,
+            },
+        },
+    },
     # Colorful style for general use
     "unicorn": {
         "vertex": {
-            "size": 30,
+            "size": 23,
             "color": None,
             "facecolor": [
                 "darkorchid",
@@ -73,6 +159,7 @@ style_library = {
                 "orange",
                 "sandybrown",
                 "tomato",
+                "deeppink",
             ],
             "edgecolor": "black",
             "linewidth": 1,
@@ -86,7 +173,8 @@ style_library = {
                     "black",
                     "black",
                     "black",
-                    "black",
+                    "white",
+                    "white",
                 ],
             },
         },
@@ -100,6 +188,7 @@ style_library = {
                 "orange",
                 "sandybrown",
                 "tomato",
+                "deeppink",
             ],
             "linewidth": 1.5,
             "label": {
@@ -112,7 +201,8 @@ style_library = {
                     "black",
                     "black",
                     "black",
-                    "black",
+                    "white",
+                    "white",
                 ],
             },
         },
