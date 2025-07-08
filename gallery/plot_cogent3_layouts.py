@@ -26,8 +26,9 @@ art = ipx.tree(
     tree,
     ax=ax,
     leaf_labels=True,
-    leaf_deep=False,
+    style="cogent3",
 )
+
 
 # %%
 # Angular layouts (without waypoints, looks more pointy) are supported:
@@ -38,14 +39,14 @@ art = ipx.tree(
     layout="horizontal",
     ax=ax,
     leaf_labels=True,
-    leaf_deep=False,
     angular=True,
+    style="cogent3",
 )
 
 # %%
 # Vertical and radial layouts are also supported along the same lines:
 
-fig, axs = plt.subplots(3, figsize=(5, 12))
+fig, axs = plt.subplots(3, 1, figsize=(6, 15))
 for ax, layout in zip(axs, ("vertical", "radial", "horizontal")):
     art = ipx.tree(
         tree,
@@ -53,6 +54,23 @@ for ax, layout in zip(axs, ("vertical", "radial", "horizontal")):
         orientation="left" if layout == "horizontal" else None,
         ax=ax,
         leaf_labels=True,
-        leaf_deep=False,
         angular=True,
+        style="cogent3",
     )
+fig.tight_layout()
+
+# %%
+# Nonangular trees can be used too:
+
+fig, axs = plt.subplots(3, 1, figsize=(6, 15))
+for ax, layout in zip(axs, ("vertical", "radial", "horizontal")):
+    art = ipx.tree(
+        tree,
+        layout=layout,
+        orientation="left" if layout == "horizontal" else None,
+        ax=ax,
+        leaf_labels=True,
+        angular=False,
+        style="cogent3",
+    )
+fig.tight_layout()

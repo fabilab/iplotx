@@ -1,6 +1,7 @@
 from typing import (
     Optional,
     Sequence,
+    Any,
 )
 from collections.abc import Hashable
 from collections import defaultdict
@@ -523,6 +524,63 @@ class TreeArtist(mpl.artist.Artist):
     def get_orientation(self) -> Optional[str]:
         """Get the orientation of the tree layout."""
         return self._ipx_internal_data.get("orientation", None)
+
+    def style_subtree(
+        self,
+        nodes: Sequence[Hashable],
+        style: Optional[dict[str, Any] | Sequence[str | dict[str, Any]]] = None,
+    ) -> None:
+        """Style a subtree of the tree.
+
+        Parameters:
+            nodes: Sequence of nodes that span the subtree. All elements below including
+                the most recent common ancestor of these leaves will be styled.
+            style: Style or sequence of styles to apply to the subtree. Each style can
+                be either a string, referring to an internal `iplotx` style, or a dictionary
+                with custom styling elements.
+        """
+        provider = data_providers["tree"][self._ipx_internal_data["tree_library"]]
+
+        # Get last (deepest) common ancestor of the requested nodes
+        root = provider(self.tree).get_lca(nodes)
+
+        # Populate a DataFrame with the array of properties to update
+        vertex_idx = {
+            node: i for i, node in enumerate(self._ipx_internal_data["vertex_df"].index)
+        }
+        edge_idx = {
+            node: i
+            for i, node in enumerate(
+                self._ipx_internal_data["edge_df"]["_ipx_target"].values
+            )
+        }
+        vertex_props = {}
+        edge_props = {}
+        vertex_style = style.get("vertex", {})
+        edge_style = style.get("edge", {})
+        for inode, node in enumerate(provider(root).preorder()):
+            for attr, value in vertex_style.items():
+                if attr not in vertex_props:
+                    vertex_props[attr] = list(getattr(self._vertices, f"get_{attr}")())
+                vertex_props[attr][vertex_idx[node]] = value
+
+            # Ignore branch coming into the root node
+            if inode == 0:
+                continue
+
+            for attr, value in edge_style.items():
+                # Edge color is actually edgecolor
+                if attr == "color":
+                    attr = "edgecolor"
+                if attr not in edge_props:
+                    edge_props[attr] = list(getattr(self._edges, f"get_{attr}")())
+                edge_props[attr][edge_idx[node]] = value
+
+        # Update the properties from the DataFrames
+        for attr in vertex_props:
+            getattr(self._vertices, f"set_{attr}")(vertex_props[attr])
+        for attr in edge_props:
+            getattr(self._edges, f"set_{attr}")(edge_props[attr])
 
     @_stale_wrapper
     def draw(self, renderer) -> None:

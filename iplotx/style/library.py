@@ -17,7 +17,6 @@ style_library = {
     "tree": {
         "vertex": {
             "size": 0,
-            "alpha": 0,
             "label": {
                 "color": "black",
                 "size": 12,
@@ -32,6 +31,27 @@ style_library = {
         },
         "edge": {
             "linewidth": 2.5,
+        },
+    },
+    # Cogent3 tree style
+    "cogent3": {
+        "vertex": {
+            "size": 3,
+            "label": {
+                "color": "black",
+                "size": 10,
+                "verticalalignment": "center",
+                "bbox": {
+                    "facecolor": "none",
+                    "edgecolor": "none",
+                },
+            },
+        },
+        "edge": {
+            "linewidth": 1.5,
+        },
+        "leaf": {
+            "deep": False,
         },
     },
     # Greyscale style

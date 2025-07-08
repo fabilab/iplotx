@@ -209,6 +209,48 @@ class TreeDataProvider(Protocol):
         branch_length = self.get_branch_length(node)
         return branch_length if branch_length is not None else 1.0
 
+    def get_lca(
+        self,
+        nodes: Sequence[Hashable],
+    ) -> Hashable:
+        """Find the last common ancestor of a sequence of nodes.
+
+        Parameters:
+            nodes: The nodes to find a common ancestor for.
+
+        Returns:
+            The node that is the last (deepest) common ancestor of the nodes.
+
+        NOTE: individual providers may implement more efficient versions of
+        this function if desired.
+        """
+        provider = self.__class__
+
+        # Find leaves of the selected nodes
+        leaves = set()
+        for node in nodes:
+            # NOTE: get_leaves excludes the node itself...
+            if len(self.get_children(node)) == 0:
+                leaves.add(node)
+            else:
+                leaves |= set(provider(node).get_leaves())
+
+        # Look for nodes with the same set of leaves, starting from the bottom
+        # and stopping at the first (i.e. lowest) hit.
+        for node in self.postorder():
+            # NOTE: As above, get_leaves excludes the node itself
+            if len(self.get_children(node)) == 0:
+                leaves_node = {node}
+            else:
+                leaves_node = set(provider(node).get_leaves())
+            if leaves <= leaves_node:
+                root = node
+                break
+        else:
+            raise ValueError(f"Common ancestor not found for nodes: {nodes}")
+
+        return root
+
     def __call__(
         self,
         layout: str | LayoutType,
