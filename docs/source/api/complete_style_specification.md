@@ -204,6 +204,9 @@
 
     # Leaf styles are currently only used for their labels
     "leaf": {
+        # Whether leaf nodes and labels will be aligned to the deepest leaf.
+        # If False, each leaf label will be at the depth of its leaf.
+        "deep": bool,
         "label": {
             "color": str | Any,  # Color of the label text
             "hmargin": float,  # Horizontal offset (before rotation) off the leaf node
