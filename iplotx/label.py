@@ -173,12 +173,12 @@ class LabelCollection(mpl.artist.Artist):
             rot_deg = 180.0 / np.pi * rotation
             # Force the font size to be upwards
             if ha == "auto":
-                if -90 <= rot_deg < 90:
+                if -90 <= np.round(rot_deg, 3) < 90:
                     art.set_horizontalalignment("left")
                 else:
                     art.set_horizontalalignment("right")
-            rot_deg = ((rot_deg + 90) % 180) - 90
-            art.set_rotation(rot_deg)
+            rot_deg_new = ((rot_deg + 90) % 180) - 90
+            art.set_rotation(rot_deg_new)
 
     def get_datalim(self, transData=None) -> mpl.transforms.Bbox:
         """Get the data limits of the labels."""

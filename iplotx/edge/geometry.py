@@ -171,11 +171,28 @@ def _compute_edge_path_straight(
     vsize_fig,
     trans,
     trans_inv,
+    layout_coordinate_system: str = "cartesian",
     **kwargs,
 ):
+    if layout_coordinate_system not in ("cartesian", "polar"):
+        raise ValueError(
+            f"Layout coordinate system not supported for straight edges: {layout_coordinate_system}.",
+        )
+
+    if layout_coordinate_system == "polar":
+        r0, theta0 = vcoord_data[0]
+        r1, theta1 = vcoord_data[1]
+        vcoord_data_cart = np.array(
+            [
+                [r0 * np.cos(theta0), r0 * np.sin(theta0)],
+                [r1 * np.cos(theta1), r1 * np.sin(theta1)],
+            ]
+        )
+    else:
+        vcoord_data_cart = vcoord_data
 
     # Coordinates in figure (default) coords
-    vcoord_fig = trans(vcoord_data)
+    vcoord_fig = trans(vcoord_data_cart)
 
     points = []
 
@@ -305,7 +322,6 @@ def _compute_edge_path_waypoints(
         idx_outer = 1 - idx_inner
         alpha_outer = [alpha0, alpha1][idx_outer]
 
-        # FIXME: this is aware of chirality as stored by the layout function
         betas = np.linspace(alpha0, alpha1, points_per_curve)
         waypoints = [r0, r1][idx_inner] * np.vstack([np.cos(betas), np.sin(betas)]).T
         endpoint = [r0, r1][idx_outer] * np.array(
@@ -314,7 +330,6 @@ def _compute_edge_path_waypoints(
         points = np.array(list(waypoints) + [endpoint])
         points = trans(points)
         codes = ["MOVETO"] + ["LINETO"] * len(waypoints)
-        # FIXME: same as previus comment
         angles = (alpha0 + pi / 2, alpha1)
 
     else:
@@ -438,7 +453,11 @@ def _compute_edge_path(
         )
 
     if tension == 0:
-        return _compute_edge_path_straight(*args, **kwargs)
+        return _compute_edge_path_straight(
+            *args,
+            layout_coordinate_system=layout_coordinate_system,
+            **kwargs,
+        )
 
     return _compute_edge_path_curved(
         tension,
