@@ -25,7 +25,7 @@ style_library = {
                 "hmargin": 10,
                 "bbox": {
                     "boxstyle": "square,pad=0.5",
-                    "facecolor": "white",
+                    "facecolor": "none",
                     "edgecolor": "none",
                 },
             },

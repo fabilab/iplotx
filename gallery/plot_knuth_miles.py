@@ -25,7 +25,7 @@ def miles_graph():
     """
     # open file miles_dat.txt.gz (or miles_dat.txt)
 
-    fh = gzip.open("knuth_miles.txt.gz", "r")
+    fh = gzip.open("data/knuth_miles.txt.gz", "r")
 
     G = nx.Graph()
     G.position = {}

@@ -215,10 +215,12 @@ class TreeDataProvider(Protocol):
         layout_style: Optional[dict[str, int | float | str]] = None,
         directed: bool | str = False,
         vertex_labels: Optional[
-            Sequence[str] | dict[Hashable, str] | pd.Series | bool
+            Sequence[str] | dict[Hashable, str] | pd.Series | bool | str
         ] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
-        leaf_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
+        leaf_labels: Optional[
+            Sequence[str] | dict[Hashable, str] | pd.Series | bool
+        ] = None,
     ) -> TreeData:
         """Create tree data object for iplotx from ete4.core.tre.Tree classes.
 
@@ -275,9 +277,25 @@ class TreeDataProvider(Protocol):
         tree_data["edge_df"] = edge_df
 
         # Add leaf_df
+        # NOTE: Sometimes (e.g. cogent3) the leaves convert into a pd.Index
+        # in a strange way, whereby their name disappears upon printing the
+        # index but is actually visible (and kept) when inspecting the
+        # individual elements (leaves). Seems ok functionally, though a little
+        # awkward visually during debugging.
         tree_data["leaf_df"] = pd.DataFrame(index=self.get_leaves())
+        leaf_name_attrs = ("name",)
 
         # Add vertex labels
+        # If only leaf labels are chosen (at vertex positions), make a dict and
+        # feed into the normal logic
+        if isinstance(vertex_labels, str) and (vertex_labels == "leaves"):
+            vertex_labels = {}
+            for leaf in tree_data["leaf_df"].index:
+                for name_attr in leaf_name_attrs:
+                    if hasattr(leaf, name_attr):
+                        vertex_labels[leaf] = getattr(leaf, name_attr)
+                        break
+
         if vertex_labels is None:
             vertex_labels = False
         if np.isscalar(vertex_labels) and vertex_labels:
@@ -299,11 +317,18 @@ class TreeDataProvider(Protocol):
         if leaf_labels is None:
             leaf_labels = False
         if np.isscalar(leaf_labels) and leaf_labels:
-            tree_data["leaf_labels"]["label"] = [
-                # FIXME: this is likely broken
-                x.name
-                for x in tree_data["leaf_df"].index
-            ]
+            leaf_labels = []
+            for leaf in tree_data["leaf_df"].index:
+                for name_attr in leaf_name_attrs:
+                    if hasattr(leaf, name_attr):
+                        label = getattr(leaf, name_attr)
+                        break
+                else:
+                    raise ValueError(
+                        "Could not find leaf name attribute.",
+                    )
+                leaf_labels.append(label)
+            tree_data["leaf_df"]["label"] = leaf_labels
         elif not np.isscalar(leaf_labels):
             # Leaves are already in the dataframe in a certain order, so sequences are allowed
             if isinstance(leaf_labels, (list, tuple, np.ndarray)):
