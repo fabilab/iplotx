@@ -59,6 +59,7 @@ class TreeArtist(mpl.artist.Artist):
         tree,
         layout: Optional[str] = "horizontal",
         orientation: Optional[str] = None,
+        angular: bool = False,
         directed: bool | str = False,
         vertex_labels: Optional[
             bool | list[str] | dict[Hashable, str] | pd.Series
@@ -95,6 +96,7 @@ class TreeArtist(mpl.artist.Artist):
             tree,
             layout,
             orientation=orientation,
+            angular=angular,
             directed=directed,
             layout_style=get_style(".layout", {}),
             vertex_labels=vertex_labels,
@@ -285,25 +287,28 @@ class TreeArtist(mpl.artist.Artist):
         """Add invisible deep vertices as leaf label anchors."""
         layout_name = self._ipx_internal_data["layout_name"]
         orientation = self._ipx_internal_data["orientation"]
+        user_leaf_style = get_style(".leaf", {})
+
+        leaf_layout = self.get_layout("leaf").copy()
 
         # Set all to max depth
-        leaf_layout = self.get_layout("leaf").copy()
-        if layout_name == "radial":
-            leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
-        elif layout_name == "horizontal":
-            if orientation == "right":
+        if user_leaf_style.get("deep", True):
+            if layout_name == "radial":
                 leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
+            elif layout_name == "horizontal":
+                if orientation == "right":
+                    leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
+                else:
+                    leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].min()
+            elif layout_name == "vertical":
+                if orientation == "descending":
+                    leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].min()
+                else:
+                    leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].max()
             else:
-                leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].min()
-        elif layout_name == "vertical":
-            if orientation == "descending":
-                leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].min()
-            else:
-                leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].max()
-        else:
-            raise ValueError(
-                f"Layout and orientation not supported: {layout_name}, {orientation}."
-            )
+                raise ValueError(
+                    f"Layout and orientation not supported: {layout_name}, {orientation}."
+                )
 
         # Set invisible vertices with visible labels
         if layout_name == "radial":
@@ -335,7 +340,6 @@ class TreeArtist(mpl.artist.Artist):
                 },
             },
         }
-        user_leaf_style = get_style(".leaf", {})
         with context([{"vertex": default_leaf_style}, {"vertex": user_leaf_style}]):
             leaf_vertex_style = get_style(".vertex")
             # Left horizontal layout has no rotation of the labels but we need to
@@ -494,7 +498,10 @@ class TreeArtist(mpl.artist.Artist):
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
 
-        edge_style["waypoints"] = waypoints
+        if self._ipx_internal_data["angular"]:
+            edge_style.pop("waypoints", None)
+        else:
+            edge_style["waypoints"] = waypoints
 
         # NOTE: Trees are directed is their "directed" property is True, "child", or "parent"
         self._edges = EdgeCollection(

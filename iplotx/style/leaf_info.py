@@ -1,6 +1,6 @@
 # These properties are at the bottom of a style dictionary. Values corresponding
-# to these keys are generally rotatable, with the exceptions below.
-style_leaves = (
+# to these keys are rotatable.
+rotating_leaves = (
     "cmap",
     "color",
     "size",
@@ -11,9 +11,6 @@ style_leaves = (
     "alpha",
     "zorder",
     "tension",
-    "looptension",
-    "loopmaxangle",
-    "paralleloffset",
     "offset",
     "rotate",
     "marker",
@@ -26,10 +23,9 @@ style_leaves = (
     "hmargin",
     "vmargin",
     "ports",
-    "extend",
 )
 
-# These properties are not allowed to be rotated (global throughout the graph).
+# These properties are also terminal style properties, but they cannot be rotated.
 # This might change in the future as the API improves.
 nonrotating_leaves = (
     "paralleloffset",
@@ -37,4 +33,8 @@ nonrotating_leaves = (
     "loopmaxangle",
     "vertexpadding",
     "extend",
+    "deep",
 )
+
+# Union of all style leaves (rotating and nonrotating)
+style_leaves = tuple(list(rotating_leaves) + list(nonrotating_leaves))

@@ -53,7 +53,7 @@ def network(
             used as a quick fix when some vertex shapes reach beyond the plot edge. This is
             a fraction of the data limits, so 0.1 means 10% of the data limits will be left
             as margin.
-        **kwargs: Additional arguments are treated as an alternate way to specify style. If
+        kwargs: Additional arguments are treated as an alternate way to specify style. If
             both "style" and additional **kwargs are provided, they are both applied in that
             order (style, then **kwargs).
 
@@ -124,9 +124,10 @@ def tree(
     tree: Optional[TreeType] = None,
     layout: str | LayoutType = "horizontal",
     orientation: Optional[str] = None,
+    angular: bool = False,
     directed: bool | str = False,
-    vertex_labels: Optional[list | dict | pd.Series] = None,
-    leaf_labels: Optional[list | dict | pd.Series] = None,
+    vertex_labels: Optional[list | dict | pd.Series | bool] = None,
+    leaf_labels: Optional[list | dict | pd.Series | bool] = None,
     ax: Optional[mpl.axes.Axes] = None,
     style: str | dict | Sequence[str | dict] = "tree",
     title: Optional[str] = None,
@@ -158,6 +159,7 @@ def tree(
             tree=tree,
             layout=layout,
             orientation=orientation,
+            angular=angular,
             directed=directed,
             transform=mpl.transforms.IdentityTransform(),
             offset_transform=ax.transData,

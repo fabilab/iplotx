@@ -24,7 +24,7 @@ def compute_tree_layout(
     """Compute the layout for a tree.
 
     Parameters:
-        layout: The name of the layout, e.g. "horizontal", "vertial", or "radial".
+        layout: The name of the layout, e.g. "horizontal", "vertical", or "radial".
         orientation: The orientation of the layout, e.g. "right", "left", "descending",
             "ascending", "clockwise", "anticlockwise".
 

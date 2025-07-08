@@ -356,7 +356,7 @@ def make_patch(
     **kwargs,
 ) -> tuple[Patch, float]:
     """Make a patch of the given marker shape and size."""
-    forbidden_props = ["label", "cmap", "norm", "cascade"]
+    forbidden_props = ["label", "cmap", "norm", "cascade", "deep"]
     for prop in forbidden_props:
         if prop in kwargs:
             kwargs.pop(prop)

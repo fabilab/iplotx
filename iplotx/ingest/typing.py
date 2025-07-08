@@ -91,6 +91,7 @@ class TreeData(TypedDict):
     layout_coordinate_system: str
     layout_name: str
     orientation: str
+    angular: bool
     ndim: int
     tree_library: NotRequired[str]
 
@@ -212,10 +213,11 @@ class TreeDataProvider(Protocol):
         self,
         layout: str | LayoutType,
         orientation: Optional[str],
+        angular: bool = False,
         layout_style: Optional[dict[str, int | float | str]] = None,
         directed: bool | str = False,
         vertex_labels: Optional[
-            Sequence[str] | dict[Hashable, str] | pd.Series | bool | str
+            Sequence[str] | dict[Hashable, str] | pd.Series | bool
         ] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
         leaf_labels: Optional[
@@ -245,6 +247,7 @@ class TreeDataProvider(Protocol):
             "ndim": 2,
             "layout_name": layout,
             "orientation": orientation,
+            "angular": angular,
         }
 
         # Add vertex_df including layout
@@ -286,16 +289,6 @@ class TreeDataProvider(Protocol):
         leaf_name_attrs = ("name",)
 
         # Add vertex labels
-        # If only leaf labels are chosen (at vertex positions), make a dict and
-        # feed into the normal logic
-        if isinstance(vertex_labels, str) and (vertex_labels == "leaves"):
-            vertex_labels = {}
-            for leaf in tree_data["leaf_df"].index:
-                for name_attr in leaf_name_attrs:
-                    if hasattr(leaf, name_attr):
-                        vertex_labels[leaf] = getattr(leaf, name_attr)
-                        break
-
         if vertex_labels is None:
             vertex_labels = False
         if np.isscalar(vertex_labels) and vertex_labels:

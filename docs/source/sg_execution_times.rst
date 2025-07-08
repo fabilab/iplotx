@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.139** total execution time for 43 files **from all galleries**:
+**00:02.250** total execution time for 43 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,13 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_plot_cogent3_layouts.py` (``../../gallery/plot_cogent3_layouts.py``)
-     - 00:01.139
+     - 00:01.412
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_knuth_miles.py` (``../../gallery/plot_knuth_miles.py``)
+     - 00:00.594
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
+     - 00:00.244
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -48,9 +54,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_biopython_tree.py` (``../../gallery/plot_biopython_tree.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
@@ -90,9 +93,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_house.py` (``../../gallery/plot_house.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_knuth_miles.py` (``../../gallery/plot_knuth_miles.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_labels_and_colors.py` (``../../gallery/plot_labels_and_colors.py``)
