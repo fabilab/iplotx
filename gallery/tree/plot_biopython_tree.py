@@ -24,7 +24,7 @@ ipx.plotting.tree(
 )
 
 # %%
-# To add labels to the leaves, you can use the `vertex_labels` argument as a dictionary.
+# To add labels to the leaves, you can use the `leaf_labels` argument as a dictionary.
 # Moreover, the plot can be customised further using hmargin (horizontal label margin)
 # and some `matplotlib` settings.
 
@@ -34,8 +34,9 @@ fig, ax = plt.subplots(figsize=(4, 4))
 ipx.plotting.tree(
     tree,
     ax=ax,
-    vertex_labels=leaf_labels,
-    vertex_label_hmargin=10,
+    leaf_labels=leaf_labels,
+    leaf_label_hmargin=10,
+    leaf_deep=False,
 )
 ax.set_xlim(0, 8)
 ax.invert_yaxis()

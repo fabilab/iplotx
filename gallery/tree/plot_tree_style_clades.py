@@ -10,14 +10,7 @@ import cogent3
 import matplotlib.pyplot as plt
 import iplotx as ipx
 
-import os
-
-try:
-    tree = cogent3.load_tree("data/tree-with-support.json")
-except FileNotFoundError:
-    os.listdir(".")
-    raise
-
+tree = cogent3.load_tree("data/tree-with-support.json")
 
 fig, ax = plt.subplots(figsize=(8, 8))
 art = ipx.tree(
@@ -29,7 +22,6 @@ art = ipx.tree(
     leaf_deep=False,
     margin=0.1,
 )
-
 
 # Style the subtree spanned by the first two leaves
 # with red edges.

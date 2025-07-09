@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.148** total execution time for 44 files **from all galleries**:
+**00:00.155** total execution time for 46 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_tree_style_clades.py` (``../../gallery/plot_tree_style_clades.py``)
-     - 00:01.148
+   * - :ref:`sphx_glr_gallery_tree_plot_biopython_tree.py` (``../../gallery/tree/plot_biopython_tree.py``)
+     - 00:00.155
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -47,9 +47,6 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_big_curves.py` (``../../gallery/plot_big_curves.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_biopython_tree.py` (``../../gallery/plot_biopython_tree.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
      - 00:00.000
      - 0.0
@@ -60,9 +57,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_cogent3_layouts.py` (``../../gallery/plot_cogent3_layouts.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_cogent3_tree.py` (``../../gallery/plot_cogent3_tree.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_company_structure.py` (``../../gallery/plot_company_structure.py``)
@@ -78,9 +72,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_edit_artists.py` (``../../gallery/plot_edit_artists.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_ete4.py` (``../../gallery/plot_ete4.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
@@ -137,9 +128,6 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_simpledataprovider.py` (``../../gallery/plot_simpledataprovider.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_skbio_tree.py` (``../../gallery/plot_skbio_tree.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
      - 00:00.000
      - 0.0
@@ -149,10 +137,7 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_traveling_salesman.py` (``../../gallery/plot_traveling_salesman.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_tree_node_background.py` (``../../gallery/plot_tree_node_background.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_trees_of_trees.py` (``../../gallery/plot_trees_of_trees.py``)
+   * - :ref:`sphx_glr_gallery_plot_tree_style_clades.py` (``../../gallery/plot_tree_style_clades.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_vertexmarkers.py` (``../../gallery/plot_vertexmarkers.py``)
@@ -162,5 +147,26 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_cogent3_layouts.py` (``../../gallery/tree/plot_cogent3_layouts.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_cogent3_tree.py` (``../../gallery/tree/plot_cogent3_tree.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_ete4.py` (``../../gallery/tree/plot_ete4.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_skbio_tree.py` (``../../gallery/tree/plot_skbio_tree.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_tree_node_background.py` (``../../gallery/tree/plot_tree_node_background.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_tree_style_clades.py` (``../../gallery/tree/plot_tree_style_clades.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_trees_of_trees.py` (``../../gallery/tree/plot_trees_of_trees.py``)
      - 00:00.000
      - 0.0
