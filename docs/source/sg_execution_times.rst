@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.155** total execution time for 46 files **from all galleries**:
+**00:10.554** total execution time for 44 files **from all galleries**:
 
 .. container::
 
@@ -32,141 +32,135 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_tree_plot_biopython_tree.py` (``../../gallery/tree/plot_biopython_tree.py``)
-     - 00:00.155
-     - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_arrows.py` (``../../gallery/plot_arrows.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_big_curves.py` (``../../gallery/plot_big_curves.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
-     - 00:00.000
+     - 00:02.154
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_cogent3_layouts.py` (``../../gallery/plot_cogent3_layouts.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_company_structure.py` (``../../gallery/plot_company_structure.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_complex.py` (``../../gallery/plot_complex.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_dag.py` (``../../gallery/plot_dag.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_directed.py` (``../../gallery/plot_directed.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_edit_artists.py` (``../../gallery/plot_edit_artists.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_grouping.py` (``../../gallery/plot_grouping.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_halfarrows.py` (``../../gallery/plot_halfarrows.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_house.py` (``../../gallery/plot_house.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_knuth_miles.py` (``../../gallery/plot_knuth_miles.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_labels_and_colors.py` (``../../gallery/plot_labels_and_colors.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_minimum_spanning_trees.py` (``../../gallery/plot_minimum_spanning_trees.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_mouse_hover.py` (``../../gallery/plot_mouse_hover.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_multipartite_layout.py` (``../../gallery/plot_multipartite_layout.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_multistyle.py` (``../../gallery/plot_multistyle.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_ports.py` (``../../gallery/plot_ports.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simple_path.py` (``../../gallery/plot_simple_path.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simpledataprovider.py` (``../../gallery/plot_simpledataprovider.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_tension.py` (``../../gallery/plot_tension.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_traveling_salesman.py` (``../../gallery/plot_traveling_salesman.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_tree_style_clades.py` (``../../gallery/plot_tree_style_clades.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_vertexmarkers.py` (``../../gallery/plot_vertexmarkers.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_voronoi.py` (``../../gallery/plot_voronoi.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_tree_plot_cogent3_layouts.py` (``../../gallery/tree/plot_cogent3_layouts.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_tree_plot_cogent3_tree.py` (``../../gallery/tree/plot_cogent3_tree.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_tree_plot_ete4.py` (``../../gallery/tree/plot_ete4.py``)
-     - 00:00.000
+     - 00:01.186
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_skbio_tree.py` (``../../gallery/tree/plot_skbio_tree.py``)
-     - 00:00.000
+     - 00:01.058
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_tree_node_background.py` (``../../gallery/tree/plot_tree_node_background.py``)
-     - 00:00.000
+     - 00:00.740
      - 0.0
-   * - :ref:`sphx_glr_gallery_tree_plot_tree_style_clades.py` (``../../gallery/tree/plot_tree_style_clades.py``)
-     - 00:00.000
+   * - :ref:`sphx_glr_gallery_plot_knuth_miles.py` (``../../gallery/plot_knuth_miles.py``)
+     - 00:00.550
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_cogent3_layouts.py` (``../../gallery/tree/plot_cogent3_layouts.py``)
+     - 00:00.539
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_multistyle.py` (``../../gallery/plot_multistyle.py``)
+     - 00:00.514
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_voronoi.py` (``../../gallery/plot_voronoi.py``)
+     - 00:00.324
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
+     - 00:00.265
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_trees_of_trees.py` (``../../gallery/tree/plot_trees_of_trees.py``)
-     - 00:00.000
+     - 00:00.255
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_labels_and_colors.py` (``../../gallery/plot_labels_and_colors.py``)
+     - 00:00.253
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_company_structure.py` (``../../gallery/plot_company_structure.py``)
+     - 00:00.243
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
+     - 00:00.204
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_traveling_salesman.py` (``../../gallery/plot_traveling_salesman.py``)
+     - 00:00.185
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
+     - 00:00.182
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_minimum_spanning_trees.py` (``../../gallery/plot_minimum_spanning_trees.py``)
+     - 00:00.160
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
+     - 00:00.131
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_tension.py` (``../../gallery/plot_tension.py``)
+     - 00:00.118
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_grouping.py` (``../../gallery/plot_grouping.py``)
+     - 00:00.101
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_complex.py` (``../../gallery/plot_complex.py``)
+     - 00:00.088
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)
+     - 00:00.088
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_cogent3_tree.py` (``../../gallery/tree/plot_cogent3_tree.py``)
+     - 00:00.087
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_biopython_tree.py` (``../../gallery/tree/plot_biopython_tree.py``)
+     - 00:00.084
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_halfarrows.py` (``../../gallery/plot_halfarrows.py``)
+     - 00:00.082
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
+     - 00:00.073
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_ports.py` (``../../gallery/plot_ports.py``)
+     - 00:00.072
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_multipartite_layout.py` (``../../gallery/plot_multipartite_layout.py``)
+     - 00:00.069
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_tree_style_clades.py` (``../../gallery/tree/plot_tree_style_clades.py``)
+     - 00:00.065
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_ete4.py` (``../../gallery/tree/plot_ete4.py``)
+     - 00:00.063
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
+     - 00:00.055
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_simple_path.py` (``../../gallery/plot_simple_path.py``)
+     - 00:00.054
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_edit_artists.py` (``../../gallery/plot_edit_artists.py``)
+     - 00:00.053
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
+     - 00:00.052
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
+     - 00:00.050
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)
+     - 00:00.048
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_simpledataprovider.py` (``../../gallery/plot_simpledataprovider.py``)
+     - 00:00.046
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_arrows.py` (``../../gallery/plot_arrows.py``)
+     - 00:00.045
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_dag.py` (``../../gallery/plot_dag.py``)
+     - 00:00.042
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
+     - 00:00.039
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_house.py` (``../../gallery/plot_house.py``)
+     - 00:00.034
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_vertexmarkers.py` (``../../gallery/plot_vertexmarkers.py``)
+     - 00:00.030
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_mouse_hover.py` (``../../gallery/plot_mouse_hover.py``)
+     - 00:00.027
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_big_curves.py` (``../../gallery/plot_big_curves.py``)
+     - 00:00.024
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_directed.py` (``../../gallery/plot_directed.py``)
+     - 00:00.022
      - 0.0
