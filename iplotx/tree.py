@@ -31,6 +31,9 @@ from .edge import (
     EdgeCollection,
     make_stub_patch as make_undirected_edge_patch,
 )
+from .edge.leaf import (
+    LeafEdgeCollection,
+)
 from .label import (
     LabelCollection,
 )
@@ -119,6 +122,7 @@ class TreeArtist(mpl.artist.Artist):
         self._add_vertices()
         self._add_edges()
         self._add_leaf_vertices()
+        self._add_leaf_edges()
 
         # NOTE: cascades need to be created after leaf vertices in case
         # they are requested to wrap around them.
@@ -134,6 +138,8 @@ class TreeArtist(mpl.artist.Artist):
         children = [self._vertices, self._edges]
         if hasattr(self, "_leaf_vertices"):
             children.append(self._leaf_vertices)
+        if hasattr(self, "_leaf_edges"):
+            children.append(self._leaf_edges)
         if hasattr(self, "_cascades"):
             children.append(self._cascades)
         return tuple(children)
@@ -158,6 +164,8 @@ class TreeArtist(mpl.artist.Artist):
         # its actual scren real estate.
         if hasattr(self, "_leaf_vertices"):
             self._leaf_vertices.set_figure(fig)
+        if hasattr(self, "_leaf_edges"):
+            self._leaf_edges.set_figure(fig)
         if hasattr(self, "_cascades"):
             self._cascades.set_figure(fig)
         self._update_cascades_extent()
@@ -226,13 +234,16 @@ class TreeArtist(mpl.artist.Artist):
         edge_bbox = self._edges.get_datalim(transData)
         bbox = mpl.transforms.Bbox.union([bbox, edge_bbox])
 
+        if hasattr(self, "_leaf_vertices"):
+            leaf_labels_bbox = self._leaf_vertices.get_datalim(transData)
+            bbox = mpl.transforms.Bbox.union([bbox, leaf_labels_bbox])
+
         if hasattr(self, "_cascades"):
             cascades_bbox = self._cascades.get_datalim(transData)
             bbox = mpl.transforms.Bbox.union([bbox, cascades_bbox])
 
-        if hasattr(self, "_leaf_vertices"):
-            leaf_labels_bbox = self._leaf_vertices.get_datalim(transData)
-            bbox = mpl.transforms.Bbox.union([bbox, leaf_labels_bbox])
+        # NOTE: We do not need to check leaf edges for bbox, because they are
+        # guaranteed within the convex hull of leaf vertices.
 
         bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
         return bbox
@@ -257,6 +268,12 @@ class TreeArtist(mpl.artist.Artist):
             return self._leaf_vertices
         return None
 
+    def get_leaf_edges(self) -> Optional[LeafEdgeCollection]:
+        """Get LeafEdgeCollection artist if present."""
+        if hasattr(self, "_leaf_edges"):
+            return self._leaf_edges
+        return None
+
     def get_vertex_labels(self) -> LabelCollection:
         """Get list of vertex label artists."""
         return self._vertices.get_labels()
@@ -266,8 +283,15 @@ class TreeArtist(mpl.artist.Artist):
         return self._edges.get_labels()
 
     def get_leaf_labels(self) -> Optional[LabelCollection]:
+        """Get the leaf label artist if present."""
         if hasattr(self, "_leaf_vertices"):
             return self._leaf_vertices.get_labels()
+        return None
+
+    def get_leaf_edge_labels(self) -> Optional[LabelCollection]:
+        """Get the leaf edge label artist if present."""
+        if hasattr(self, "_leaf_edges"):
+            return self._leaf_edges.get_labels()
         return None
 
     def _add_vertices(self) -> None:
@@ -283,6 +307,101 @@ class TreeArtist(mpl.artist.Artist):
             transform=self.get_transform(),
             offset_transform=self.get_offset_transform(),
         )
+
+    def _add_leaf_edges(self) -> None:
+        """Add edges from the leaf to the max leaf depth."""
+        # If there are no leaves or leaves are not deep, there are no leaf edges
+        if not hasattr(self, "_leaf_vertices"):
+            return
+        if not get_style(".leaf", {}).get("deep", True):
+            return
+
+        edge_style = get_style(
+            ".leafedge",
+            {
+                "linestyle": "--",
+                "linewidth": 1,
+                "edgecolor": "#111",
+            },
+        )
+
+        labels = None
+        # TODO: implement leaf edge labels
+        # self._get_label_series("leafedge")
+
+        if "cmap" in edge_style:
+            cmap_fun = _build_cmap_fun(
+                edge_style["color"],
+                edge_style["cmap"],
+            )
+        else:
+            cmap_fun = None
+
+        leaf_shallow_layout = self.get_layout("leaf")
+        leaf_deep_layout = self._leaf_vertices.get_layout()
+
+        print(leaf_shallow_layout)
+        print(leaf_deep_layout)
+
+        return
+
+        edge_df = self._ipx_internal_data["edge_df"].set_index(
+            ["_ipx_source", "_ipx_target"]
+        )
+
+        if "cmap" in edge_style:
+            colorarray = []
+        edgepatches = []
+        adjacent_vertex_ids = []
+        for i, (vid1, vid2) in enumerate(edge_df.index):
+            edge_stylei = rotate_style(edge_style, index=i, key=(vid1, vid2))
+
+            # FIXME:: Improve this logic. We have three layers of priority:
+            # 1. Explicitely set in the style of "plot"
+            # 2. Internal through network attributes
+            # 3. Default styles
+            # Because 1 and 3 are merged as a style context on the way in,
+            # it's hard to squeeze 2 in the middle. For now, we will assume
+            # the priority order is 2-1-3 instead (internal property is
+            # highest priority).
+            # This is also why we cannot shift this logic further into the
+            # EdgeCollection class, which is oblivious of NetworkArtist's
+            # internal data. In fact, one would argue this needs to be
+            # pushed outwards to deal with the wrong ordering.
+            _update_from_internal(edge_stylei, edge_df.iloc[i], kind="edge")
+
+            if cmap_fun is not None:
+                colorarray.append(edge_stylei["color"])
+                edge_stylei["color"] = cmap_fun(edge_stylei["color"])
+
+            # These are not the actual edges drawn, only stubs to establish
+            # the styles which are then fed into the dynamic, optimised
+            # factory (the collection) below
+            patch = make_undirected_edge_patch(
+                **edge_stylei,
+            )
+            edgepatches.append(patch)
+            adjacent_vertex_ids.append((vid1, vid2))
+
+        if "cmap" in edge_style:
+            vmin = np.min(colorarray)
+            vmax = np.max(colorarray)
+            norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
+            edge_style["norm"] = norm
+
+        # NOTE: Trees are directed is their "directed" property is True, "child", or "parent"
+        self._edges = LeafEdgeCollection(
+            edgepatches,
+            vertex_leaf_ids=adjacent_vertex_ids,
+            vertex_collection=self._vertices,
+            leaf_collection=self._leaf_vertices,
+            labels=labels,
+            transform=self.get_offset_transform(),
+            style=edge_style,
+            directed=False,
+        )
+        if "cmap" in edge_style:
+            self._edges.set_array(colorarray)
 
     def _add_leaf_vertices(self) -> None:
         """Add invisible deep vertices as leaf label anchors."""
