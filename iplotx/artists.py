@@ -8,6 +8,7 @@ from .vertex import VertexCollection
 from .edge import EdgeCollection
 from .label import LabelCollection
 from .edge.arrow import EdgeArrowCollection
+from .edge.leaf import LeafEdgeCollection
 from .cascades import CascadeCollection
 
 
@@ -16,6 +17,7 @@ ___all__ = (
     TreeArtist,
     VertexCollection,
     EdgeCollection,
+    LeafEdgeCollection,
     LabelCollection,
     EdgeArrowCollection,
     CascadeCollection,
