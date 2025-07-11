@@ -16,7 +16,7 @@
 
         # Marker style. Currently supported markers:
         # o, c, circle: circle
-    f   # s, square, r, rectangle: rectangle (square if only one size specified)
+        # s, square, r, rectangle: rectangle (square if only one size specified)
         # ^, triangle: upward triangle
         # v, triangle_down: downward triangle
         # <, triangle_left: leftward triangle
