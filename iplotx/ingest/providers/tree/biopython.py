@@ -45,3 +45,16 @@ class BiopythonDataProvider(TreeDataProvider):
         from Bio import Phylo
 
         return Phylo.BaseTree.Tree
+
+    def get_support(self):
+        """Get support/confidence values for all nodes."""
+        support_dict = {}
+        for node in self.preorder():
+            if hasattr(node, "confidences"):
+                support = node.confidences
+            elif hasattr(node, "confidence"):
+                support = node.confidence
+            else:
+                support = None
+            support_dict[node] = support
+        return support_dict

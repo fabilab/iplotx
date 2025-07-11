@@ -39,3 +39,10 @@ class Cogent3DataProvider(TreeDataProvider):
         from cogent3.core.tree import PhyloNode
 
         return PhyloNode
+
+    def get_support(self):
+        """Get support values for all nodes."""
+        support_dict = {}
+        for node in self.preorder():
+            support_dict[node] = node.params.get("support", None)
+        return support_dict

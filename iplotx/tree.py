@@ -70,6 +70,7 @@ class TreeArtist(mpl.artist.Artist):
         leaf_labels: Optional[Sequence | dict[Hashable, str]] | pd.Series = None,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
         offset_transform: Optional[mpl.transforms.Transform] = None,
+        show_support: bool = False,
     ):
         """Initialize the TreeArtist.
 
@@ -88,6 +89,8 @@ class TreeArtist(mpl.artist.Artist):
             transform: The transform to apply to the tree artist. This is usually the identity.
             offset_transform: The offset transform to apply to the tree artist. This is
                 usually `ax.transData`.
+            show_support: Whether to show support values on the nodes. If both show_support and
+                vertex_labels are set, this parameters takes precedence.
         """
 
         self.tree = tree
@@ -100,6 +103,10 @@ class TreeArtist(mpl.artist.Artist):
             edge_labels=edge_labels,
             leaf_labels=leaf_labels,
         )
+
+        if show_support:
+            support = self._ipx_internal_data["vertex_df"]["support"]
+            self._ipx_internal_data["vertex_df"]["label"] = support
 
         super().__init__()
 

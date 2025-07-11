@@ -305,6 +305,15 @@ class TreeDataProvider(Protocol):
         else:
             tree_data["layout_coordinate_system"] = "cartesian"
 
+        # Add leaf_df
+        # NOTE: Sometimes (e.g. cogent3) the leaves convert into a pd.Index
+        # in a strange way, whereby their name disappears upon printing the
+        # index but is actually visible (and kept) when inspecting the
+        # individual elements (leaves). Seems ok functionally, though a little
+        # awkward visually during debugging.
+        tree_data["leaf_df"] = pd.DataFrame(index=self.get_leaves())
+        leaf_name_attrs = ("name",)
+
         # Add edge_df
         edge_data = {"_ipx_source": [], "_ipx_target": []}
         for node in self.preorder():
@@ -318,14 +327,26 @@ class TreeDataProvider(Protocol):
         edge_df = pd.DataFrame(edge_data)
         tree_data["edge_df"] = edge_df
 
-        # Add leaf_df
-        # NOTE: Sometimes (e.g. cogent3) the leaves convert into a pd.Index
-        # in a strange way, whereby their name disappears upon printing the
-        # index but is actually visible (and kept) when inspecting the
-        # individual elements (leaves). Seems ok functionally, though a little
-        # awkward visually during debugging.
-        tree_data["leaf_df"] = pd.DataFrame(index=self.get_leaves())
-        leaf_name_attrs = ("name",)
+        # Add branch support
+        if hasattr(self, "get_support"):
+            support = self.get_support()
+
+            for key, value in support.items():
+                # Leaves never show support, it's not a branching point
+                if key in tree_data["leaf_df"].index:
+                    support[key] = ""
+                elif value is None:
+                    support[key] = ""
+                elif np.isscalar(value):
+                    # Assume support is in percentage and round it to nearest integer.
+                    support[key] = str(int(np.round(value, 0)))
+                else:
+                    # Apparently multiple supports are accepted in some XML format
+                    support[key] = "/".join(str(int(np.round(v, 0))) for v in value)
+
+            tree_data["vertex_df"]["support"] = pd.Series(support).loc[
+                tree_data["vertex_df"].index
+            ]
 
         # Add vertex labels
         if vertex_labels is None:

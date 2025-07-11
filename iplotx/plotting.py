@@ -126,6 +126,7 @@ def tree(
     directed: bool | str = False,
     vertex_labels: Optional[list | dict | pd.Series | bool] = None,
     leaf_labels: Optional[list | dict | pd.Series | bool] = None,
+    show_support: bool = False,
     ax: Optional[mpl.axes.Axes] = None,
     style: str | dict | Sequence[str | dict] = "tree",
     title: Optional[str] = None,
@@ -140,6 +141,9 @@ def tree(
         layout: The layout to use for plotting.
         directed: If False, donot draw arrows. If True or "child", draw arrows from parent to child
             node. If "parent", draw arrows the other way around.
+        show_support: If True, show the support values for the nodes (assumed to be from 0 to 100,
+            rounded to nearest integer). If both this parameter and vertex_labels are set,
+            show_support takes precedence and hides the vertex labels.
 
     Returns:
         A TreeArtist object, set as a direct child of the matplotlib Axes.
@@ -158,6 +162,7 @@ def tree(
             offset_transform=ax.transData,
             vertex_labels=vertex_labels,
             leaf_labels=leaf_labels,
+            show_support=show_support,
         )
         ax.add_artist(artist)
 
