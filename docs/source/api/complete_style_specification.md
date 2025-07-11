@@ -220,6 +220,18 @@
         "color": str | Any,  # Color of the leaf edge (e.g. 'gray', '#808080')
         "linewidth": float,  # Width of the leaf edge in points
         "linestyle": str | Any,  # Style of the leaf edge line ('--' for dashed etc.)
+
+        # Leaf edge labels.
+        # NOTE: These lines will NOT exist for leaves that are set at the max depth
+        # (at least one leaf will always be skipped). Therefore, using labels here
+        # can be a little trickier than you might expect.
+        "label": {
+            "color": str | Any,  # Color of the leaf edge label (e.g. 'black')
+            "hmargin": float,  # Horizontal offset (before rotation) off the leaf edge
+            "vmargin": float,  # Vertical offset (before rotation) off the leaf edge
+            # Whether to rotate the label to be horizontal (True) or parallel to the edge (False)
+            "rotate": bool,
+        },
     },
 
     # Layout options for trees
