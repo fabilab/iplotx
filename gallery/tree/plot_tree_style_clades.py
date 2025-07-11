@@ -18,7 +18,7 @@ art = ipx.tree(
     layout="radial",
     ax=ax,
     leaf_labels=True,
-    angular=True,
+    layout_angular=True,
     leaf_deep=False,
     margin=0.1,
 )

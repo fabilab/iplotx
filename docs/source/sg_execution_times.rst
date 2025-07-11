@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.226** total execution time for 44 files **from all galleries**:
+**00:02.706** total execution time for 44 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,13 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_tree_plot_ete4.py` (``../../gallery/tree/plot_ete4.py``)
-     - 00:01.226
+     - 00:01.293
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_tree_node_background.py` (``../../gallery/tree/plot_tree_node_background.py``)
+     - 00:00.854
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_cogent3_layouts.py` (``../../gallery/tree/plot_cogent3_layouts.py``)
+     - 00:00.559
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -146,16 +152,10 @@ Computation times
    * - :ref:`sphx_glr_gallery_tree_plot_biopython_tree.py` (``../../gallery/tree/plot_biopython_tree.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_tree_plot_cogent3_layouts.py` (``../../gallery/tree/plot_cogent3_layouts.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_cogent3_tree.py` (``../../gallery/tree/plot_cogent3_tree.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_skbio_tree.py` (``../../gallery/tree/plot_skbio_tree.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_tree_plot_tree_node_background.py` (``../../gallery/tree/plot_tree_node_background.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_tree_style_clades.py` (``../../gallery/tree/plot_tree_style_clades.py``)

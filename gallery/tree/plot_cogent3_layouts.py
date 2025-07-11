@@ -35,7 +35,7 @@ art = ipx.tree(
     layout="horizontal",
     ax=ax,
     leaf_labels=True,
-    angular=True,
+    layout_angular=True,
     style="cogent3",
 )
 
@@ -47,10 +47,10 @@ for ax, layout in zip(axs, ("vertical", "radial", "horizontal")):
     art = ipx.tree(
         tree,
         layout=layout,
-        orientation="left" if layout == "horizontal" else None,
+        layout_orientation="left" if layout == "horizontal" else None,
         ax=ax,
         leaf_labels=True,
-        angular=True,
+        layout_angular=True,
         style="cogent3",
     )
 fig.tight_layout()
@@ -63,10 +63,10 @@ for ax, layout in zip(axs, ("vertical", "radial", "horizontal")):
     art = ipx.tree(
         tree,
         layout=layout,
-        orientation="left" if layout == "horizontal" else None,
+        layout_orientation="left" if layout == "horizontal" else None,
         ax=ax,
         leaf_labels=True,
-        angular=False,
+        layout_angular=False,
         style="cogent3",
     )
 fig.tight_layout()

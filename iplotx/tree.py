@@ -62,8 +62,6 @@ class TreeArtist(mpl.artist.Artist):
         self,
         tree,
         layout: Optional[str] = "horizontal",
-        orientation: Optional[str] = None,
-        angular: bool = False,
         directed: bool | str = False,
         vertex_labels: Optional[
             bool | list[str] | dict[Hashable, str] | pd.Series
@@ -78,9 +76,6 @@ class TreeArtist(mpl.artist.Artist):
         Parameters:
             tree: The tree to plot.
             layout: The layout to use for the tree. Can be "horizontal", "vertical", or "radial".
-            orientation: The orientation of the tree layout. Can be "right" or "left" (for
-                horizontal and radial layouts) and "descending" or "ascending" (for vertical
-                layouts).
             directed: Whether the tree is directed. Can be a boolean or a string with the
                 following choices: "parent" or "child".
             vertex_labels: Labels for the vertices. Can be a list, dictionary, or pandas Series.
@@ -99,8 +94,6 @@ class TreeArtist(mpl.artist.Artist):
         self._ipx_internal_data = ingest_tree_data(
             tree,
             layout,
-            orientation=orientation,
-            angular=angular,
             directed=directed,
             layout_style=get_style(".layout", {}),
             vertex_labels=vertex_labels,
@@ -318,12 +311,15 @@ class TreeArtist(mpl.artist.Artist):
 
         edge_style = get_style(
             ".leafedge",
-            {
-                "linestyle": "--",
-                "linewidth": 1,
-                "edgecolor": "#111",
-            },
         )
+        default_style = {
+            "linestyle": "--",
+            "linewidth": 1,
+            "edgecolor": "#111",
+        }
+        for key, value in default_style.items():
+            if key not in edge_style:
+                edge_style[key] = value
 
         labels = None
         # TODO: implement leaf edge labels
@@ -338,37 +334,13 @@ class TreeArtist(mpl.artist.Artist):
             cmap_fun = None
 
         leaf_shallow_layout = self.get_layout("leaf")
-        leaf_deep_layout = self._leaf_vertices.get_layout()
-
-        print(leaf_shallow_layout)
-        print(leaf_deep_layout)
-
-        return
-
-        edge_df = self._ipx_internal_data["edge_df"].set_index(
-            ["_ipx_source", "_ipx_target"]
-        )
 
         if "cmap" in edge_style:
             colorarray = []
         edgepatches = []
         adjacent_vertex_ids = []
-        for i, (vid1, vid2) in enumerate(edge_df.index):
-            edge_stylei = rotate_style(edge_style, index=i, key=(vid1, vid2))
-
-            # FIXME:: Improve this logic. We have three layers of priority:
-            # 1. Explicitely set in the style of "plot"
-            # 2. Internal through network attributes
-            # 3. Default styles
-            # Because 1 and 3 are merged as a style context on the way in,
-            # it's hard to squeeze 2 in the middle. For now, we will assume
-            # the priority order is 2-1-3 instead (internal property is
-            # highest priority).
-            # This is also why we cannot shift this logic further into the
-            # EdgeCollection class, which is oblivious of NetworkArtist's
-            # internal data. In fact, one would argue this needs to be
-            # pushed outwards to deal with the wrong ordering.
-            _update_from_internal(edge_stylei, edge_df.iloc[i], kind="edge")
+        for i, vid in enumerate(leaf_shallow_layout.index):
+            edge_stylei = rotate_style(edge_style, index=i, key=vid)
 
             if cmap_fun is not None:
                 colorarray.append(edge_stylei["color"])
@@ -381,7 +353,7 @@ class TreeArtist(mpl.artist.Artist):
                 **edge_stylei,
             )
             edgepatches.append(patch)
-            adjacent_vertex_ids.append((vid1, vid2))
+            adjacent_vertex_ids.append(vid)
 
         if "cmap" in edge_style:
             vmin = np.min(colorarray)
@@ -389,8 +361,7 @@ class TreeArtist(mpl.artist.Artist):
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
 
-        # NOTE: Trees are directed is their "directed" property is True, "child", or "parent"
-        self._edges = LeafEdgeCollection(
+        self._leaf_edges = LeafEdgeCollection(
             edgepatches,
             vertex_leaf_ids=adjacent_vertex_ids,
             vertex_collection=self._vertices,
@@ -401,7 +372,7 @@ class TreeArtist(mpl.artist.Artist):
             directed=False,
         )
         if "cmap" in edge_style:
-            self._edges.set_array(colorarray)
+            self._leaf_edges.set_array(colorarray)
 
     def _add_leaf_vertices(self) -> None:
         """Add invisible deep vertices as leaf label anchors."""
@@ -618,7 +589,7 @@ class TreeArtist(mpl.artist.Artist):
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
 
-        if self._ipx_internal_data["angular"]:
+        if get_style(".layout", {}).get("angular", False):
             edge_style.pop("waypoints", None)
         else:
             edge_style["waypoints"] = waypoints
@@ -714,6 +685,8 @@ class TreeArtist(mpl.artist.Artist):
         z_suborder = defaultdict(int)
         if hasattr(self, "_leaf_vertices"):
             z_suborder[self._leaf_vertices] = -2
+        if hasattr(self, "_leaf_edges"):
+            z_suborder[self._leaf_edges] = -2
         if hasattr(self, "_cascades"):
             z_suborder[self._cascades] = -1
         children = list(self.get_children())

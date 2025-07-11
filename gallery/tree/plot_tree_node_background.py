@@ -99,7 +99,7 @@ for i, (layout_name, layout_orientations) in enumerate(layout_and_orientations.i
             tree,
             ax=axs[i, j],
             layout=layout_name,
-            orientation=orientation,
+            layout_orientation=orientation,
             leaf_labels={
                 leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())
             },

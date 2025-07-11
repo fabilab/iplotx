@@ -262,11 +262,13 @@ class EdgeCollection(mpl.collections.PatchCollection):
         trans_inv = transform.inverted().transform
 
         # 1. Make a list of vertices with loops, and store them for later
-        loop_vertex_dict = defaultdict(lambda: dict(indices=[], edge_angles=[]))
-        for i, (v1, v2) in enumerate(vids):
-            # Postpone loops (step 3)
-            if v1 == v2:
-                loop_vertex_dict[v1]["indices"].append(i)
+        # NOTE: vinfo["loops"] can be False when we want no loops (e.g. leaf edges)
+        if vinfo.get("loops", True):
+            loop_vertex_dict = defaultdict(lambda: dict(indices=[], edge_angles=[]))
+            for i, (v1, v2) in enumerate(vids):
+                # Postpone loops (step 3)
+                if v1 == v2:
+                    loop_vertex_dict[v1]["indices"].append(i)
 
         # 2. Make paths for non-loop edges
         # NOTE: keep track of parallel edges to offset them
@@ -274,7 +276,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         paths = []
         for i, (v1, v2) in enumerate(vids):
             # Postpone loops (step 3)
-            if v1 == v2:
+            if vinfo.get("loops", True) and (v1 == v2):
                 paths.append(None)
                 continue
 
@@ -330,10 +332,11 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 path.vertices[:] = trans_inv(trans(path.vertices) + offset)
 
             # Collect angles for this vertex, to be used for loops plotting below
-            if v1 in loop_vertex_dict:
-                loop_vertex_dict[v1]["edge_angles"].append(angles[0])
-            if v2 in loop_vertex_dict:
-                loop_vertex_dict[v2]["edge_angles"].append(angles[1])
+            if vinfo.get("loops", True):
+                if v1 in loop_vertex_dict:
+                    loop_vertex_dict[v1]["edge_angles"].append(angles[0])
+                if v2 in loop_vertex_dict:
+                    loop_vertex_dict[v2]["edge_angles"].append(angles[1])
 
             # Add the path for this non-loop edge
             paths.append(path)
@@ -360,39 +363,40 @@ class EdgeCollection(mpl.collections.PatchCollection):
                     )
 
         # 3. Deal with loops at the end
-        for vid, ldict in loop_vertex_dict.items():
-            vpath = vpaths[ldict["indices"][0]][0]
-            vsize = vsizes[ldict["indices"][0]][0]
-            vcoord_fig = trans(vcenters[ldict["indices"][0]][0])
-            nloops = len(ldict["indices"])
-            edge_angles = ldict["edge_angles"]
+        if vinfo.get("loops", True):
+            for vid, ldict in loop_vertex_dict.items():
+                vpath = vpaths[ldict["indices"][0]][0]
+                vsize = vsizes[ldict["indices"][0]][0]
+                vcoord_fig = trans(vcenters[ldict["indices"][0]][0])
+                nloops = len(ldict["indices"])
+                edge_angles = ldict["edge_angles"]
 
-            # The space between the existing angles is where we can fit the loops
-            # One loop we can fit in the largest wedge, multiple loops we need
-            nloops_per_angle = _compute_loops_per_angle(nloops, edge_angles)
+                # The space between the existing angles is where we can fit the loops
+                # One loop we can fit in the largest wedge, multiple loops we need
+                nloops_per_angle = _compute_loops_per_angle(nloops, edge_angles)
 
-            idx = 0
-            for theta1, theta2, nloops in nloops_per_angle:
-                # Angular size of each loop in this wedge
-                delta = (theta2 - theta1) / nloops
+                idx = 0
+                for theta1, theta2, nloops in nloops_per_angle:
+                    # Angular size of each loop in this wedge
+                    delta = (theta2 - theta1) / nloops
 
-                # Iterate over individual loops
-                for j in range(nloops):
-                    thetaj1 = theta1 + j * delta + max(delta - loopmaxangle, 0) / 2
-                    thetaj2 = thetaj1 + min(delta, loopmaxangle)
+                    # Iterate over individual loops
+                    for j in range(nloops):
+                        thetaj1 = theta1 + j * delta + max(delta - loopmaxangle, 0) / 2
+                        thetaj2 = thetaj1 + min(delta, loopmaxangle)
 
-                    # Get the path for this loop
-                    path = _compute_loop_path(
-                        vcoord_fig,
-                        vpath,
-                        vsize,
-                        thetaj1,
-                        thetaj2,
-                        trans_inv,
-                        looptension=self._style.get("looptension", 2.5),
-                    )
-                    paths[ldict["indices"][idx]] = path
-                    idx += 1
+                        # Get the path for this loop
+                        path = _compute_loop_path(
+                            vcoord_fig,
+                            vpath,
+                            vsize,
+                            thetaj1,
+                            thetaj2,
+                            trans_inv,
+                            looptension=self._style.get("looptension", 2.5),
+                        )
+                        paths[ldict["indices"][idx]] = path
+                        idx += 1
 
         self._paths = paths
 

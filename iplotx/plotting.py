@@ -123,8 +123,6 @@ def network(
 def tree(
     tree: Optional[TreeType] = None,
     layout: str | LayoutType = "horizontal",
-    orientation: Optional[str] = None,
-    angular: bool = False,
     directed: bool | str = False,
     vertex_labels: Optional[list | dict | pd.Series | bool] = None,
     leaf_labels: Optional[list | dict | pd.Series | bool] = None,
@@ -140,9 +138,6 @@ def tree(
     Parameters:
         tree: The tree to plot. Can be a BioPython.Phylo.Tree object.
         layout: The layout to use for plotting.
-        orientation: The orientation of the layout. Can be "right" or "left". Defaults to
-            "right" for horizontal layout, "descending" or "ascending" for vertical layout,
-            and "clockwise" or "anticlockwise" for radial layout.
         directed: If False, donot draw arrows. If True or "child", draw arrows from parent to child
             node. If "parent", draw arrows the other way around.
 
@@ -158,8 +153,6 @@ def tree(
         artist = TreeArtist(
             tree=tree,
             layout=layout,
-            orientation=orientation,
-            angular=angular,
             directed=directed,
             transform=mpl.transforms.IdentityTransform(),
             offset_transform=ax.transData,

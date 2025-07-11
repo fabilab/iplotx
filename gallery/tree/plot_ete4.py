@@ -28,7 +28,7 @@ ipx.plotting.tree(
 ipx.plotting.tree(
     tree,
     layout="radial",
-    orientation="right",
+    layout_orientation="right",
     style=[
         "tree",
         {
@@ -44,6 +44,10 @@ ipx.plotting.tree(
                 "label": {
                     "hmargin": 15,
                 }
+            },
+            "leafedge": {
+                "color": "purple",
+                "linewidth": 2,
             },
         },
     ],

@@ -190,7 +190,8 @@
         "vertexpadding": float,  # Padding around the vertices in the grouping in points
     },
 
-    # The following entries are used by trees ONLY (not by networks as plotted by `iplotx.network`)
+    ############################################################################
+    # The following entries are used by trees ONLY (as plotted by `iplotx.tree`)
     "cascade": {
         # Whether to limit the cascade to the deepest descendant (False),
         # to the deepest leaf overall (True), or to include the leaf labels
@@ -212,6 +213,27 @@
             "hmargin": float,  # Horizontal offset (before rotation) off the leaf node
         }
     },
+
+    # Leaf edge styles are used for the (usually dashed) lines connecting leaves
+    # at less-than-max depth to deep labels (if used).
+    "leafedge": {
+        "color": str | Any,  # Color of the leaf edge (e.g. 'gray', '#808080')
+        "linewidth": float,  # Width of the leaf edge in points
+        "linestyle": str | Any,  # Style of the leaf edge line ('--' for dashed etc.)
+    },
+
+    # Layout options for trees
+    "layout": {
+        # Orientation of the tree. Accepted values depend on the tree layout:
+        # - "horizontal" layout: "left" or "right"
+        # - "vertical" layout: "ascending" or "descending"
+        # - "radial" layout: "clockwise" or "counterclockwise"
+        "orientation": str,
+        "angular": bool,  # Whether to use an angular or waypoint-based layout
+        "start": float,  # Starting angle for radial layouts (in degrees)
+        "span": float,  # Angle span for radial layouts (in degrees)
+    },
+    ############################################################################
 }
 ```
 

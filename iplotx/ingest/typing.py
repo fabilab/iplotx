@@ -91,7 +91,6 @@ class TreeData(TypedDict):
     layout_coordinate_system: str
     layout_name: str
     orientation: str
-    angular: bool
     ndim: int
     tree_library: NotRequired[str]
 
@@ -254,8 +253,6 @@ class TreeDataProvider(Protocol):
     def __call__(
         self,
         layout: str | LayoutType,
-        orientation: Optional[str],
-        angular: bool = False,
         layout_style: Optional[dict[str, int | float | str]] = None,
         directed: bool | str = False,
         vertex_labels: Optional[
@@ -274,6 +271,7 @@ class TreeDataProvider(Protocol):
         if layout_style is None:
             layout_style = {}
 
+        orientation = layout_style.pop("orientation", None)
         if orientation is None:
             if layout == "horizontal":
                 orientation = "right"
@@ -289,7 +287,6 @@ class TreeDataProvider(Protocol):
             "ndim": 2,
             "layout_name": layout,
             "orientation": orientation,
-            "angular": angular,
         }
 
         # Add vertex_df including layout

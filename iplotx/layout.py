@@ -38,6 +38,10 @@ def compute_tree_layout(
     kwargs["branch_length_fun"] = branch_length_fun
     kwargs["orientation"] = orientation
 
+    # Angular or not, the vertex layout is unchanged. Since we do not
+    # currently compute an edge layout here, we can ignore the option.
+    kwargs.pop("angular", None)
+
     if layout == "radial":
         layout_dict = _radial_tree_layout(**kwargs)
     elif layout == "horizontal":

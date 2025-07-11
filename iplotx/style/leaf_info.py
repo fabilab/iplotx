@@ -34,6 +34,7 @@ nonrotating_leaves = (
     "vertexpadding",
     "extend",
     "deep",
+    "angular",
 )
 
 # Union of all style leaves (rotating and nonrotating)

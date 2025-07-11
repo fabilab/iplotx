@@ -8,6 +8,8 @@ from typing import (
     Optional,
     Any,
 )
+import numpy as np
+import pandas as pd
 import matplotlib as mpl
 
 from ..utils.matplotlib import (
@@ -60,7 +62,7 @@ class LeafEdgeCollection(EdgeCollection):
                 with zero size or opacity to obtain an "arrowless" effect).
             style: The edge style (subdictionary: "edge") to use at creation.
         """
-        self.leaf_collection = leaf_collection
+        self._leaf_collection = leaf_collection
         super().__init__(
             patches=patches,
             vertex_ids=vertex_leaf_ids,
@@ -73,4 +75,43 @@ class LeafEdgeCollection(EdgeCollection):
             **kwargs,
         )
 
-    # TODO: reimplement the vertex info function plus perhaps something else
+    def _get_adjacent_vertices_info(self):
+        lindex = self._leaf_collection.get_index()
+        lindex = pd.Series(
+            np.arange(len(lindex)),
+            index=lindex,
+        )
+        vindex = self._vertex_collection.get_index()
+        vindex = pd.Series(
+            np.arange(len(vindex)),
+            index=vindex,
+        ).loc[lindex.index]
+
+        voffsets = []
+        vpaths = []
+        vsizes = []
+        for vid in self._vertex_ids:
+            # NOTE: these are in the original layout coordinate system
+            # not cartesianised yet.
+            offset1 = self._vertex_collection.get_layout().values[vindex[vid]]
+            offset2 = self._leaf_collection.get_layout().values[lindex[vid]]
+            voffsets.append((offset1, offset2))
+
+            path1 = self._vertex_collection.get_paths()[vindex[vid]]
+            path2 = self._leaf_collection.get_paths()[lindex[vid]]
+            vpaths.append((path1, path2))
+
+            # NOTE: This needs to be computed here because the
+            # VertexCollection._transforms are reset each draw in order to
+            # accomodate for DPI changes on the canvas
+            size1 = self._vertex_collection.get_sizes_dpi()[vindex[vid]]
+            size2 = self._leaf_collection.get_sizes_dpi()[lindex[vid]]
+            vsizes.append((size1, size2))
+
+        return {
+            "ids": [(vid, vid) for vid in self._vertex_ids],
+            "offsets": voffsets,
+            "paths": vpaths,
+            "sizes": vsizes,
+            "loops": False,
+        }

@@ -107,8 +107,6 @@ def ingest_network_data(
 def ingest_tree_data(
     tree: TreeType,
     layout: Optional[str] = "horizontal",
-    orientation: Optional[str] = None,
-    angular: bool = False,
     directed: bool | str = False,
     layout_style: Optional[dict[str, str | int | float]] = None,
     vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series] = None,
@@ -133,8 +131,6 @@ def ingest_tree_data(
         tree=tree,
     )(
         layout=layout,
-        orientation=orientation,
-        angular=angular,
         directed=directed,
         layout_style=layout_style,
         vertex_labels=vertex_labels,
@@ -142,8 +138,6 @@ def ingest_tree_data(
         leaf_labels=leaf_labels,
     )
     result["tree_library"] = tl
-
-    # TODO: cascading thing here
 
     return result
 
