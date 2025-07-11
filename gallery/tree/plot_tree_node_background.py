@@ -29,7 +29,7 @@ backgrounds = {
 
 ipx.plotting.tree(
     tree,
-    vertex_cascade_facecolor=backgrounds,
+    cascade_facecolor=backgrounds,
 )
 
 # %%
@@ -39,8 +39,8 @@ ipx.plotting.tree(
 ipx.plotting.tree(
     tree,
     layout="vertical",
-    vertex_cascade_facecolor=backgrounds,
-    vertex_cascade_extend=True,
+    cascade_facecolor=backgrounds,
+    cascade_extend=True,
 )
 
 # %%
@@ -50,8 +50,8 @@ ipx.plotting.tree(
 ipx.plotting.tree(
     tree,
     layout="radial",
-    vertex_cascade_facecolor=backgrounds,
-    vertex_cascade_extend=True,
+    cascade_facecolor=backgrounds,
+    cascade_extend=True,
     aspect=1,
 )
 
@@ -65,8 +65,8 @@ ipx.plotting.tree(
     ax=ax1,
     layout="radial",
     leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
-    vertex_cascade_facecolor=backgrounds,
-    vertex_cascade_extend=True,  # Exclude leaf labels
+    cascade_facecolor=backgrounds,
+    cascade_extend=True,  # Exclude leaf labels
     aspect=1,
     margins=0.4,
     title="Exclude leaf labels",
@@ -76,8 +76,8 @@ ipx.plotting.tree(
     ax=ax2,
     layout="radial",
     leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
-    vertex_cascade_facecolor=backgrounds,
-    vertex_cascade_extend="leaf_labels",  # Include leaf labels
+    cascade_facecolor=backgrounds,
+    cascade_extend="leaf_labels",  # Include leaf labels
     aspect=1,
     margins=0.4,
     title="Include leaf labels",
@@ -103,8 +103,8 @@ for i, (layout_name, layout_orientations) in enumerate(layout_and_orientations.i
             leaf_labels={
                 leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())
             },
-            vertex_cascade_facecolor=backgrounds,
-            vertex_cascade_extend="leaf_labels",
+            cascade_facecolor=backgrounds,
+            cascade_extend="leaf_labels",
             aspect=1,
             title=f"{layout_name} ({orientation})",
             margins=0.1,

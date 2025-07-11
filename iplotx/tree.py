@@ -119,7 +119,7 @@ class TreeArtist(mpl.artist.Artist):
 
         # NOTE: cascades need to be created after leaf vertices in case
         # they are requested to wrap around them.
-        if "cascade" in self.get_vertices().get_style():
+        if get_style(".cascade") != {}:
             self._add_cascades()
 
     def get_children(self) -> tuple[mpl.artist.Artist]:
@@ -168,7 +168,7 @@ class TreeArtist(mpl.artist.Artist):
         if not hasattr(self, "_cascades"):
             return
 
-        style_cascade = self.get_vertices().get_style()["cascade"]
+        style_cascade = get_style(".cascade")
         extend_to_labels = style_cascade.get("extend", False) == "leaf_labels"
         if not extend_to_labels:
             return
@@ -303,10 +303,14 @@ class TreeArtist(mpl.artist.Artist):
 
     def _add_leaf_edges(self) -> None:
         """Add edges from the leaf to the max leaf depth."""
-        # If there are no leaves or leaves are not deep, there are no leaf edges
+        # If there are no leaves, no leaf labels, or leaves are not deep,
+        # skip leaf edges
         if not hasattr(self, "_leaf_vertices"):
             return
-        if not get_style(".leaf", {}).get("deep", True):
+        leaf_style = get_style(".leaf", {})
+        if ("deep" not in leaf_style) and self.get_leaf_labels() is None:
+            return
+        if not leaf_style.get("deep", True):
             return
 
         edge_style = get_style(
@@ -461,7 +465,7 @@ class TreeArtist(mpl.artist.Artist):
         # NOTE: If leaf labels are present and the cascades are requested to wrap around them,
         # we have to compute the max extend of the cascades from the leaf labels.
         maxdepth = None
-        style_cascade = self.get_vertices().get_style()["cascade"]
+        style_cascade = get_style(".cascade")
         extend_to_labels = style_cascade.get("extend", False) == "leaf_labels"
         has_leaf_labels = self.get_leaf_labels() is not None
         if extend_to_labels and not has_leaf_labels:

@@ -61,7 +61,7 @@ art = ipx.tree(
     ax=ax,
     aspect=1,
     edge_color="grey",
-    vertex_cascade_facecolor={
+    cascade_facecolor={
         list(tree.leaves())[0]: "lightblue",
         list(tree.traverse("preorder"))[2]: "pink",
     },
