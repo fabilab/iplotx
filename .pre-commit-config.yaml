@@ -33,3 +33,9 @@ repos:
 #    hooks:
 #    -   id: mypy
 #        files: '^(iplotx)/'
+
+-   repo: https://github.com/astral-sh/uv-pre-commit
+    # uv version.
+    rev: 0.7.20
+    hooks:
+      - id: uv-lock
