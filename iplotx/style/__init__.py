@@ -361,7 +361,9 @@ def rotate_style(
         if (index is not None) and isinstance(
             val, (tuple, list, np.ndarray, pd.Index, pd.Series)
         ):
-            style[prop] = np.asarray(val)[index % len(val)]
+            # NOTE: cannot cast to ndarray because rotation might involve
+            # cross-type lists (e.g. ["none", False])
+            style[prop] = list(val)[index % len(val)]
         # Try key indexing for unordered, dict-like types
         if (
             (key is not None)

@@ -298,9 +298,19 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 tension = 0
                 ports = None
 
+            # False is a synonym for "none"
             waypoints = edge_stylei.get("waypoints", "none")
+            if waypoints is False or waypoints is np.False_:
+                waypoints = "none"
+            elif waypoints is True or waypoints is np.True_:
+                raise ValueError(
+                    "Could not determine automatically type of edge waypoints.",
+                )
             if waypoints != "none":
                 ports = edge_stylei.get("ports", (None, None))
+
+            if not isinstance(waypoints, str):
+                __import__("ipdb").set_trace()
 
             # Compute actual edge path
             path, angles = _compute_edge_path(

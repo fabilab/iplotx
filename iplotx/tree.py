@@ -574,6 +574,8 @@ class TreeArtist(mpl.artist.Artist):
 
             # Tree layout determines waypoints
             waypointsi = edge_stylei.pop("waypoints", None)
+            if isinstance(waypointsi, (bool, np.bool)):
+                waypointsi = ["none", None][int(waypointsi)]
             if waypointsi is None:
                 layout_name = self._ipx_internal_data["layout_name"]
                 if layout_name == "horizontal":
@@ -583,7 +585,9 @@ class TreeArtist(mpl.artist.Artist):
                 elif layout_name == "radial":
                     waypointsi = "r0a1"
                 else:
-                    waypointsi = "none"
+                    raise ValueError(
+                        f"Layout not supported: {layout_name}. ",
+                    )
             waypoints.append(waypointsi)
 
             # These are not the actual edges drawn, only stubs to establish

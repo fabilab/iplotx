@@ -1,0 +1,74 @@
+"""
+Angular layout and edge waypoints
+=================================
+
+This example demonstrates `iplotx`'s capability to style tree appearance with
+an angular look, either for the whole tree or specific edges.
+
+.. tip::
+    "Waypoints" and "angular" are opposites. When an edge uses waypoints, you
+    can say it is using an angular style.
+
+"""
+
+from Bio import Phylo
+from io import StringIO
+import matplotlib.pyplot as plt
+import iplotx as ipx
+
+tree = Phylo.read(
+    StringIO("(((A,B),(C,D)),(E,F,G));"),
+    format="newick",
+)
+
+fig, axs = plt.subplots(2, 2, figsize=(9, 9))
+ipx.tree(
+    tree,
+    ax=axs[0, 0],
+    title="Default\n(with waypoints)",
+)
+ipx.tree(
+    tree,
+    ax=axs[0, 1],
+    layout_angular=True,
+    title="Angular",
+)
+ipx.tree(
+    tree,
+    ax=axs[1, 0],
+    edge_waypoints=False,
+    title="Angular\n(via edge_waypoints)",
+)
+ipx.tree(
+    tree,
+    ax=axs[1, 1],
+    edge_waypoints=[True, False],
+    title="Mixed",
+)
+
+# %%
+# .. warning::
+#     For waypoints, ``None`` and the string ``"none"`` are interpreted differently
+#     by ``iplotx``. The latter ``"none"`` means no waypoints, whereas the Python
+#     singleton ``None`` means letting ``iplotx`` determine the correct type of
+#     waypoints. ``None`` is equivalent to ``True``, while ``"none"`` is equivalent
+#     to ``False``.
+#
+# You can even specify angularity on a per-edge basis with a defaultdict:
+
+from collections import defaultdict
+
+ipx.tree(
+    tree,
+    edge_waypoints=defaultdict(bool, {tree.clade[0, 1]: True}),
+    title="Mixed\n(per-edge)",
+)
+
+# %%
+# You can also mix booleans and other types, although it is not very readable:
+
+ipx.tree(
+    tree,
+    edge_waypoints=[True, "none"],
+    title="Mixed",
+)
