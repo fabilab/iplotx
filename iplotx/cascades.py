@@ -93,9 +93,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
             stylei = rotate_style(style, key=node)
             stylei.pop("extend", None)
             # Default alpha is 0.5 for simple colors
-            if isinstance(stylei.get("facecolor", None), str) and (
-                "alpha" not in stylei
-            ):
+            if isinstance(stylei.get("facecolor", None), str) and ("alpha" not in stylei):
                 stylei["alpha"] = 0.5
 
             provider_node = provider(node)
@@ -137,9 +135,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
                 rmax = maxdepth if extend else leaves_coords[:, 0].max()
                 thetamin = leaves_coords[:, 1].min() - 0.5 * dtheta
                 thetamax = leaves_coords[:, 1].max() + 0.5 * dtheta
-                thetas = np.linspace(
-                    thetamin, thetamax, max(30, (thetamax - thetamin) // 3)
-                )
+                thetas = np.linspace(thetamin, thetamax, max(30, (thetamax - thetamin) // 3))
                 xs = list(rmin * np.cos(thetas)) + list(rmax * np.cos(thetas[::-1]))
                 ys = list(rmin * np.sin(thetas)) + list(rmax * np.sin(thetas[::-1]))
                 points = list(zip(xs, ys))
@@ -200,9 +196,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
             for path in self.get_paths():
                 # Old radii
                 r2old = np.linalg.norm(path.vertices[-2])
-                path.vertices[(len(path.vertices) - 1) // 2 :] *= (
-                    self.get_maxdepth() / r2old
-                )
+                path.vertices[(len(path.vertices) - 1) // 2 :] *= self.get_maxdepth() / r2old
             return
 
         if (layout_name, orientation) == ("horizontal", "right"):

@@ -64,9 +64,7 @@ class TreeArtist(mpl.artist.Artist):
         tree,
         layout: Optional[str] = "horizontal",
         directed: bool | str = False,
-        vertex_labels: Optional[
-            bool | list[str] | dict[Hashable, str] | pd.Series
-        ] = None,
+        vertex_labels: Optional[bool | list[str] | dict[Hashable, str] | pd.Series] = None,
         edge_labels: Optional[Sequence | dict[Hashable, str] | pd.Series] = None,
         leaf_labels: Optional[Sequence | dict[Hashable, str]] | pd.Series = None,
         transform: mpl.transforms.Transform = mpl.transforms.IdentityTransform(),
@@ -194,9 +192,7 @@ class TreeArtist(mpl.artist.Artist):
 
     def get_layout(self, kind="vertex"):
         """Get vertex or edge layout."""
-        layout_columns = [
-            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
-        ]
+        layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
 
         if kind == "vertex":
             layout = self._ipx_internal_data["vertex_df"][layout_columns]
@@ -497,9 +493,7 @@ class TreeArtist(mpl.artist.Artist):
         layout_name = self.get_layout_name()
         if layout_name == "radial":
             maxdepth = 0
-            bboxes = self.get_leaf_labels().get_datalims_children(
-                self.get_offset_transform()
-            )
+            bboxes = self.get_leaf_labels().get_datalims_children(self.get_offset_transform())
             for bbox in bboxes:
                 r1 = np.linalg.norm([bbox.xmax, bbox.ymax])
                 r2 = np.linalg.norm([bbox.xmax, bbox.ymin])
@@ -542,9 +536,7 @@ class TreeArtist(mpl.artist.Artist):
         else:
             cmap_fun = None
 
-        edge_df = self._ipx_internal_data["edge_df"].set_index(
-            ["_ipx_source", "_ipx_target"]
-        )
+        edge_df = self._ipx_internal_data["edge_df"].set_index(["_ipx_source", "_ipx_target"])
 
         if "cmap" in edge_style:
             colorarray = []
@@ -661,14 +653,10 @@ class TreeArtist(mpl.artist.Artist):
         root = provider(self.tree).get_lca(nodes)
 
         # Populate a DataFrame with the array of properties to update
-        vertex_idx = {
-            node: i for i, node in enumerate(self._ipx_internal_data["vertex_df"].index)
-        }
+        vertex_idx = {node: i for i, node in enumerate(self._ipx_internal_data["vertex_df"].index)}
         edge_idx = {
             node: i
-            for i, node in enumerate(
-                self._ipx_internal_data["edge_df"]["_ipx_target"].values
-            )
+            for i, node in enumerate(self._ipx_internal_data["edge_df"]["_ipx_target"].values)
         }
         vertex_props = {}
         edge_props = {}

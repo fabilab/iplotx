@@ -1,25 +1,22 @@
 from io import StringIO
-import os
+import importlib
 import unittest
-import pytest
-import numpy as np
 import matplotlib as mpl
-
-try:
-    from Bio import Phylo
-except ImportError:
-    raise unittest.SkipTest("biopython not found, skipping tests")
 
 mpl.use("agg")
 import matplotlib.pyplot as plt
-
 import iplotx as ipx
 
 from utils import image_comparison
 
 
-class TreeTestRunner(unittest.TestCase):
+if importlib.util.find_spec("Bio") is None:
+    raise unittest.SkipTest("biopython not found, skipping tests")
+else:
+    from Bio import Phylo
 
+
+class TreeTestRunner(unittest.TestCase):
     @property
     def small_tree(self):
         tree = next(
@@ -70,9 +67,7 @@ class TreeTestRunner(unittest.TestCase):
     def test_leaf_labels_hmargin(self):
         tree = self.small_tree
         leaf_labels = {leaf: str(i + 1) for i, leaf in enumerate(tree.get_terminals())}
-        vertex_label_hmargin = {
-            key: [10, 22][(int(x) - 1) % 2] for key, x in leaf_labels.items()
-        }
+        vertex_label_hmargin = {key: [10, 22][(int(x) - 1) % 2] for key, x in leaf_labels.items()}
 
         fig, ax = plt.subplots(figsize=(4, 4))
         ipx.plotting.tree(

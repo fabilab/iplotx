@@ -200,9 +200,7 @@ class NetworkArtist(mpl.artist.Artist):
         self.axes.autoscale_view(tight=tight)
 
     def get_layout(self):
-        layout_columns = [
-            f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])
-        ]
+        layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
         vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
         return vertex_layout_df
 
@@ -249,9 +247,7 @@ class NetworkArtist(mpl.artist.Artist):
         else:
             cmap_fun = None
 
-        edge_df = self._ipx_internal_data["edge_df"].set_index(
-            ["_ipx_source", "_ipx_target"]
-        )
+        edge_df = self._ipx_internal_data["edge_df"].set_index(["_ipx_source", "_ipx_target"])
 
         if "cmap" in edge_style:
             colorarray = []

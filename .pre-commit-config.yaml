@@ -1,41 +1,54 @@
 # See https://pre-commit.com for more information
 # See https://pre-commit.com/hooks.html for more hooks
 repos:
--   repo: https://github.com/pre-commit/pre-commit-hooks
-    rev: v5.0.0
-    hooks:
-    -   id: trailing-whitespace
-    -   id: end-of-file-fixer
-    -   id: check-yaml
-    -   id: check-added-large-files
--   repo: https://github.com/psf/black
-    rev: 25.1.0
-    hooks:
-    -   id: black
-        args: [--check,--target-version,py310]
--   repo: https://github.com/PyCQA/flake8
-    rev: 7.3.0
-    hooks:
-    -   id: flake8
-        args: [
-            '--count',
-            '--max-complexity=20',
-            '--max-line-length=127',
-            '--statistics',
-            '--extend-ignore=RST399',
-            '--exit-zero',
-        ]
-        additional_dependencies: [
-            'flake8-rst-docstrings>=0.2.3',
-        ]
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v5.0.0
+  hooks:
+  -   id: trailing-whitespace
+  -   id: end-of-file-fixer
+  -   id: check-yaml
+  -   id: check-added-large-files
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.12.3
+  hooks:
+    # Run the linter.
+    - id: ruff-check
+      types_or: [ python, pyi ]
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
+      types_or: [ python, pyi ]
+
+#- repo: https://github.com/psf/black
+#  rev: 25.1.0
+#  hooks:
+#  -   id: black
+#      args: [--check,--target-version,py311]
+- repo: https://github.com/PyCQA/flake8
+  rev: 7.3.0
+  hooks:
+  -   id: flake8
+      args: [
+          --count,
+          --max-complexity=20,
+          --max-line-length=127,
+          --statistics,
+          --extend-ignore=RST399,
+          --exit-zero,
+      ]
+      additional_dependencies: [
+          'flake8-rst-docstrings>=0.2.3',
+      ]
 #-   repo: https://github.com/pre-commit/mirrors-mypy
 #    rev: v1.16.1
 #    hooks:
 #    -   id: mypy
 #        files: '^(iplotx)/'
 
--   repo: https://github.com/astral-sh/uv-pre-commit
-    # uv version.
-    rev: 0.7.20
-    hooks:
-      - id: uv-lock
+- repo: https://github.com/astral-sh/uv-pre-commit
+  # uv version.
+  rev: 0.7.20
+  hooks:
+    - id: uv-lock

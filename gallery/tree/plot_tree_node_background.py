@@ -100,9 +100,7 @@ for i, (layout_name, layout_orientations) in enumerate(layout_and_orientations.i
             ax=axs[i, j],
             layout=layout_name,
             layout_orientation=orientation,
-            leaf_labels={
-                leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())
-            },
+            leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
             cascade_facecolor=backgrounds,
             cascade_extend="leaf_labels",
             aspect=1,

@@ -1,28 +1,20 @@
-from ast import Import
-import os
 import unittest
-import pytest
+import importlib
 import numpy as np
 import matplotlib as mpl
 
 mpl.use("agg")
 import matplotlib.pyplot as plt
-
 import iplotx as ipx
-
-try:
-    import networkx as nx
-except ImportError:
-    nx = None
-
 from utils import image_comparison
+
+if importlib.util.find_spec("networkx") is None:
+    raise unittest.SkipTest("networkx not found, skipping tests")
+else:
+    import networkx as nx
 
 
 class GraphTestRunner(unittest.TestCase):
-    def setUp(self):
-        if nx is None:
-            raise unittest.SkipTest("networkx not found, skipping tests")
-
     @image_comparison(baseline_images=["flat_style"], remove_text=True)
     def test_flat_style(self):
         G = nx.Graph(
@@ -143,9 +135,7 @@ class GraphTestRunner(unittest.TestCase):
             ax=ax,
         )
 
-    @image_comparison(
-        baseline_images=["directed_graph_with_colorbar"], remove_text=True
-    )
+    @image_comparison(baseline_images=["directed_graph_with_colorbar"], remove_text=True)
     def test_directed_graph(self):
         seed = 13648  # Seed random number generators for reproducibility
         G = nx.random_k_out_graph(10, 3, 0.5, seed=seed)

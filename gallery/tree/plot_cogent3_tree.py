@@ -25,7 +25,7 @@ ipx.plotting.tree(
 # Moreover, the plot can be customised further using hmargin (horizontal label margin)
 # and some `matplotlib` settings.
 
-leaf_labels = {leaf: f"Species {i+1}" for i, leaf in enumerate(tree.tips())}
+leaf_labels = {leaf: f"Species {i + 1}" for i, leaf in enumerate(tree.tips())}
 fig, ax = plt.subplots(figsize=(5, 4))
 ipx.plotting.tree(
     tree,

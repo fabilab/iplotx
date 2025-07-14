@@ -255,13 +255,9 @@ class TreeDataProvider(Protocol):
         layout: str | LayoutType,
         layout_style: Optional[dict[str, int | float | str]] = None,
         directed: bool | str = False,
-        vertex_labels: Optional[
-            Sequence[str] | dict[Hashable, str] | pd.Series | bool
-        ] = None,
+        vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series | bool] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
-        leaf_labels: Optional[
-            Sequence[str] | dict[Hashable, str] | pd.Series | bool
-        ] = None,
+        leaf_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series | bool] = None,
     ) -> TreeData:
         """Create tree data object for iplotx from ete4.core.tre.Tree classes.
 
@@ -344,17 +340,13 @@ class TreeDataProvider(Protocol):
                     # Apparently multiple supports are accepted in some XML format
                     support[key] = "/".join(str(int(np.round(v, 0))) for v in value)
 
-            tree_data["vertex_df"]["support"] = pd.Series(support).loc[
-                tree_data["vertex_df"].index
-            ]
+            tree_data["vertex_df"]["support"] = pd.Series(support).loc[tree_data["vertex_df"].index]
 
         # Add vertex labels
         if vertex_labels is None:
             vertex_labels = False
         if np.isscalar(vertex_labels) and vertex_labels:
-            tree_data["vertex_df"]["label"] = [
-                x.name for x in tree_data["vertex_df"].index
-            ]
+            tree_data["vertex_df"]["label"] = [x.name for x in tree_data["vertex_df"].index]
         elif not np.isscalar(vertex_labels):
             # If a dict-like object is passed, it can be incomplete (e.g. only the leaves):
             # we fill the rest with empty strings which are not going to show up in the plot.
@@ -386,8 +378,7 @@ class TreeDataProvider(Protocol):
             # Leaves are already in the dataframe in a certain order, so sequences are allowed
             if isinstance(leaf_labels, (list, tuple, np.ndarray)):
                 leaf_labels = {
-                    leaf: label
-                    for leaf, label in zip(tree_data["leaf_df"].index, leaf_labels)
+                    leaf: label for leaf, label in zip(tree_data["leaf_df"].index, leaf_labels)
                 }
             # If a dict-like object is passed, it can be incomplete (e.g. only the leaves):
             # we fill the rest with empty strings which are not going to show up in the plot.

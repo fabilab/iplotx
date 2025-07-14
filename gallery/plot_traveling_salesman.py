@@ -31,8 +31,7 @@ for i in range(len(pos)):
 cycle = nx_app.christofides(G, weight="weight")
 edge_list = list(nx.utils.pairwise(cycle))
 edge_color = {
-    tuple(e): "red" if e in edge_list or e[::-1] in edge_list else "none"
-    for e in G.edges()
+    tuple(e): "red" if e in edge_list or e[::-1] in edge_list else "none" for e in G.edges()
 }
 nx.set_edge_attributes(G, edge_color, "color")
 

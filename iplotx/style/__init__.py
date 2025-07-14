@@ -1,5 +1,6 @@
 from typing import (
     Any,
+    Iterable,
     Optional,
     Sequence,
 )
@@ -17,53 +18,8 @@ from .leaf_info import (
 )
 
 
-default = {
-    "vertex": {
-        "size": 20,
-        "facecolor": "black",
-        "marker": "o",
-        "label": {
-            "color": "white",
-            "horizontalalignment": "center",
-            "verticalalignment": "center",
-            "hpadding": 18,
-            "vpadding": 12,
-        },
-    },
-    "edge": {
-        "linewidth": 1.5,
-        "linestyle": "-",
-        "color": "black",
-        "curved": False,
-        "tension": 1,
-        "looptension": 4,
-        "loopmaxangle": 60,
-        "paralleloffset": 3,
-        "label": {
-            "horizontalalignment": "center",
-            "verticalalignment": "center",
-            "rotate": False,
-            "bbox": {
-                "boxstyle": "round",
-                "facecolor": "white",
-                "edgecolor": "none",
-            },
-        },
-        "arrow": {
-            "marker": "|>",
-            "width": 8,
-        },
-    },
-    "grouping": {
-        "facecolor": ["grey", "steelblue", "tomato"],
-        "edgecolor": "black",
-        "linewidth": 1.5,
-        "alpha": 0.5,
-        "vertexpadding": 18,
-    },
-}
-
-
+# Prepopulate default style, it's used later as a backbone for everything else
+default = style_library["default"]
 styles = {
     "default": default,
 }
@@ -116,7 +72,9 @@ def get_style(name: str = "", *args) -> dict[str, Any]:
     return style
 
 
-def merge_styles(styles: Sequence[dict[str, Any] | str]) -> dict[str, Any]:
+def merge_styles(
+    styles: Sequence[str | dict[str, Any]] | Iterable[str | dict[str, Any]],
+) -> dict[str, Any]:
     """Merge a sequence of styles into a single one.
 
     Parameters:
@@ -198,7 +156,9 @@ def merge_styles(styles: Sequence[dict[str, Any] | str]) -> dict[str, Any]:
 # The following is inspired by matplotlib's style library
 # https://github.com/matplotlib/matplotlib/blob/v3.10.3/lib/matplotlib/style/core.py#L45
 def use(
-    style: Optional[str | dict[str, Any] | Sequence[str | dict[str, Any]]] = None,
+    style: Optional[
+        str | dict[str, Any] | Sequence[str | dict[str, Any]] | Iterable[str | dict[str, Any]]
+    ] = None,
     **kwargs,
 ):
     """Use iplotx style setting for a style specification.
@@ -251,7 +211,12 @@ def reset() -> None:
 
 
 @contextmanager
-def context(style: Optional[str | dict | Sequence] = None, **kwargs):
+def context(
+    style: Optional[
+        str | dict[str, Any] | Sequence[str | dict[str, Any]] | Iterable[str | dict[str, Any]]
+    ] = None,
+    **kwargs,
+):
     """Create a style context for iplotx.
 
     Parameters:
@@ -311,9 +276,7 @@ def unflatten_style(
 
     # top-level adjustments
     if "zorder" in style_flat:
-        style_flat["network_zorder"] = style_flat["grouping_zorder"] = style_flat.pop(
-            "zorder"
-        )
+        style_flat["network_zorder"] = style_flat["grouping_zorder"] = style_flat.pop("zorder")
 
     # Begin recursion
     _inner(style_flat)
@@ -344,9 +307,7 @@ def rotate_style(
         {'vertex': {'size': 10}}
     """
     if (index is None) and (key is None):
-        raise ValueError(
-            "At least one of 'index' or 'key' must be provided to rotate_style."
-        )
+        raise ValueError("At least one of 'index' or 'key' must be provided to rotate_style.")
 
     if props is None:
         props = tuple(prop for prop in style_leaves if prop not in nonrotating_leaves)
@@ -358,9 +319,7 @@ def rotate_style(
         if val is None:
             continue
         # Try integer indexing for ordered types
-        if (index is not None) and isinstance(
-            val, (tuple, list, np.ndarray, pd.Index, pd.Series)
-        ):
+        if (index is not None) and isinstance(val, (tuple, list, np.ndarray, pd.Index, pd.Series)):
             # NOTE: cannot cast to ndarray because rotation might involve
             # cross-type lists (e.g. ["none", False])
             style[prop] = list(val)[index % len(val)]
@@ -393,7 +352,8 @@ def add_style(name: str, style: dict[str, Any]) -> None:
         styles[name] = get_style()
 
 
-# Populate style library
+# Populate style library (default is already there)
 for name, style in style_library.items():
-    add_style(name, style)
-    del name, style
+    if name != "default":
+        add_style(name, style)
+        del name, style

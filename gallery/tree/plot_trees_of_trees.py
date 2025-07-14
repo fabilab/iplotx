@@ -33,7 +33,6 @@ art = ipx.tree(
 )
 
 for i, leaf in enumerate(tree.leaves()):
-
     # Create an axis in the rough proximity
     # and with the rough diemension of a leaf,
     # with some padding

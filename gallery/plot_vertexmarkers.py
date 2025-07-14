@@ -17,9 +17,7 @@ g = ig.Graph(
 )
 
 # Create star layout
-layout = {
-    i + 1: (np.cos(2 * np.pi / n * i), np.sin(2 * np.pi / n * i)) for i in range(n)
-}
+layout = {i + 1: (np.cos(2 * np.pi / n * i), np.sin(2 * np.pi / n * i)) for i in range(n)}
 layout[0] = (0, 0)
 
 # Colors

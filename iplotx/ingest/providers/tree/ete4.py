@@ -3,6 +3,7 @@ from typing import (
     Optional,
     Sequence,
 )
+import importlib
 from functools import partialmethod
 
 from ...typing import (
@@ -31,11 +32,7 @@ class Ete4DataProvider(TreeDataProvider):
 
     @staticmethod
     def check_dependencies() -> bool:
-        try:
-            from ete4 import Tree
-        except ImportError:
-            return False
-        return True
+        return importlib.util.find_spec("ete4") is not None
 
     @staticmethod
     def tree_type():

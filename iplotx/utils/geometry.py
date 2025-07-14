@@ -13,12 +13,7 @@ def _evaluate_squared_bezier(points, t):
 def _evaluate_cubic_bezier(points, t):
     """Evaluate a cubic Bezier curve at t."""
     p0, p1, p2, p3 = points
-    return (
-        (1 - t) ** 3 * p0
-        + 3 * (1 - t) ** 2 * t * p1
-        + 3 * (1 - t) * t**2 * p2
-        + t**3 * p3
-    )
+    return (1 - t) ** 3 * p0 + 3 * (1 - t) ** 2 * t * p1 + 3 * (1 - t) * t**2 * p2 + t**3 * p3
 
 
 def _evaluate_cubic_bezier_derivative(points, t):
@@ -90,9 +85,7 @@ def _convex_hull_Graham_scan(points):
     pivot_idx = miny_idx[points[miny_idx, 0].argmin()]
 
     # Compute angles against that pivot, ensuring the pivot itself last
-    angles = np.arctan2(
-        points[:, 1] - points[pivot_idx, 1], points[:, 0] - points[pivot_idx, 0]
-    )
+    angles = np.arctan2(points[:, 1] - points[pivot_idx, 1], points[:, 0] - points[pivot_idx, 0])
     angles[pivot_idx] = np.inf
 
     # Sort points by angle
@@ -200,7 +193,6 @@ def _compute_group_path_with_vertex_padding(
 
     # Singleton: draw a circle around it
     if len(hull) == 1:
-
         # NOTE: linspace is double inclusive, which covers CLOSEPOLY
         thetas = np.linspace(
             -np.pi,
@@ -213,7 +205,6 @@ def _compute_group_path_with_vertex_padding(
 
     # Doublet: draw two semicircles
     if len(hull) == 2:
-
         # Unit vector connecting the two points
         dv = trans(hull[0]) - trans(hull[1])
         dv = dv / np.sqrt((dv**2).sum())

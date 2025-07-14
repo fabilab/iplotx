@@ -1,18 +1,13 @@
 from typing import (
     Optional,
     Sequence,
-    Any,
 )
 from collections.abc import Hashable
 import numpy as np
 import pandas as pd
 
 from ....typing import (
-    GraphType,
     LayoutType,
-)
-from ...heuristics import (
-    normalise_layout,
 )
 from ...typing import (
     NetworkDataProvider,
@@ -69,9 +64,7 @@ class SimpleDataProvider(NetworkDataProvider):
             if np.isscalar(vertex_labels):
                 vertex_df["label"] = vertex_df.index.astype(str)
             elif len(vertex_labels) != len(vertex_df):
-                raise ValueError(
-                    "Vertex labels must be the same length as the number of vertices."
-                )
+                raise ValueError("Vertex labels must be the same length as the number of vertices.")
             else:
                 vertex_df["label"] = vertex_labels
 

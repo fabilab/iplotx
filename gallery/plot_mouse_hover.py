@@ -47,7 +47,7 @@ def hover_callback(event):
         if cont:
             i = ind["ind"][0]
             annot.xy = vc.get_offsets()[i]
-            annot.set_text(f"{i+1}")
+            annot.set_text(f"{i + 1}")
             annot.set_visible(True)
         # Otherwise, hide the bubble
         elif annot.get_visible():

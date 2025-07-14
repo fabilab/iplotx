@@ -134,7 +134,7 @@ if link_github:
 
         version = parse_version(iplotx.__version__)
         tag = "main" if version.is_devrelease else f"v{version.public}"
-        return "https://github.com/fabilab/iplotx/blob" f"/{tag}/{fn}{linespec}"
+        return f"https://github.com/fabilab/iplotx/blob/{tag}/{fn}{linespec}"
 
 else:
     extensions.append("sphinx.ext.viewcode")

@@ -204,9 +204,7 @@ def _compute_edge_path_straight(
     points.append(vs)
 
     # Shorten at end vertex
-    ve = (
-        _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi) + vcoord_fig[1]
-    )
+    ve = _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi) + vcoord_fig[1]
     points.append(ve)
 
     codes = ["MOVETO", "LINETO"]
@@ -230,7 +228,6 @@ def _compute_edge_path_waypoints(
     ports: Pair[Optional[str]] = (None, None),
     **kwargs,
 ):
-
     if waypoints in ("x0y1", "y0x1"):
         assert layout_coordinate_system == "cartesian"
 
@@ -253,8 +250,7 @@ def _compute_edge_path_waypoints(
 
             # Shorten at vertex border
             vshorts[i] = (
-                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i])
-                + vcoord_fig[i]
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i]) + vcoord_fig[i]
             )
 
         # Shorten waypoints to keep the angles right
@@ -302,10 +298,7 @@ def _compute_edge_path_waypoints(
                 theta = atan2(*(_get_port_unit_vector(ports[i], trans_inv)[::-1]))
 
             # Shorten at vertex border
-            vshort = (
-                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], theta)
-                + vcoord_fig[i]
-            )
+            vshort = _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], theta) + vcoord_fig[i]
             thetas.append(theta)
             vshorts.append(vshort)
 
@@ -324,9 +317,7 @@ def _compute_edge_path_waypoints(
 
         betas = np.linspace(alpha0, alpha1, points_per_curve)
         waypoints = [r0, r1][idx_inner] * np.vstack([np.cos(betas), np.sin(betas)]).T
-        endpoint = [r0, r1][idx_outer] * np.array(
-            [np.cos(alpha_outer), np.sin(alpha_outer)]
-        )
+        endpoint = [r0, r1][idx_outer] * np.array([np.cos(alpha_outer), np.sin(alpha_outer)])
         points = np.array(list(waypoints) + [endpoint])
         points = trans(points)
         codes = ["MOVETO"] + ["LINETO"] * len(waypoints)
@@ -406,10 +397,7 @@ def _compute_edge_path_curved(
     thetas = [None, None]
     for i in range(2):
         thetas[i] = atan2(*((auxs[i] - vcoord_fig[i])[::-1]))
-        vs[i] = (
-            _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i])
-            + vcoord_fig[i]
-        )
+        vs[i] = _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i]) + vcoord_fig[i]
 
     path = {
         "vertices": [

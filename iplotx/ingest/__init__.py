@@ -32,15 +32,11 @@ provider_protocols = {
 }
 
 # Internally supported data providers
-data_providers: dict[str, dict[str, Protocol]] = {
-    kind: {} for kind in provider_protocols
-}
+data_providers: dict[str, dict[str, Protocol]] = {kind: {} for kind in provider_protocols}
 for kind in data_providers:
     providers_path = pathlib.Path(__file__).parent.joinpath("providers").joinpath(kind)
     for importer, module_name, _ in pkgutil.iter_modules([providers_path]):
-        module = importlib.import_module(
-            f"iplotx.ingest.providers.{kind}.{module_name}"
-        )
+        module = importlib.import_module(f"iplotx.ingest.providers.{kind}.{module_name}")
         for key, val in module.__dict__.items():
             if key == provider_protocols[kind].__name__:
                 continue
@@ -123,8 +119,7 @@ def ingest_tree_data(
     else:
         sup = ", ".join(data_providers["tree"].keys())
         raise ValueError(
-            f"Tree library '{tl}' is not installed. "
-            f"Currently installed supported libraries: {sup}."
+            f"Tree library '{tl}' is not installed. Currently installed supported libraries: {sup}."
         )
 
     result = provider(
@@ -145,14 +140,10 @@ def ingest_tree_data(
 # INTERNAL FUNCTIONS
 def _update_data_providers(kind):
     """Update data provieders dynamically from external packages."""
-    discovered_providers = importlib.metadata.entry_points(
-        group=f"iplotx.{kind}_data_providers"
-    )
+    discovered_providers = importlib.metadata.entry_points(group=f"iplotx.{kind}_data_providers")
     for entry_point in discovered_providers:
         if entry_point.name not in data_providers["network"]:
             try:
                 data_providers[kind][entry_point.name] = entry_point.load()
             except Exception as e:
-                warnings.warn(
-                    f"Failed to load {kind} data provider '{entry_point.name}': {e}"
-                )
+                warnings.warn(f"Failed to load {kind} data provider '{entry_point.name}': {e}")

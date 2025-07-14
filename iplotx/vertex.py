@@ -227,9 +227,7 @@ class VertexCollection(PatchCollection):
 
         if style.get("size", 20) == "label":
             if self._labels is None:
-                warnings.warn(
-                    "No labels found, cannot resize vertices based on labels."
-                )
+                warnings.warn("No labels found, cannot resize vertices based on labels.")
                 style["size"] = get_style("default.vertex")["size"]
 
         if "cmap" in style:
@@ -265,9 +263,7 @@ class VertexCollection(PatchCollection):
         transform = self.get_offset_transform()
 
         style = (
-            copy_with_deep_values(self._style.get("label", None))
-            if self._style is not None
-            else {}
+            copy_with_deep_values(self._style.get("label", None)) if self._style is not None else {}
         )
         forbidden_props = ["hpadding", "vpadding"]
         for prop in forbidden_props:
@@ -380,9 +376,7 @@ def make_patch(
     elif marker in ("s", "square", "r", "rectangle"):
         art = Rectangle((-size[0] / 2, -size[1] / 2), size[0], size[1], **kwargs)
     elif marker in ("^", "triangle"):
-        art = RegularPolygon(
-            (0, 0), numVertices=3, radius=size[0] / np.sqrt(2), **kwargs
-        )
+        art = RegularPolygon((0, 0), numVertices=3, radius=size[0] / np.sqrt(2), **kwargs)
     elif marker in ("v", "triangle_down"):
         art = RegularPolygon(
             (0, 0),
@@ -408,21 +402,13 @@ def make_patch(
             **kwargs,
         )
     elif marker in ("d", "diamond"):
-        art = RegularPolygon(
-            (0, 0), numVertices=4, radius=size[0] / np.sqrt(2), **kwargs
-        )
+        art = RegularPolygon((0, 0), numVertices=4, radius=size[0] / np.sqrt(2), **kwargs)
     elif marker in ("p", "pentagon"):
-        art = RegularPolygon(
-            (0, 0), numVertices=5, radius=size[0] / np.sqrt(2), **kwargs
-        )
+        art = RegularPolygon((0, 0), numVertices=5, radius=size[0] / np.sqrt(2), **kwargs)
     elif marker in ("h", "hexagon"):
-        art = RegularPolygon(
-            (0, 0), numVertices=6, radius=size[0] / np.sqrt(2), **kwargs
-        )
+        art = RegularPolygon((0, 0), numVertices=6, radius=size[0] / np.sqrt(2), **kwargs)
     elif marker in ("8", "octagon"):
-        art = RegularPolygon(
-            (0, 0), numVertices=8, radius=size[0] / np.sqrt(2), **kwargs
-        )
+        art = RegularPolygon((0, 0), numVertices=8, radius=size[0] / np.sqrt(2), **kwargs)
     elif marker in ("e", "ellipse"):
         art = Ellipse((0, 0), size[0], size[1], **kwargs)
     elif marker in ("*", "star"):

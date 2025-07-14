@@ -1,26 +1,20 @@
-import os
 import unittest
-import pytest
+import importlib
 import matplotlib as mpl
 
 mpl.use("agg")
 import matplotlib.pyplot as plt
-
 import iplotx as ipx
 
-try:
+if importlib.util.find_spec("igraph") is None:
+    raise unittest.SkipTest("igraph not found, skipping tests")
+else:
     import igraph as ig
-except ImportError:
-    ig = None
 
 from utils import image_comparison
 
 
 class GraphTestRunner(unittest.TestCase):
-    def setUp(self):
-        if ig is None:
-            raise unittest.SkipTest("igraph not found, skipping tests")
-
     @property
     def layout_small_ring(self):
         coords = [
@@ -72,7 +66,7 @@ class GraphTestRunner(unittest.TestCase):
         ipx.plot(g, layout=layout, ax=ax)
 
     @image_comparison(baseline_images=["graph_layout_attribute"], remove_text=True)
-    def test_layout_attribute(self):
+    def test_layout_attribute_alt(self):
         g = ig.Graph.Ring(5)
         g["layout"] = ig.Layout([(x, x) for x in range(g.vcount())])
         fig, ax = plt.subplots(figsize=(3, 3))
@@ -163,7 +157,7 @@ class GraphTestRunner(unittest.TestCase):
         ax.set_aspect(1.0)
 
     @image_comparison(baseline_images=["multigraph_with_curved_edges_undirected"])
-    def test_graph_with_curved_edges(self):
+    def test_graph_with_curved_edges_undirected(self):
         g = ig.Graph.Ring(24, directed=False)
         g.add_edges([(0, 1), (1, 2)])
         fig, ax = plt.subplots()
@@ -199,10 +193,6 @@ class GraphTestRunner(unittest.TestCase):
 
 
 class ClusteringTestRunner(unittest.TestCase):
-    def setUp(self):
-        if mpl is None or plt is None:
-            raise unittest.SkipTest("matplotlib not found, skipping tests")
-
     @property
     def layout_small_ring(self):
         coords = [

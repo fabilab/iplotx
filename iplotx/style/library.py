@@ -1,4 +1,49 @@
 style_library = {
+    "default": {
+        "vertex": {
+            "size": 20,
+            "facecolor": "black",
+            "marker": "o",
+            "label": {
+                "color": "white",
+                "horizontalalignment": "center",
+                "verticalalignment": "center",
+                "hpadding": 18,
+                "vpadding": 12,
+            },
+        },
+        "edge": {
+            "linewidth": 1.5,
+            "linestyle": "-",
+            "color": "black",
+            "curved": False,
+            "tension": 1,
+            "looptension": 4,
+            "loopmaxangle": 60,
+            "paralleloffset": 3,
+            "label": {
+                "horizontalalignment": "center",
+                "verticalalignment": "center",
+                "rotate": False,
+                "bbox": {
+                    "boxstyle": "round",
+                    "facecolor": "white",
+                    "edgecolor": "none",
+                },
+            },
+            "arrow": {
+                "marker": "|>",
+                "width": 8,
+            },
+        },
+        "grouping": {
+            "facecolor": ["grey", "steelblue", "tomato"],
+            "edgecolor": "black",
+            "linewidth": 1.5,
+            "alpha": 0.5,
+            "vertexpadding": 18,
+        },
+    },
     # Hollow style for organization charts et similar
     "hollow": {
         "vertex": {

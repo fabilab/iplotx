@@ -11,9 +11,7 @@ import iplotx as ipx
 
 G = nx.house_graph()
 fig, ax = plt.subplots()
-nx.set_node_attributes(
-    G, {0: (0, 0), 1: (1, 0), 2: (0, 1), 3: (1, 1), 4: (0.5, 2.0)}, "pos"
-)
+nx.set_node_attributes(G, {0: (0, 0), 1: (1, 0), 2: (0, 1), 3: (1, 1), 4: (0.5, 2.0)}, "pos")
 nx.set_node_attributes(
     G,
     {

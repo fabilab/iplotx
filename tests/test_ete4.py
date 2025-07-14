@@ -1,25 +1,17 @@
-from io import StringIO
-import os
 import unittest
-import pytest
-import numpy as np
+import importlib
 import matplotlib as mpl
-
-try:
-    import ete4
-except ImportError:
-    raise unittest.SkipTest("ete4 not found, skipping tests")
 
 mpl.use("agg")
 import matplotlib.pyplot as plt
-
 import iplotx as ipx
-
 from utils import image_comparison
+
+if importlib.util.find_spec("ete4") is None:
+    raise unittest.SkipTest("ete4 not found, skipping tests")
 
 
 class TreeTestRunner(unittest.TestCase):
-
     @property
     def small_tree(self):
         from ete4 import Tree

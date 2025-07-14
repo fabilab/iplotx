@@ -28,9 +28,7 @@ except ImportError:
 _default_extension = "png"
 
 
-def _unittest_image_comparison(
-    baseline_images, tol, remove_text, savefig_kwargs, style
-):
+def _unittest_image_comparison(baseline_images, tol, remove_text, savefig_kwargs, style):
     """
     Decorate function with image comparison for unittest.
     This function creates a decorator that wraps a figure-generating function
@@ -55,10 +53,10 @@ def _unittest_image_comparison(
                 plt.close("all")
                 func(*args, **kwargs)
 
-            assert len(figs) == len(
-                baseline_images
-            ), "Test generated {} images but there are {} baseline images".format(
-                len(figs), len(baseline_images)
+            assert len(figs) == len(baseline_images), (
+                "Test generated {} images but there are {} baseline images".format(
+                    len(figs), len(baseline_images)
+                )
             )
             for fig, baseline in zip(figs, baseline_images):
                 img.compare(fig, baseline, _default_extension, _lock=False)

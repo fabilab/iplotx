@@ -3,11 +3,11 @@ from typing import (
     Sequence,
 )
 from collections.abc import Hashable
+import importlib
 import numpy as np
 import pandas as pd
 
 from ....typing import (
-    GraphType,
     LayoutType,
 )
 from ...heuristics import (
@@ -64,21 +64,13 @@ class NetworkXDataProvider(NetworkDataProvider):
             if "label" in vertex_df:
                 del vertex_df["label"]
         else:
-            if (
-                np.isscalar(vertex_labels)
-                and (not vertex_labels)
-                and ("label" in vertex_df)
-            ):
+            if np.isscalar(vertex_labels) and (not vertex_labels) and ("label" in vertex_df):
                 del vertex_df["label"]
             elif vertex_labels is True:
                 if "label" not in vertex_df:
                     vertex_df["label"] = vertex_df.index
-            elif (not np.isscalar(vertex_labels)) and (
-                len(vertex_labels) != len(vertex_df)
-            ):
-                raise ValueError(
-                    "Vertex labels must be the same length as the number of vertices."
-                )
+            elif (not np.isscalar(vertex_labels)) and (len(vertex_labels) != len(vertex_df)):
+                raise ValueError("Vertex labels must be the same length as the number of vertices.")
             elif isinstance(vertex_labels, nx.classes.reportviews.NodeDataView):
                 vertex_df["label"] = pd.Series(dict(vertex_labels))
             else:
@@ -108,9 +100,7 @@ class NetworkXDataProvider(NetworkDataProvider):
                     edge_df["label"] = [str(i) for i in edge_df.index]
             else:
                 if len(edge_labels) != len(edge_df):
-                    raise ValueError(
-                        "Edge labels must be the same length as the number of edges."
-                    )
+                    raise ValueError("Edge labels must be the same length as the number of edges.")
                 edge_df["label"] = edge_labels
 
         network_data = {
@@ -123,11 +113,7 @@ class NetworkXDataProvider(NetworkDataProvider):
 
     @staticmethod
     def check_dependencies() -> bool:
-        try:
-            import networkx
-        except ImportError:
-            return False
-        return True
+        return importlib.util.find_spec("networkx") is not None
 
     @staticmethod
     def graph_type():

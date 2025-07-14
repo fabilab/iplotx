@@ -28,7 +28,7 @@ ipx.plotting.tree(
     tree,
     cascade_facecolor=backgrounds,
     cascade_extend=True,
-    leaf_labels={leaf: f"L{i+1}" for i, leaf in enumerate(tree.get_terminals())},
+    leaf_labels={leaf: f"L{i + 1}" for i, leaf in enumerate(tree.get_terminals())},
     edge_color="#111",
     leafedge_linewidth=2,
     leafedge_color="steelblue",

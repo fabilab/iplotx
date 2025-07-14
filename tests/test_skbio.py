@@ -1,25 +1,19 @@
 from io import StringIO
-import os
+import importlib
 import unittest
-import pytest
-import numpy as np
 import matplotlib as mpl
-
-try:
-    import skbio
-except ImportError:
-    raise unittest.SkipTest("skbio not found, skipping tests")
 
 mpl.use("agg")
 import matplotlib.pyplot as plt
-
 import iplotx as ipx
 
 from utils import image_comparison
 
+if importlib.util.find_spec("skbio") is None:
+    raise unittest.SkipTest("skbio not found, skipping tests")
+
 
 class TreeTestRunner(unittest.TestCase):
-
     @property
     def small_tree(self):
         from skbio import TreeNode

@@ -3,11 +3,11 @@ from typing import (
     Sequence,
 )
 from collections.abc import Hashable
+import importlib
 import numpy as np
 import pandas as pd
 
 from ....typing import (
-    GraphType,
     LayoutType,
 )
 from ...heuristics import (
@@ -51,9 +51,7 @@ class IGraphDataProvider(NetworkDataProvider):
             if np.isscalar(vertex_labels):
                 vertex_df["label"] = vertex_df.index.astype(str)
             elif len(vertex_labels) != len(vertex_df):
-                raise ValueError(
-                    "Vertex labels must be the same length as the number of vertices."
-                )
+                raise ValueError("Vertex labels must be the same length as the number of vertices.")
             else:
                 vertex_df["label"] = vertex_labels
 
@@ -72,9 +70,7 @@ class IGraphDataProvider(NetworkDataProvider):
         # Edge labels
         if edge_labels is not None:
             if len(edge_labels) != len(edge_df):
-                raise ValueError(
-                    "Edge labels must be the same length as the number of edges."
-                )
+                raise ValueError("Edge labels must be the same length as the number of edges.")
             edge_df["label"] = edge_labels
 
         network_data = {
@@ -87,11 +83,7 @@ class IGraphDataProvider(NetworkDataProvider):
 
     @staticmethod
     def check_dependencies() -> bool:
-        try:
-            import igraph
-        except ImportError:
-            return False
-        return True
+        return importlib.util.find_spec("igraph") is not None
 
     @staticmethod
     def graph_type():

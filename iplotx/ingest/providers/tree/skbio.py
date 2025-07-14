@@ -3,6 +3,7 @@ from typing import (
     Optional,
     Sequence,
 )
+import importlib
 from ...typing import (
     TreeDataProvider,
 )
@@ -28,11 +29,7 @@ class SkbioDataProvider(TreeDataProvider):
 
     @staticmethod
     def check_dependencies() -> bool:
-        try:
-            from skbio import TreeNode
-        except ImportError:
-            return False
-        return True
+        return importlib.util.find_spec("skbio") is not None
 
     @staticmethod
     def tree_type():

@@ -1,16 +1,11 @@
-import os
 from copy import deepcopy
 import unittest
-import pytest
-import numpy as np
 
 import iplotx as ipx
 
 
 class StyleTestRunner(unittest.TestCase):
     def test_flat_style(self):
-        style = deepcopy(ipx.style.current)
-
         with ipx.style.context(
             dict(
                 vertex_size=80,
@@ -25,9 +20,7 @@ class StyleTestRunner(unittest.TestCase):
                 vertex_size=70,
             ):
                 self.assertEqual(current["vertex"]["size"], 70)
-                self.assertEqual(
-                    current["edge"]["label"]["bbox"]["facecolor"], "yellow"
-                )
+                self.assertEqual(current["edge"]["label"]["bbox"]["facecolor"], "yellow")
 
     def test_generator(self):
         styles = iter([{"vertex_size": 80}, {"vertex_size": 70}])

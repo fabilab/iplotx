@@ -37,9 +37,7 @@ nx.set_edge_attributes(
     {
         (u, v): {
             "color": (
-                "red"
-                if (u, v) in path_edges or tuple(reversed((u, v))) in path_edges
-                else "black"
+                "red" if (u, v) in path_edges or tuple(reversed((u, v))) in path_edges else "black"
             ),
             "label": d["weight"],
         }

@@ -3,6 +3,7 @@ from typing import (
     Optional,
     Sequence,
 )
+import importlib
 from functools import partialmethod
 
 from ...typing import (
@@ -34,11 +35,7 @@ class BiopythonDataProvider(TreeDataProvider):
 
     @staticmethod
     def check_dependencies() -> bool:
-        try:
-            from Bio import Phylo
-        except ImportError:
-            return False
-        return True
+        return importlib.util.find_spec("Bio") is not None
 
     @staticmethod
     def tree_type():

@@ -3,7 +3,6 @@ Heuristics module to funnel certain variable inputs (e.g. layouts) into a standa
 """
 
 from typing import (
-    Optional,
     Any,
 )
 from collections.abc import Hashable
@@ -79,9 +78,7 @@ def normalise_tree_layout(
     if isinstance(layout, str):
         layout = compute_tree_layout(layout, **kwargs)
     else:
-        raise NotImplementedError(
-            "Only internally computed tree layout currently accepted."
-        )
+        raise NotImplementedError("Only internally computed tree layout currently accepted.")
 
     if isinstance(layout, dict):
         # Adjust vertex layout
