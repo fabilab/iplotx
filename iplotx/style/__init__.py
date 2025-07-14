@@ -3,6 +3,7 @@ from typing import (
     Optional,
     Sequence,
 )
+from collections import defaultdict
 from collections.abc import Hashable
 from contextlib import contextmanager
 import numpy as np
@@ -140,11 +141,14 @@ def use(style: Optional[str | dict | Sequence] = None, **kwargs):
     def _sanitize_leaves(style: dict):
         for key, value in style.items():
             if key in style_leaves:
+                # Networkx has a few lazy data structures
+                # TODO: move this code to provider
                 if nx is not None:
                     if isinstance(value, nx.classes.reportviews.NodeView):
                         style[key] = dict(value)
                     elif isinstance(value, nx.classes.reportviews.EdgeViewABC):
                         style[key] = [v for *e, v in value]
+
             elif isinstance(value, dict):
                 _sanitize_leaves(value)
 
@@ -154,13 +158,39 @@ def use(style: Optional[str | dict | Sequence] = None, **kwargs):
                 current[key] = value
                 continue
 
-            # Style leaves are by definition not to be recurred into
-            if isinstance(value, dict) and (key not in style_leaves):
-                _update(value, current[key])
-            elif value is None:
-                del current[key]
+            # Style non-leaves are either recurred into or deleted
+            if key not in style_leaves:
+                if isinstance(value, dict):
+                    _update(value, current[key])
+                elif value is None:
+                    del current[key]
+                else:
+                    raise ValueError(
+                        f"Setting non-leaf style value to a non-dict: {key}, {value}",
+                    )
             else:
-                current[key] = value
+                # Style leaves could be incomplete, ensure a sensible default
+                if value is None:
+                    del current[key]
+                    continue
+
+                if not isinstance(value, dict):
+                    current[key] = value
+                    continue
+
+                if hasattr(value, "default_factory"):
+                    current[key] = value
+                    continue
+
+                if hasattr(current[key], "default_factory"):
+                    default_value = current[key].default_factory()
+                else:
+                    default_value = current[key]
+                current[key] = defaultdict(
+                    lambda: default_value,
+                    value,
+                )
+                print("default value:", default_value)
 
     old_style = copy_with_deep_values(current)
 
@@ -314,14 +344,14 @@ def rotate_style(
             and (not isinstance(val, (str, tuple, list, np.ndarray)))
             and hasattr(val, "__getitem__")
         ):
-            # If only a subset of keys is provided, default the other ones
-            # to the empty type constructor (e.g. 0 for ints, 0.0 for floats,
-            # empty strings).
-            if key in val:
-                style[prop] = val[key]
-            else:
+            # If only a subset of keys is provided, try the default value a la
+            # defaultdict. If that fails, use an empty constructor
+            try:
+                newval = val[key]
+            except KeyError:
                 valtype = type(next(iter(val.values())))
-                style[prop] = valtype()
+                newval = valtype()
+            style[prop] = newval
 
     return style
 

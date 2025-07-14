@@ -23,6 +23,8 @@ rotating_leaves = (
     "hmargin",
     "vmargin",
     "ports",
+    "width",
+    "height",
 )
 
 # These properties are also terminal style properties, but they cannot be rotated.
@@ -35,6 +37,7 @@ nonrotating_leaves = (
     "extend",
     "deep",
     "angular",
+    "curved",
 )
 
 # Union of all style leaves (rotating and nonrotating)
