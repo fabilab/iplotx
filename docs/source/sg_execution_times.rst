@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.224** total execution time for 49 files **from all galleries**:
+**00:00.270** total execution time for 49 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_tree_plot_angular_waypoints.py` (``../../gallery/tree/plot_angular_waypoints.py``)
-     - 00:00.224
+     - 00:00.270
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000

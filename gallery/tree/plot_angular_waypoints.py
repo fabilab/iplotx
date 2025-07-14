@@ -60,8 +60,21 @@ from collections import defaultdict
 
 ipx.tree(
     tree,
-    edge_waypoints=defaultdict(bool, {tree.clade[0, 1]: True}),
+    edge_waypoints=defaultdict(lambda: True, {tree.clade[0, 1]: False}),
     title="Mixed\n(per-edge)",
+)
+
+# %%
+# .. note::
+#   ``iplotx``'s fallback for per-element styling is the constructor for the
+#   **type** used by the first value of the dictionary, in this case ``bool()``
+#   which returns ``False``. Therefore, if we are ok with angular edges as the
+#   fallback, we can skip the defaultdict altogether:
+
+ipx.tree(
+    tree,
+    edge_waypoints={tree.clade[0, 1]: True},
+    title="Mixed per-edge\n(default fallback)",
 )
 
 # %%
