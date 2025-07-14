@@ -14,6 +14,7 @@ from .style import (
     context,
     get_style,
     rotate_style,
+    merge_styles,
 )
 from .utils.matplotlib import (
     _stale_wrapper,
@@ -630,6 +631,7 @@ class TreeArtist(mpl.artist.Artist):
         self,
         nodes: Sequence[Hashable],
         style: Optional[dict[str, Any] | Sequence[str | dict[str, Any]]] = None,
+        **kwargs,
     ) -> None:
         """Style a subtree of the tree.
 
@@ -639,7 +641,16 @@ class TreeArtist(mpl.artist.Artist):
             style: Style or sequence of styles to apply to the subtree. Each style can
                 be either a string, referring to an internal `iplotx` style, or a dictionary
                 with custom styling elements.
+            kwargs: Additional flat style elements. If both style and kwargs are provided,
+                kwargs is applied last.
         """
+        styles = []
+        if isinstance(style, (str, dict)):
+            styles = [style]
+        elif style is not None:
+            styles = list(style)
+        style = merge_styles(styles + [kwargs])
+
         provider = data_providers["tree"][self._ipx_internal_data["tree_library"]]
 
         # Get last (deepest) common ancestor of the requested nodes

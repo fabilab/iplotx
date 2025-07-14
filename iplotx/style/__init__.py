@@ -116,27 +116,19 @@ def get_style(name: str = "", *args) -> dict[str, Any]:
     return style
 
 
-# The following is inspired by matplotlib's style library
-# https://github.com/matplotlib/matplotlib/blob/v3.10.3/lib/matplotlib/style/core.py#L45
-def use(style: Optional[str | dict | Sequence] = None, **kwargs):
-    """Use iplotx style setting for a style specification.
-
-    The style name of 'default' is reserved for reverting back to
-    the default style settings.
+def merge_styles(styles: Sequence[dict[str, Any] | str]) -> dict[str, Any]:
+    """Merge a sequence of styles into a single one.
 
     Parameters:
-        style: A style specification, currently either a name of an existing style
-            or a dict with specific parts of the style to override. The string
-            "default" resets the style to the default one. If this is a sequence,
-            each style is applied in order.
-        **kwargs: Additional style changes to be applied at the end of any style.
+        styles: Sequence (list, tuple, etc.) of styles, each either the name of an internal
+            style or a dict-like with custom properties.
+    Returns:
+        The composite style as a dict.
     """
     try:
         import networkx as nx
     except ImportError:
         nx = None
-
-    global current
 
     def _sanitize_leaves(style: dict):
         for key, value in style.items():
@@ -190,31 +182,63 @@ def use(style: Optional[str | dict | Sequence] = None, **kwargs):
                     lambda: default_value,
                     value,
                 )
-                print("default value:", default_value)
+
+    merged = {}
+    for style in styles:
+        if isinstance(style, str):
+            style = get_style(style)
+        else:
+            _sanitize_leaves(style)
+            unflatten_style(style)
+        _update(style, merged)
+
+    return merged
+
+
+# The following is inspired by matplotlib's style library
+# https://github.com/matplotlib/matplotlib/blob/v3.10.3/lib/matplotlib/style/core.py#L45
+def use(
+    style: Optional[str | dict[str, Any] | Sequence[str | dict[str, Any]]] = None,
+    **kwargs,
+):
+    """Use iplotx style setting for a style specification.
+
+    The style name of 'default' is reserved for reverting back to
+    the default style settings.
+
+    Parameters:
+        style: A style specification, currently either a name of an existing style
+            or a dict with specific parts of the style to override. The string
+            "default" resets the style to the default one. If this is a sequence,
+            each style is applied in order.
+        **kwargs: Additional style changes to be applied at the end of any style.
+    """
+    global current
+
+    styles = []
+    if isinstance(style, (dict, str)):
+        styles.append(style)
+    elif style is not None:
+        styles.extend(list(style))
+    if kwargs:
+        styles.append(kwargs)
+
+    # Discard empty styles for speed
+    styles = [style for style in styles if style]
+
+    if len(styles) == 0:
+        return
+
+    # If the first style is a string (internal style), apply it cold. If it's a
+    # dict, apply it hot (on top of the current style(. Any style after the first
+    # is always applied hot - otherwise it would invalidate previous styles.
+    if not isinstance(styles[0], str):
+        # hot insertion on top of current
+        styles.insert(0, current)
 
     old_style = copy_with_deep_values(current)
-
     try:
-        if style is None:
-            styles = []
-        elif isinstance(style, (dict, str)):
-            styles = [style]
-        else:
-            styles = list(style)
-
-        if kwargs:
-            styles.append(kwargs)
-
-        for style in styles:
-            if style == "default":
-                reset()
-            else:
-                if isinstance(style, str):
-                    current = get_style(style)
-                else:
-                    _sanitize_leaves(style)
-                    unflatten_style(style)
-                    _update(style, current)
+        current = merge_styles(styles)
     except:
         current = old_style
         raise
