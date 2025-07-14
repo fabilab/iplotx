@@ -33,3 +33,26 @@ art.style_subtree(
         },
     },
 )
+
+
+# %%
+# The same can be done with nonangular layouts:
+
+fig, ax = plt.subplots(figsize=(8, 8))
+art = ipx.tree(
+    tree,
+    layout="horizontal",
+    ax=ax,
+    leaf_labels=True,
+    layout_angular=False,
+    leaf_deep=False,
+    margin=0.1,
+)
+art.style_subtree(
+    tree.tips()[:2],
+    {
+        "edge": {
+            "color": "red",
+        },
+    },
+)
