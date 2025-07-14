@@ -5,7 +5,8 @@ Basics of styling
 This example shows a few simple styling options available in `iplotx`.
 
 .. tip::
-  `iplotx` has an internal library of styles. See the :doc:`plot_multistyle` example.
+  `iplotx` has an internal library of styles. See the :doc:`plot_multistyle`
+  example.
 """
 
 import igraph as ig
@@ -26,10 +27,11 @@ style = {
     },
 }
 fig, ax = plt.subplots(figsize=(3, 3))
-ipx.plot(g, ax=ax, layout=layout, style=style)
+ipx.network(g, ax=ax, layout=layout, style=style)
 
 # %%
-# You can also **chain styles**. For example, you can apply an existing style first, and then modify it with a custom dictionary:
+# You can also **chain styles**. For example, you can apply an existing
+# style first, and then modify it with a custom dictionary:
 
 style = {
     "edge": {
@@ -37,7 +39,7 @@ style = {
     },
 }
 fig, ax = plt.subplots(figsize=(3, 3))
-ipx.plot(
+ipx.network(
     g,
     ax=ax,
     layout=layout,
@@ -45,5 +47,5 @@ ipx.plot(
 )
 
 # %%
-# As you can see, the network is visualised with the "rededge" style (which has red, solid edges)
-# but further modified to have dashed lines.
+# As you can see, the network is visualised with the "rededge" style (which
+# has red, solid edges) but further modified to have dashed lines.

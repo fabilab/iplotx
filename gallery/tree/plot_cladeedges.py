@@ -2,14 +2,16 @@
 Styling clades
 ==============
 
-This Biopython-inspired example shows how to style clade edges for a node and its descendants.
+This Biopython-inspired example shows how to style clade edges for a
+node and its descendants.
+
+.. warning::
+  This example is currently WIP and might not work as expected.
 """
 
 from Bio import Phylo
 from io import StringIO
 import iplotx as ipx
-import matplotlib.pyplot as plt
-from collections import defaultdict
 
 tree = Phylo.read(
     StringIO("(((A,B),(C,D)),(E,F,G));"),

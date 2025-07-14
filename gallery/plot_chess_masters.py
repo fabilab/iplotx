@@ -2,10 +2,17 @@
 Chess masters
 =============
 
-This example from networkx shows the relatinoships between chess masters. The example has a lot of network analysis code that is somewhat irrelevant for `iplotx` and is kept to demonstrate functional parity.
+This example from networkx shows the relatinoships between chess masters.
+The example has a lot of network analysis code that is somewhat irrelevant
+for `iplotx` and is kept to demonstrate functional parity.
 
 .. note::
-  The layout of this graph is computed with the Kamada-Kawai algorithm. In networkx, that requires the `scipy` package to be installed. Here, we also demonstrate the alternative, which is to convert the network to `igraph`, which has an internal implementation of the algorithm. While the exact layout is not identical, it is equally accurate and visually similar.
+  The layout of this graph is computed with the Kamada-Kawai algorithm. In
+  networkx, that requires the `scipy` package to be installed. Here, we
+  also demonstrate the alternative, which is to convert the network to
+  `igraph`, which has an internal implementation of the algorithm. While
+  the exact layout is not identical, it is equally accurate and visually
+  similar.
 """
 
 import numpy as np

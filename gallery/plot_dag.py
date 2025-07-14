@@ -7,7 +7,6 @@ This example demonstrates how to create a random directed acyclic graph (DAG) an
 
 import random
 import igraph as ig
-import matplotlib.pyplot as plt
 import iplotx as ipx
 
 

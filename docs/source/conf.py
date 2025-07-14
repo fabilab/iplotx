@@ -49,7 +49,6 @@ myst_enable_extensions = ["colon_fence"]
 sphinx_gallery_conf = {
     "examples_dirs": "../../gallery",  # path to your example scripts
     "gallery_dirs": "./gallery",  # path to where to save gallery generated output
-    #'matplotlib_animations': (True, 'mp4'),
     "matplotlib_animations": True,
 }
 

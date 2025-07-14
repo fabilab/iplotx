@@ -2,12 +2,12 @@
 Maximum Bipartite Matching by Maximum Flow
 ==========================================
 
-This example from `igraph` presents how to visualise bipartite matching using maximum flow, with edge linewidth and vertex facecolor styling.
+This example from `igraph` presents how to visualise bipartite matching
+using maximum flow, with edge linewidth and vertex facecolor styling.
 
 """
 
 import igraph as ig
-import matplotlib.pyplot as plt
 import iplotx as ipx
 
 # We start by creating the bipartite directed graph.
@@ -37,7 +37,7 @@ layout = g.layout_bipartite()
 layout[9] = (2, -1)
 layout[10] = (2, 2)
 
-ipx.plot(
+ipx.network(
     g,
     layout=layout,
     vertex_labels=True,
@@ -57,7 +57,7 @@ ipx.plot(
 # vertex style accordingly, perhaps with pronounced vertex borders to
 # increase constrast:
 #
-ipx.plot(
+ipx.network(
     g,
     layout=layout,
     vertex_labels=True,

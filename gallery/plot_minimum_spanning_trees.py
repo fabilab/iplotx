@@ -7,7 +7,6 @@ This example from igraph shows how to work with edge labels and linewidths.
 
 import random
 import igraph as ig
-import matplotlib.pyplot as plt
 import iplotx as ipx
 
 
@@ -24,7 +23,7 @@ g.es[mst_edges]["width"] = 3.0
 
 layout = g.layout("grid")
 
-ipx.plot(
+ipx.network(
     g,
     layout=layout,
     edge_labels=g.es["weight"],
@@ -48,10 +47,11 @@ ipx.plot(
 )
 
 # %%
-# If you want to avoid rotating the labels vertically and let them follow the edge directions instead,
-# just set the "rotate" parameter to False (or skip it in the default style):
+# If you want to avoid rotating the labels vertically and let them follow the
+# edge directions instead, just set the "rotate" parameter to False (or skip
+# it in the default style):
 
-ipx.plot(
+ipx.network(
     g,
     layout=layout,
     edge_labels=g.es["weight"],

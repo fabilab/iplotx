@@ -7,7 +7,6 @@ This short example demonstrates how to combine leaf edges and cascades.
 
 from Bio import Phylo
 from io import StringIO
-import matplotlib.pyplot as plt
 import iplotx as ipx
 
 # Make a tree from a string in Newick format

@@ -2,17 +2,17 @@
 Editing artists after plotting
 ==============================
 
-One of the strengths of `iplotx` is the support for editing artists after they have been plotted the first time without making a whole new figure.
+One of the strengths of `iplotx` is the support for editing artists after
+they have been plotted the first time without making a whole new figure.
 
-In this example, we will change vertices, edges, arrows, etc. and check out how they look like.
+In this example, we will change vertices, edges, arrows, etc. and check
+out how they look like.
 """
 
 # %%
 # This is the vanilla version, taken from the "Ports" gallery example:
 
 import igraph as ig
-import numpy as np
-import matplotlib.pyplot as plt
 import iplotx as ipx
 
 g = ig.Graph.Ring(3, directed=True)

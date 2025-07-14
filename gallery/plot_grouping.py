@@ -2,9 +2,11 @@
 Grouping
 ========
 
-This example shows how to use the `grouping` argument to visualise vertex covers or clustering, including singletons (i.e. groups of one vertex).
+This example shows how to use the `grouping` argument to visualise vertex
+covers or clustering, including singletons (i.e. groups of one vertex).
 
-The function takes a few different formats for the groups, but the easiest is a dictionary of sets, in which each key is the name of the group and
+The function takes a few different formats for the groups, but the easiest
+is a dictionary of sets, in which each key is the name of the group and
 each value is the set of vertices in that group.
 
 """
@@ -15,7 +17,7 @@ import iplotx as ipx
 
 g = ig.Graph.Ring(8)
 
-ipx.plot(
+ipx.network(
     network=g,
     layout="circle",
     grouping={
@@ -28,11 +30,13 @@ plt.gca().set_aspect(1.0)
 
 # %%
 # .. note::
-#   Group layouts are computed as rounded convex hulls around each group of vertices. If you are interested in contributing an algorithm that computes concave group layouts, please reach out on GitHub!
+#   Group layouts are computed as rounded convex hulls around each group of vertices.
+#   If you are interested in contributing an algorithm that computes concave group
+#   layouts, please reach out on GitHub!
 #
 # Groups can be styles in a similar way as all other elements in `iplotx`:
 
-ipx.plot(
+ipx.network(
     network=g,
     layout="circle",
     grouping={
@@ -61,7 +65,7 @@ plt.gca().set_aspect(1.0)
 
 layout = g.layout("circle")
 fig, ax = plt.subplots(figsize=(5, 5))
-ipx.plot(
+ipx.network(
     network=g,
     layout=layout,
     ax=ax,
@@ -70,7 +74,7 @@ ipx.plot(
     vertex_label_color="white",
     zorder=2,
 )
-ipx.plot(
+ipx.network(
     grouping={
         "singleton": {0},
         "doublet": {1, 2},
@@ -87,6 +91,7 @@ ipx.plot(
 
 # %%
 # .. note::
-#   The argument `zorder` is applied to both network and grouping style, however since only one of them is plotted each
-#   time this is equivalent to setting `network_zorder` and `grouping_zorder`. If both are specified, `zorder` takes
+#   The argument `zorder` is applied to both network and grouping style, however
+#   since only one of them is plotted each time this is equivalent to setting
+#   `network_zorder` and `grouping_zorder`. If both are specified, `zorder` takes
 #   priority over its more specific cousins.

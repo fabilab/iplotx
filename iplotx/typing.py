@@ -32,12 +32,14 @@ LayoutType = Union[
     Sequence[Sequence[float]],
     np.ndarray,
     pd.DataFrame,
+    dict[Hashable, Sequence[float] | tuple[float, float]],
     # igraph.Layout,
 ]
 GroupingType = Union[
     Sequence[set],
     Sequence[int],
     Sequence[str],
+    dict[str, set],
     # igraph.clustering.Clustering,
     # igraph.clustering.VertexClustering,
     # igraph.clustering.Cover,

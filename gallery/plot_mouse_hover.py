@@ -12,7 +12,6 @@ This example shows how to interact with mouse events (e.g. hovering) in `iplotx`
 """
 
 import matplotlib.pyplot as plt
-import numpy as np
 import igraph as ig
 import iplotx as ipx
 

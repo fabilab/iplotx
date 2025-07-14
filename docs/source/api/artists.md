@@ -22,4 +22,3 @@ In turn, a `VertexCollection` or `EdgeCollection` instance **may** contain a `La
 .. autoclass:: iplotx.edge.arrow.EdgeArrowCollection
     :members:
 ```
-

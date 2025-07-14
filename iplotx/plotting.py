@@ -21,7 +21,7 @@ def network(
     network: Optional[GraphType] = None,
     layout: Optional[LayoutType] = None,
     grouping: Optional[GroupingType] = None,
-    vertex_labels: Optional[list | dict | pd.Series] = None,
+    vertex_labels: Optional[list | dict | pd.Series | bool] = None,
     edge_labels: Optional[Sequence] = None,
     ax: Optional[mpl.axes.Axes] = None,
     style: str | dict | Sequence[str | dict] = (),

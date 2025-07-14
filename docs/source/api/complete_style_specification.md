@@ -28,7 +28,7 @@
         # 8, octagon: octagon
         # *, star: 5-point star, upright
         "marker": str,
-        
+
         "facecolor": str | Any,  # Color of the vertex face (e.g. 'red', '#FF0000')
         "edgecolor": str | Any,  # Color of the vertex edge (e.g. 'black', '#000000')
         "alpha": float,  # Opacity of the vertex (0.0 for fully transparent, 1.0 for fully opaque)

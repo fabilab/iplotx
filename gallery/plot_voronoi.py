@@ -2,7 +2,11 @@
 iplotx and other visualisations
 ===============================
 
-This example shows how to combine `iplotx` visualisations with other tools such as `scipy` and vanilla `matplotlib`. This is one of the key strengths of `iplotx` over custom visualisations in many other packages: `iplotx` produces fully compliant matplotlib artists that can be combined with other matplotlib tools, including `seaborn`.
+This example shows how to combine `iplotx` visualisations with other tools
+such as `scipy` and vanilla `matplotlib`. This is one of the key strengths
+of `iplotx` over custom visualisations in many other packages: `iplotx`
+produces fully compliant matplotlib artists that can be combined with other
+matplotlib tools, including `seaborn`.
 
 """
 

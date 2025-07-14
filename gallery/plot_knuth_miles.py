@@ -8,7 +8,6 @@ This example from newtorkx shows an undirected graph of 128 US cities.
 import gzip
 import re
 
-import numpy as np
 import matplotlib.pyplot as plt
 import networkx as nx
 import iplotx as ipx

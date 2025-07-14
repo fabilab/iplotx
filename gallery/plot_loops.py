@@ -6,7 +6,6 @@ This minimal example shows how to style a plot in a few different ways.
 """
 
 import networkx as nx
-import matplotlib.pyplot as plt
 import iplotx as ipx
 
 # Create a graph and add a self-loop to node 0
@@ -22,7 +21,7 @@ G.add_edges_from(edgelist)
 # Style the edge lines
 linestyle = {e: "-" if e not in edgelist else "--" for e in G.edges()}
 
-ipx.plot(
+ipx.network(
     G,
     layout=pos,
     vertex_labels=True,
@@ -47,11 +46,11 @@ ipx.plot(
 )
 
 # %%
-# In addition to fully structured styles in the form of nested dictionaries, `iplotx`
-# also accepts flat or semi-flat styles, with levels separated by underscores ("_").
-# The above is equivalent to:
+# In addition to fully structured styles in the form of nested dictionaries,
+# `iplotx` also accepts flat or semi-flat styles, with levels separated by
+# underscores ("_"). The above is equivalent to:
 
-ipx.plot(
+ipx.network(
     G,
     layout=pos,
     vertex_labels=True,
@@ -71,7 +70,7 @@ ipx.plot(
 # The `**kwargs` flexible argument of `ipx.plotting` can be used for this purpose as well,
 # for increased readability:
 
-ipx.plot(
+ipx.network(
     G,
     layout=pos,
     vertex_labels=True,
@@ -98,7 +97,7 @@ with ipx.style.context(
     edge_looptension=3.5,
     edge_arrow_marker="|>",
 ):
-    ipx.plot(
+    ipx.network(
         G,
         layout=pos,
         vertex_labels=True,

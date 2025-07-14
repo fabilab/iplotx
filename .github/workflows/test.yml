@@ -38,4 +38,4 @@ jobs:
       run: uv run pytest tests
 
     - name: Run flake8
-      run: uv run flake8 iplotx --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+      run: uv run flake8 iplotx --count --exit-zero --max-complexity=20 --max-line-length=127 --statistics

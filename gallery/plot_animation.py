@@ -2,9 +2,12 @@
 Animations
 ==========
 
-This tutorial shows how to animate `iplotx` visualizations using `matplotlib.animation.FuncAnimation`.
+This tutorial shows how to animate `iplotx` visualizations using
+`matplotlib.animation.FuncAnimation`.
 
-For illustration purposes, we will animate a simple directed graph, rotating it around its center. We also modify the opacity of the vertices and edges, just for fun.
+For illustration purposes, we will animate a simple directed graph,
+rotating it around its center. We also modify the opacity of the
+vertices and edges, just for fun.
 """
 
 import matplotlib.pyplot as plt
