@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.286** total execution time for 48 files **from all galleries**:
+**00:00.780** total execution time for 48 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_tree_plot_tree_style_clades.py` (``../../gallery/tree/plot_tree_style_clades.py``)
-     - 00:01.286
+   * - :ref:`sphx_glr_gallery_tree_plot_cladeedges.py` (``../../gallery/tree/plot_cladeedges.py``)
+     - 00:00.780
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -146,9 +146,6 @@ Computation times
    * - :ref:`sphx_glr_gallery_tree_plot_biopython_tree.py` (``../../gallery/tree/plot_biopython_tree.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_tree_plot_cladeedges.py` (``../../gallery/tree/plot_cladeedges.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_cogent3_layouts.py` (``../../gallery/tree/plot_cogent3_layouts.py``)
      - 00:00.000
      - 0.0
@@ -171,6 +168,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_tree_node_background.py` (``../../gallery/tree/plot_tree_node_background.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_tree_style_clades.py` (``../../gallery/tree/plot_tree_style_clades.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_trees_of_trees.py` (``../../gallery/tree/plot_trees_of_trees.py``)

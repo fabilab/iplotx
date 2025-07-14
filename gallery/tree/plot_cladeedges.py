@@ -5,8 +5,6 @@ Styling clades
 This Biopython-inspired example shows how to style clade edges for a
 node and its descendants.
 
-.. warning::
-  This example is currently WIP and might not work as expected.
 """
 
 from Bio import Phylo
@@ -29,8 +27,12 @@ art = ipx.tree(
         tree.clade[0, 1]: "steelblue",
     },
     cascade_extend=True,
-    edge_color={
-        mrca: "purple",
-        tree.clade[0, 1]: "navy",
-    },
+)
+art.style_subtree(
+    [mrca],
+    {"edge": {"color": "purple"}},
+)
+art.style_subtree(
+    [tree.clade[0, 1]],
+    {"edge": {"color": "navy"}},
 )
