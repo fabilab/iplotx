@@ -38,7 +38,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
 
         # NOTE: there is a weird bug in pandas when using generic Hashable-s
         # with .loc. Seems like doing .T[...] works for individual index
-        # elements only though
+        # elements only though (i.e. using __getitem__ a la dict)
         def get_node_coords(node):
             return layout.T[node].values
 

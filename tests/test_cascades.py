@@ -14,8 +14,7 @@ else:
 CascadeCollection = ipx.artists.CascadeCollection
 
 
-@pytest.fixture
-def small_tree():
+def make_small_tree(layout="horizontal"):
     tree = next(
         Phylo.NewickIO.parse(
             StringIO(
@@ -26,7 +25,7 @@ def small_tree():
 
     internal_data = ipx.ingest.ingest_tree_data(
         tree,
-        "horizontal",
+        layout,
         directed=False,
         layout_style={},
     )
@@ -40,26 +39,64 @@ def small_tree():
     }
 
 
-def test_init(small_tree):
-    CascadeCollection(
-        tree=small_tree["tree"],
-        layout=small_tree["layout"],
-        layout_name="horizontal",
-        orientation="right",
-        style=ipx.style.get_style(".cascade"),
-        provider=small_tree["provider"],
-        transform=mpl.transforms.IdentityTransform(),
+def make_cascade(layout="horizontal", orientation="right", style={}):
+    small_tree = make_small_tree(layout=layout)
+    with ipx.style.context(style):
+        return CascadeCollection(
+            tree=small_tree["tree"],
+            layout=small_tree["layout"],
+            layout_name=layout,
+            orientation=orientation,
+            style=ipx.style.get_style(".cascade"),
+            provider=small_tree["provider"],
+            transform=mpl.transforms.IdentityTransform(),
+        )
+
+
+def test_init():
+    cascade = make_cascade()
+    assert isinstance(cascade, CascadeCollection)
+
+
+def test_init_unsupported():
+    with pytest.raises(NotImplementedError):
+        make_cascade(layout="unsupported")
+
+
+def test_update_maxdepth():
+    for layout, orientation in [
+        ("horizontal", "right"),
+        ("horizontal", "left"),
+        ("vertical", "ascending"),
+        ("vertical", "descending"),
+        ("radial", "clockwise"),
+        ("radial", "counterclockwise"),
+    ]:
+        cascade = make_cascade(layout=layout, orientation=orientation)
+        cascade._update_maxdepth()
+
+
+def test_update_maxdepth_unsupported():
+    cascade = make_cascade(layout="horizontal", orientation="unsupported")
+    with pytest.raises(ValueError):
+        cascade._update_maxdepth()
+
+
+def test_extend_true():
+    make_cascade(
+        style={
+            "cascade": {
+                "extend": True,
+            }
+        }
     )
 
 
-def test_update_maxdepth(small_tree):
-    cascades = CascadeCollection(
-        tree=small_tree["tree"],
-        layout=small_tree["layout"],
-        layout_name="horizontal",
-        orientation="right",
-        style=ipx.style.get_style(".cascade"),
-        provider=small_tree["provider"],
-        transform=mpl.transforms.IdentityTransform(),
+def test_extend_leaflabels():
+    make_cascade(
+        style={
+            "cascade": {
+                "extend": "leaf_labels",
+            },
+        },
     )
-    cascades._update_maxdepth()
