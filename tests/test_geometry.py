@@ -115,6 +115,18 @@ def test_vertexpadding_one(three_points):
     assert len(padding) == 31
 
 
+def test_vertexpadding_two(three_points):
+    hull_idx = geometry.convex_hull(three_points[:2])
+    hull = three_points[hull_idx]
+    padding = geometry._compute_group_path_with_vertex_padding(
+        hull,
+        np.array([three_points[0]] * 61),
+        mpl.transforms.IdentityTransform(),
+        vertexpadding=10,
+    )
+    assert len(padding) == 61
+
+
 def test_vertexpadding_three(three_points):
     hull_idx = geometry.convex_hull(three_points)
     hull = three_points[hull_idx]
