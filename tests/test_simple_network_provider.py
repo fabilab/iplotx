@@ -1,4 +1,7 @@
 import unittest
+import pytest
+import numpy as np
+import pandas as pd
 import matplotlib as mpl
 
 mpl.use("agg")
@@ -31,6 +34,73 @@ class GraphTestRunner(unittest.TestCase):
             ]
         }
         return g
+
+    def test_with_nodes(self):
+        g = self.make_ring()
+        g["nodes"] = [0, 1, 2, 3, 4]
+        ipx.ingest.ingest_network_data(
+            g,
+        )
+
+    def test_with_False_labels(self):
+        g = self.make_ring()
+        ipx.ingest.ingest_network_data(
+            g,
+            vertex_labels=False,
+        )
+
+    def test_with_True_labels(self):
+        g = self.make_ring()
+        ipx.ingest.ingest_network_data(
+            g,
+            vertex_labels=True,
+        )
+
+    def test_with_invalid_labels(self):
+        g = self.make_ring()
+        with pytest.raises(ValueError):
+            ipx.ingest.ingest_network_data(
+                g,
+                vertex_labels=["x", "y"],
+            )
+
+    def test_with_no_edges(self):
+        g = {
+            "nodes": [0, 1],
+        }
+        ipx.ingest.ingest_network_data(
+            g,
+        )
+
+    def test_with_layout_dataframe(self):
+        g = self.make_ring()
+        ipx.ingest.ingest_network_data(
+            g,
+            layout=pd.DataFrame(
+                np.zeros((5, 2), np.float64),
+            ),
+        )
+
+    def test_with_layout_dict(self):
+        g = self.make_ring()
+        ipx.ingest.ingest_network_data(
+            g,
+            layout=pd.DataFrame(
+                np.zeros((5, 2), np.float64),
+            ).T.to_dict(),
+        )
+
+    def test_count_nodes(self):
+        g = self.make_ring()
+        network_data = ipx.ingest.ingest_network_data(g)
+        ptype = network_data["network_library"]
+        provider = ipx.ingest.data_providers["network"][ptype]
+        nvertices = provider(g).number_of_vertices()
+        assert nvertices == 5
+
+        g["nodes"] = [0, 1, 2, 3, 4]
+        nvertices = provider(g).number_of_vertices()
+        assert nvertices == 5
 
     @image_comparison(baseline_images=["graph_basic"], remove_text=True)
     def test_basic(self):
