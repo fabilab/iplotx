@@ -2,6 +2,7 @@
 Module for handling edge ports in iplotx.
 """
 
+from collections.abc import Callable
 import numpy as np
 
 sq2 = np.sqrt(2) / 2
@@ -19,8 +20,8 @@ port_dict = {
 
 
 def _get_port_unit_vector(
-    portstring,
-    trans_inv,
+    portstring: str,
+    trans_inv: Callable,
 ):
     """Get the tangent unit vector from a port string."""
     # The only tricky bit is if the port says e.g. north but the y axis is inverted, in which
