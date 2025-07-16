@@ -1,6 +1,7 @@
 ![Github Actions](https://github.com/fabilab/iplotx/actions/workflows/test.yml/badge.svg)
 ![PyPI - Version](https://img.shields.io/pypi/v/iplotx)
 ![RTD](https://readthedocs.org/projects/iplotx/badge/?version=latest)
+[![Coverage Status](https://coveralls.io/repos/github/fabilab/iplotx/badge.svg?branch=main)](https://coveralls.io/github/fabilab/iplotx?branch=main)
 ![pylint](assets/pylint.svg)
 
 # iplotx
