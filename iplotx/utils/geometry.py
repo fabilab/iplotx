@@ -1,5 +1,9 @@
+from typing import (
+    Sequence,
+)
 from math import atan2
 import numpy as np
+import matplotlib as mpl
 
 
 # See also this link for the general answer (using scipy to compute coefficients):
@@ -14,22 +18,6 @@ def _evaluate_cubic_bezier(points, t):
     """Evaluate a cubic Bezier curve at t."""
     p0, p1, p2, p3 = points
     return (1 - t) ** 3 * p0 + 3 * (1 - t) ** 2 * t * p1 + 3 * (1 - t) * t**2 * p2 + t**3 * p3
-
-
-def _evaluate_cubic_bezier_derivative(points, t):
-    """Evaluate the derivative of a cubic Bezier curve at t."""
-    p0, p1, p2, p3 = points
-    # (dx / dt, dy / dt) is the parametric gradient
-    # to get the angle from this, one can just atanh(dy/dt, dx/dt)
-    # This is equivalent to computing the actual bezier curve
-    # at low t, of course, which is the geometric interpretation
-    # (obviously, division by t is irrelenant)
-    return (
-        3 * p0 * (1 - t) ** 2
-        + 3 * p1 * (1 - t) * (-3 * t + 1)
-        + 3 * p2 * t * (2 - 3 * t)
-        + 3 * p3 * t**2
-    )
 
 
 def convex_hull(points):
@@ -162,22 +150,36 @@ def _convex_hull_Graham_scan(points):
 
 
 def _compute_group_path_with_vertex_padding(
-    hull,
-    points,
-    transform,
-    vertexpadding=10,
-    points_per_curve=30,
+    hull: np.ndarray | Sequence[int],
+    points: np.ndarray,
+    transform: mpl.transforms.Transform,
+    vertexpadding: int = 10,
     # TODO: check how dpi affects this
-    dpi=72.0,
-):
+    dpi: float = 72.0,
+) -> np.ndarray:
     """Offset path for a group based on vertex padding.
 
-    At the input, the structure is [v1, v1, v1, ..., vn, vn, vn, v1]
+    Parameters:
+        hull: The coordinates (not indices!) of the convex hull.
+        points: This is the np.ndarray where the coordinates will be written to (output).
+            The length is some integer ppc * len(hull) + 1 because for each vertex, this
+            function wraps around it using a certain fixed ppc number of points, plus the
+            final point for CLOSEPOLY.
+        transform: The transform of the hull points.
+        vertexpadding: The padding to apply to the vertices, in figure coordinates.
+        dpi (WIP): The dpi of the figure renderer.
 
-    # NOTE: this would look better as a cubic Bezier, but ok for now.
+    Returns:
+        None. The output is written to the `points` array in place. This ensures that the
+        length of this array is unchanged, which is important to ensure that the vertices
+        and SVG codes are in sync.
     """
-    # Short form
-    ppc = points_per_curve
+    if len(hull) == 0:
+        return
+
+    # Short form for point per curve
+    ppc = (len(points) - 1) // len(hull)
+    assert len(points) % ppc == 1
 
     # No padding, set degenerate path
     if vertexpadding == 0:
@@ -189,7 +191,6 @@ def _compute_group_path_with_vertex_padding(
     # Transform into figure coordinates
     trans = transform.transform
     trans_inv = transform.inverted().transform
-    points = trans(points)
 
     # Singleton: draw a circle around it
     if len(hull) == 1:

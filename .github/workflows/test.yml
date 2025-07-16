@@ -37,5 +37,8 @@ jobs:
     - name: Run pytest
       run: uv run pytest --cov-report term-missing --cov=iplotx tests
 
+    - name: Coveralls
+      uses: coverallsapp/github-action@v2
+
     - name: Run flake8
       run: uv run flake8 iplotx --count --exit-zero --max-complexity=20 --max-line-length=127 --statistics

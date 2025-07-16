@@ -130,14 +130,12 @@ class GroupingArtist(PatchCollection):
         return patches, grouping, coords_hulls
 
     def _compute_paths(self, dpi: float = 72.0) -> None:
-        ppc = self._points_per_curve
         for i, hull in enumerate(self._coords_hulls):
-            self._paths[i].vertices = _compute_group_path_with_vertex_padding(
+            _compute_group_path_with_vertex_padding(
                 hull,
                 self._paths[i].vertices,
                 self.get_transform(),
                 vertexpadding=self.get_vertexpadding_dpi(dpi),
-                points_per_curve=ppc,
             )
 
     def _process(self) -> None:
