@@ -61,6 +61,7 @@ test = [
   "scikit-bio>=0.6.3",
   "pandas-stubs>=2.2.3.250527",
   "types-networkx>=3.5.0.20250610",
+  "pytest-cov>=6.2.1",
 ]
 docs = [
   "sphinx",

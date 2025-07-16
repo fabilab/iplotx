@@ -35,7 +35,7 @@ jobs:
       run: uv sync --all-extras --group test
 
     - name: Run pytest
-      run: uv run pytest tests
+      run: uv run pytest --cov-report term-missing --cov=iplotx tests
 
     - name: Run flake8
       run: uv run flake8 iplotx --count --exit-zero --max-complexity=20 --max-line-length=127 --statistics
