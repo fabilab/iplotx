@@ -59,7 +59,7 @@ def test_init():
 
 
 def test_init_unsupported():
-    with pytest.raises(NotImplementedError):
+    with pytest.raises(ValueError):
         make_cascade(layout="unsupported")
 
 
