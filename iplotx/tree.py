@@ -261,9 +261,7 @@ class TreeArtist(mpl.artist.Artist):
 
     def get_leaf_vertices(self) -> Optional[VertexCollection]:
         """Get leaf VertexCollection artist."""
-        if hasattr(self, "_leaf_vertices"):
-            return self._leaf_vertices
-        return None
+        return self._leaf_vertices
 
     def get_leaf_edges(self) -> Optional[LeafEdgeCollection]:
         """Get LeafEdgeCollection artist if present."""
@@ -281,12 +279,11 @@ class TreeArtist(mpl.artist.Artist):
 
     def get_leaf_labels(self) -> Optional[LabelCollection]:
         """Get the leaf label artist if present."""
-        if hasattr(self, "_leaf_vertices"):
-            return self._leaf_vertices.get_labels()
-        return None
+        return self._leaf_vertices.get_labels()
 
     def get_leaf_edge_labels(self) -> Optional[LabelCollection]:
         """Get the leaf edge label artist if present."""
+        # TODO: leaf edge labels are basically unsupported as of now
         if hasattr(self, "_leaf_edges"):
             return self._leaf_edges.get_labels()
         return None
@@ -309,8 +306,6 @@ class TreeArtist(mpl.artist.Artist):
         """Add edges from the leaf to the max leaf depth."""
         # If there are no leaves, no leaf labels, or leaves are not deep,
         # skip leaf edges
-        if not hasattr(self, "_leaf_vertices"):
-            return
         leaf_style = get_style(".leaf", {})
         if ("deep" not in leaf_style) and self.get_leaf_labels() is None:
             return
@@ -394,16 +389,14 @@ class TreeArtist(mpl.artist.Artist):
         if user_leaf_style.get("deep", True):
             if layout_name == "radial":
                 leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
-            elif layout_name == "horizontal":
-                if orientation == "right":
-                    leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
-                else:
-                    leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].min()
-            elif layout_name == "vertical":
-                if orientation == "descending":
-                    leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].min()
-                else:
-                    leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].max()
+            elif (layout_name, orientation) == ("horizontal", "right"):
+                leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
+            elif (layout_name, orientation) == ("horizontal", "left"):
+                leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].min()
+            elif (layout_name, orientation) == ("vertical", "descending"):
+                leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].min()
+            elif (layout_name, orientation) == ("vertical", "ascending"):
+                leaf_layout.iloc[:, 1] = leaf_layout.iloc[:, 1].max()
             else:
                 raise ValueError(
                     f"Layout and orientation not supported: {layout_name}, {orientation}."

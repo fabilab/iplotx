@@ -56,7 +56,9 @@ class CascadeCollection(mpl.collections.PatchCollection):
         nodes_unordered = set()
         for prop in ("facecolor", "edgecolor"):
             if prop in style:
-                nodes_unordered |= set(style[prop].keys())
+                value = style[prop]
+                if isinstance(value, dict):
+                    nodes_unordered |= set(value.keys())
 
         # Draw the patches from the closest to the root (earlier drawing)
         # to the closer to the leaves (later drawing).
