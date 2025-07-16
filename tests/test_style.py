@@ -1,4 +1,5 @@
 from copy import deepcopy
+from collections import defaultdict
 import unittest
 
 import iplotx as ipx
@@ -34,6 +35,20 @@ class StyleTestRunner(unittest.TestCase):
         ipx.style.use("hollow")
         ipx.style.use("default")
         self.assertEqual(style, ipx.style.current)
+
+    def test_copy_with_deep_values(self):
+        partial_style = defaultdict(lambda: 80, {"a": 10})
+        partial_style_copy = ipx.style.copy_with_deep_values(partial_style)
+        self.assertEqual(partial_style_copy["a"], 10)
+        self.assertEqual(partial_style_copy["b"], 80)
+        self.assertTrue(hasattr(partial_style_copy, "default_factory"))
+
+        style = {"vertex": {"size": defaultdict(lambda: 80, {"a": 10})}}
+        style_copy = ipx.style.copy_with_deep_values(style)
+        self.assertEqual(style_copy["vertex"]["size"]["a"], 10)
+        self.assertEqual(style_copy["vertex"]["size"]["b"], 80)
+        self.assertFalse(hasattr(style_copy, "default_factory"))
+        self.assertTrue(hasattr(style_copy["vertex"]["size"], "default_factory"))
 
 
 def suite():

@@ -55,7 +55,7 @@ class VertexCollection(PatchCollection):
         *args,
         layout_coordinate_system: str = "cartesian",
         style: Optional[dict[str, Any]] = None,
-        labels: Optional[Sequence[str]] = None,
+        labels: Optional[Sequence[str] | pd.Series] = None,
         **kwargs,
     ):
         """Initialise the VertexCollection.
@@ -69,9 +69,12 @@ class VertexCollection(PatchCollection):
 
         self._index = layout.index
         self._style = style
-        self._labels = labels
         self._layout = layout
         self._layout_coordinate_system = layout_coordinate_system
+
+        if (labels is not None) and (not isinstance(labels, pd.Series)):
+            labels = pd.Series(labels, index=self._layout.index)
+        self._labels = labels
 
         # Create patches from structured data
         patches, sizes, kwargs2 = self._init_vertex_patches()
@@ -90,6 +93,10 @@ class VertexCollection(PatchCollection):
 
         if self._labels is not None:
             self._compute_label_collection()
+
+    def __len__(self):
+        """Return the number of vertices in the collection."""
+        return len(self.get_paths())
 
     def get_children(self) -> tuple[mpl.artist.Artist]:
         """Get the children artists.
