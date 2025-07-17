@@ -1,9 +1,9 @@
 """
-Zero-dependencies trees
-=======================
+Zero-dependency trees
+=====================
 
-This example demonstrates how to visualise trees using `iplotx`'s internal `SimpleTreeDataProvider`,
-a simple tree representation as nested Python dictionaries via the ``children`` keyword.
+This example demonstrates how to visualise trees using `iplotx`'s internal `SimpleTree`,
+a simple tree representation via the ``children`` attribute.
 
 .. tip::
     This provider is not as powerful as proper tree libraries such as ``cogent3`` or ``ETE4``. It
