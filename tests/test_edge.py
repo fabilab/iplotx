@@ -30,10 +30,16 @@ def edge_collection(**kwargs):
     return ipx.artists.EdgeCollection(**kwargs)
 
 
-def test_directed_prop():
+def test_props():
     edges = edge_collection()
     edges.directed = True
     assert edges._directed is True
+    assert edges.get_curved() is False
+
+
+def test_curved():
+    edges = edge_collection()
+    edges.set_curved(True)
 
 
 def test_ports():
@@ -52,6 +58,11 @@ def test_looptension():
     edges = edge_collection()
     edges.set_looptension(None)
     edges.set_looptension(0.5)
+
+
+def test_loopmaxangle():
+    edges = edge_collection()
+    edges.set_loopmaxangle(45)
 
 
 def test_offset():
