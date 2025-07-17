@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.270** total execution time for 49 files **from all galleries**:
+**00:01.074** total execution time for 50 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_tree_plot_angular_waypoints.py` (``../../gallery/tree/plot_angular_waypoints.py``)
-     - 00:00.270
+   * - :ref:`sphx_glr_gallery_tree_plot_simpletreedataprovider.py` (``../../gallery/tree/plot_simpletreedataprovider.py``)
+     - 00:01.074
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -122,7 +122,7 @@ Computation times
    * - :ref:`sphx_glr_gallery_plot_simple_path.py` (``../../gallery/plot_simple_path.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simpledataprovider.py` (``../../gallery/plot_simpledataprovider.py``)
+   * - :ref:`sphx_glr_gallery_plot_simplenetworkdataprovider.py` (``../../gallery/plot_simplenetworkdataprovider.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
@@ -141,6 +141,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_angular_waypoints.py` (``../../gallery/tree/plot_angular_waypoints.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_biopython_tree.py` (``../../gallery/tree/plot_biopython_tree.py``)

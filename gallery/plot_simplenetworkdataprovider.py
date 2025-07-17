@@ -1,8 +1,8 @@
 """
-Zero dependencies
-=================
+Zero-dependency networks
+========================
 
-This example uses `iplotx`'s internal `SimpleDataProvider` to show how to visualise
+This example uses `iplotx`'s internal `SimpleNetworkDataProvider` to show how to visualise
 networkx without using any external analysis library (e.g. `igraph`, `networkx`).
 """
 

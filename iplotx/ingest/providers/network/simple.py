@@ -18,7 +18,7 @@ from ....utils.internal import (
 )
 
 
-class SimpleDataProvider(NetworkDataProvider):
+class SimpleNetworkDataProvider(NetworkDataProvider):
     def __call__(
         self,
         layout: Optional[LayoutType] = None,

@@ -209,7 +209,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         index = pd.Series(
             np.arange(len(index)),
             index=index,
-        )
+        ).to_dict()
 
         voffsets = []
         vpaths = []
