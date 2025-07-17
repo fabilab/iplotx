@@ -372,6 +372,51 @@ class GraphTestRunner(unittest.TestCase):
                     "linewidth": 1,
                     "looptension": 7.5,
                     "label": {
+                        "rotate": True,
+                        "color": "black",
+                        "bbox": {
+                            "facecolor": "none",
+                        },
+                    },
+                },
+            },
+        )
+
+    @image_comparison(baseline_images=["complex_rotatelabels"], remove_text=True)
+    def test_complex_rotatelabels(self):
+        import itertools as it
+
+        nodes = "ABC"
+        prod = list(it.product(nodes, repeat=2)) * 4
+        G = nx.MultiDiGraph()
+        for i, (u, v) in enumerate(prod):
+            G.add_edge(u, v, w=round(i / 3, 2))
+        nx.set_node_attributes(G, nx.spring_layout(G, seed=3113794652), "pos")
+        csi = it.cycle([5 * r for r in it.accumulate([0.15] * 4)])
+        nx.set_edge_attributes(G, {e: next(csi) for e in G.edges(keys=True)}, "tension")
+        nx.set_edge_attributes(
+            G,
+            {tuple(e): w for *e, w in G.edges(keys=True, data="w")},
+            "label",
+        )
+
+        fig, ax = plt.subplots()
+        ipx.plot(
+            G,
+            ax=ax,
+            layout="pos",
+            edge_labels=True,
+            margins=0.03,
+            style={
+                "edge": {
+                    "curved": True,
+                    "tension": G.edges.data("tension"),
+                    "color": G.edges.data("w"),
+                    "cmap": mpl.colormaps["inferno"],
+                    "linewidth": 1,
+                    "looptension": 7.5,
+                    "label": {
+                        "rotate": False,
                         "color": "black",
                         "bbox": {
                             "facecolor": "none",

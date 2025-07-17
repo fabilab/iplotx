@@ -2,6 +2,8 @@
 Module for edge arrows in iplotx.
 """
 
+from typing import Never
+
 import numpy as np
 import matplotlib as mpl
 from matplotlib.patches import PathPatch
@@ -124,12 +126,17 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
         return patches, sizes
 
-    def set_array(self, A):
+    def set_array(self, A: np.ndarray) -> Never:
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
         raise ValueError("Setting an array for arrows directly is not supported.")
 
-    def set_colors(self, colors):
-        """Set arrow colors (edge and/or face) based on a colormap."""
+    def set_colors(self, colors: np.ndarray) -> None:
+        """Set arrow colors (edge and/or face) based on a colormap.
+
+        Parameters:
+            colors: Color array to apply. This must be an Nx3 or Nx4 vector of RGB or RGBA colors.
+                This function will NOT attempt to convert other color descriptions to RGB/RGBA.
+        """
         # NOTE: facecolors is always an array because we come from patches
         # It can have zero alpha (i.e. if we choose "none", or a hollow marker)
         self.set_edgecolor(colors)

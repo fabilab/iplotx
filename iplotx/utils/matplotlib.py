@@ -127,32 +127,35 @@ def _get_label_width_height(text, hpadding=18, vpadding=12, dpi=72.0, **kwargs):
 
 def _compute_mid_coord_and_rot(path, trans):
     """Compute mid point of an edge, straight or curved."""
-    # Distinguish between straight and curved paths
+    # Straight path
     if path.codes[-1] == mpl.path.Path.LINETO:
         coord = path.vertices.mean(axis=0)
-        vtr = trans(path.vertices)
-        rot = atan2(
-            vtr[-1, 1] - vtr[0, 1],
-            vtr[-1, 0] - vtr[0, 0],
-        )
+        v1 = path.vertices[0]
+        v2 = path.vertices[-1]
 
     # Cubic Bezier
     elif path.codes[-1] == mpl.path.Path.CURVE4:
         coord = _evaluate_cubic_bezier(path.vertices, 0.5)
-        # TODO:
-        rot = 0
+        v1 = _evaluate_cubic_bezier(path.vertices, 0.475)
+        v2 = _evaluate_cubic_bezier(path.vertices, 0.525)
 
     # Square Bezier
     elif path.codes[-1] == mpl.path.Path.CURVE3:
         coord = _evaluate_squared_bezier(path.vertices, 0.5)
-        # TODO:
-        rot = 0
+        v1 = _evaluate_squared_bezier(path.vertices, 0.475)
+        v2 = _evaluate_squared_bezier(path.vertices, 0.525)
 
     else:
         raise ValueError(
             "Curve type not straight and not squared/cubic Bezier, cannot compute mid point."
         )
 
+    v1 = trans(v1)
+    v2 = trans(v2)
+    rot = atan2(
+        v2[1] - v1[1],
+        v2[0] - v1[0],
+    )
     return coord, rot
 
 
