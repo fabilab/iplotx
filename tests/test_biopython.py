@@ -88,6 +88,15 @@ def test_get_elements(tree):
     assert art.get_vertex_labels() is None
 
 
+def test_leaf_labels_array(tree):
+    for leaf in tree.get_terminals():
+        leaf.name = "hello"
+    ipx.artists.TreeArtist(
+        tree,
+        leaf_labels=True,
+    )
+
+
 @pytest.mark.parametrize(
     "layout,orientation",
     [

@@ -499,7 +499,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 edge end.
         """
         if ports is None:
-            del self._style["ports"]
+            if "ports" in self._style:
+                del self._style["ports"]
         else:
             self._style["ports"] = ports
         self.stale = True
@@ -533,7 +534,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
         """
         if tension is None:
-            del self._style["tension"]
+            if "tension" in self._style:
+                del self._style["tension"]
         else:
             self._style["tension"] = tension
         self.stale = True
@@ -593,7 +595,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
             looptension: The tension to use for loops. If None, the default is 2.5.
         """
         if looptension is None:
-            del self._style["looptension"]
+            if "looptension" in self._style:
+                del self._style["looptension"]
         else:
             self._style["looptension"] = looptension
         self.stale = True
@@ -613,7 +616,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
             offset: The offset in points for parallel straight edges. If None, the default is 3.
         """
         if offset is None:
-            del self._style["offset"]
+            if "offset" in self._style:
+                del self._style["offset"]
         else:
             self._style["offset"] = offset
         self.stale = True

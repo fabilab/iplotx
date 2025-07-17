@@ -104,7 +104,8 @@ class NetworkArtist(mpl.artist.Artist):
         """
         self = cls.from_edgecollection(other._edges)
         self.network = other.network
-        self._ipx_internal_data = other._ipx_internal_data
+        if hasattr(other, "_ipx_internal_data"):
+            self._ipx_internal_data = other._ipx_internal_data
         return self
 
     @classmethod

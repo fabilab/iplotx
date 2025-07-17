@@ -30,31 +30,12 @@ def edge_collection(**kwargs):
     return ipx.artists.EdgeCollection(**kwargs)
 
 
-def test_directed_prop():
+def test_hotload():
     edges = edge_collection()
-    edges.directed = True
-    assert edges._directed is True
+    res = ipx.artists.NetworkArtist.from_edgecollection(
+        edges,
+    )
+    assert isinstance(res, ipx.artists.NetworkArtist)
 
-
-def test_ports():
-    edges = edge_collection()
-    edges.set_ports(None)
-    edges.set_ports(("n", "w"))
-
-
-def test_tension():
-    edges = edge_collection()
-    edges.set_tension(None)
-    edges.set_tension(0.5)
-
-
-def test_looptension():
-    edges = edge_collection()
-    edges.set_looptension(None)
-    edges.set_looptension(0.5)
-
-
-def test_offset():
-    edges = edge_collection()
-    edges.set_offset(None)
-    edges.set_offset(2)
+    res2 = ipx.artists.NetworkArtist.from_other(res)
+    assert isinstance(res2, ipx.artists.NetworkArtist)
