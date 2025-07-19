@@ -1,6 +1,6 @@
 """
-Styling clades
-==============
+Subtrees and cascades
+=====================
 
 This Biopython-inspired example shows how to style clade edges for a
 node and its descendants.

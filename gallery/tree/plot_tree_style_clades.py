@@ -1,6 +1,6 @@
 """
-Clade styling
-=============
+Subtree styling
+===============
 
 This example shows how to style tree clades - or subtrees - post rendering,
 similar of the equivalent option in `cogent3`.
