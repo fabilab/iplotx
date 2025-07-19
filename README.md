@@ -19,7 +19,9 @@ Supports:
   - [scikit-bio](https://scikit.bio)
   - [minimal tree data structure](https://iplotx.readthedocs.io/en/latest/gallery/tree/plot_simpletreedataprovider.html#sphx-glr-gallery-tree-plot-simpletreedataprovider-py) (for educational purposes)
 
-**NOTE**: This is currently beta quality software. The API and functionality are settling in and might break occasionally.
+In addition to the above, *any* network or tree analysis library can register an [entry point](https://iplotx.readthedocs.io/en/latest/providers.html#creating-a-custom-data-provider) to gain compatibility with `iplotx` with no intervention from our side.
+
+**NOTE**: This is currently late beta quality software. The API and functionality might break rarely.
 
 ## Installation
 ```bash
