@@ -5,7 +5,19 @@
 ![pylint](assets/pylint.svg)
 
 # iplotx
-Plotting networks from igraph and networkx.
+Visualise networks and trees in Python, with style.
+
+Supports:
+- **networks**:
+  - [networkx](https://networkx.org/)
+  - [igraph](igraph.readthedocs.io/)
+  - [minimal network data structure](https://iplotx.readthedocs.io/en/latest/gallery/plot_simplenetworkdataprovider.html#sphx-glr-gallery-plot-simplenetworkdataprovider-py) (for educational purposes)
+- **trees**:
+  - [ETE4](https://etetoolkit.github.io/ete/)
+  - [cogent3](https://cogent3.org/)
+  - [Biopython](https://biopython.org/)
+  - [scikit-bio](https://scikit.bio)
+  - [minimal tree data structure](https://iplotx.readthedocs.io/en/latest/gallery/tree/plot_simpletreedataprovider.html#sphx-glr-gallery-tree-plot-simpletreedataprovider-py) (for educational purposes)
 
 **NOTE**: This is currently beta quality software. The API and functionality are settling in and might break occasionally.
 
@@ -34,19 +46,20 @@ See [readthedocs](https://iplotx.readthedocs.io/en/latest/) for the full documen
 ## Gallery
 See [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
 
-## Roadmap
-- Plot networks from igraph and networkx interchangeably, using matplotlib as a backend. ✅
-- Support interactive plotting, e.g. zooming and panning after the plot is created. ✅
-- Support storing the plot to disk thanks to the many matplotlib backends (SVG, PNG, PDF, etc.). ✅
-- Support flexible yet easy styling. ✅
+## Features
+- Plot networks from multiple libraries including networkx and igraph, using matplotlib as a backend. ✅
+- Plot trees from multiple libraries such as cogent3, ETE4, skbio, and biopython. ✅
+- Flexible yet easy styling, including an internal library of styles ✅
+- Interactive plotting, e.g. zooming and panning after the plot is created. ✅
+- Store the plot to disk thanks to the many matplotlib backends (SVG, PNG, PDF, etc.). ✅
 - Efficient plotting of large graphs using matplotlib's collection functionality. ✅
-- Support editing plotting elements after the plot is created, e.g. changing node colors, labels, etc. ✅
-- Support animations, e.g. showing the evolution of a network over time. ✅
-- Support mouse interaction, e.g. hovering over or clicking on nodes and edges to get information about them. ✅
-- Support trees from special libraries such as ete3, biopython, etc. This will need a dedicated function and layouting. ✅
-- Support uni- and bi-directional communication between graph object and plot object.🏗️
-
-**NOTE:** The last item can probably be achieved already by using `matplotlib`'s existing callback functionality. It is currently untested, but if you manage to get it to work on your graph let me know and I'll add it to the examples (with credit).
+- Edit plotting elements after the plot is created, e.g. changing node colors, labels, etc. ✅
+- Animations, e.g. showing the evolution of a network over time. ✅
+- Mouse and keyboard interaction, e.g. hovering over or clicking on nodes and edges to get information about them. ✅
+- Node clustering and covers, e.g. showing communities in a network. ✅
+- Choice of tree layouts and orientations. ✅
+- Tree-specific options: cascades, subtree styling, split edges, etc. ✅
+- (WIP) Support uni- and bi-directional communication between graph object and plot object.🏗️
 
 ## Authors
 Fabio Zanini (https://fabilab.org)
