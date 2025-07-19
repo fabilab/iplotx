@@ -55,7 +55,7 @@ See [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
 - Efficient plotting of large graphs using matplotlib's collection functionality. ✅
 - Edit plotting elements after the plot is created, e.g. changing node colors, labels, etc. ✅
 - Animations, e.g. showing the evolution of a network over time. ✅
-- Mouse and keyboard interaction, e.g. hovering over or clicking on nodes and edges to get information about them. ✅
+- Mouse and keyboard interaction, e.g. hovering over nodes/edges to get information about them. ✅
 - Node clustering and covers, e.g. showing communities in a network. ✅
 - Choice of tree layouts and orientations. ✅
 - Tree-specific options: cascades, subtree styling, split edges, etc. ✅
