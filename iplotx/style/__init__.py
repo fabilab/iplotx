@@ -286,6 +286,7 @@ def rotate_style(
     style: dict[str, Any],
     index: Optional[int] = None,
     key: Optional[Hashable] = None,
+    key2: Optional[Hashable] = None,
     props: Optional[Sequence[str]] = None,
 ) -> dict[str, Any]:
     """Rotate leaves of a style for a certain index or key.
@@ -295,6 +296,9 @@ def rotate_style(
         index: The integer to rotate the style leaves into.
         key: For dict-like leaves (e.g. vertex properties specified as a dict-like object over the
             vertices themselves), the key to use for rotation (e.g. the vertex itself).
+        key2: For dict-like leaves, a backup key in case the first key fails. If this is None
+            or also a failure (i.e. KeyError), default to the empty type constructor for the
+            first value of the dict-like style leaf.
         props: The properties to rotate, usually all leaf properties.
 
     Returns:
@@ -331,11 +335,16 @@ def rotate_style(
         ):
             # If only a subset of keys is provided, try the default value a la
             # defaultdict. If that fails, use an empty constructor
-            try:
+            if key in val:
                 newval = val[key]
-            except KeyError:
-                valtype = type(next(iter(val.values())))
-                newval = valtype()
+            elif key2 is not None and (key2 in val):
+                newval = val[key2]
+            else:
+                try:
+                    newval = val[key]
+                except KeyError:
+                    valtype = type(next(iter(val.values())))
+                    newval = valtype()
             style[prop] = newval
 
     return style
