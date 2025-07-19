@@ -140,7 +140,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
             "linestyles": [],
         }
         for i in range(nedges):
-            stylei = rotate_style(style, index=i)
+            vids = self._vertex_ids[i]
+            stylei = rotate_style(style, index=i, key=vids[-1])
             for key, values in kwargs.items():
                 # iplotx uses singular style properties
                 key = key.rstrip("s")
