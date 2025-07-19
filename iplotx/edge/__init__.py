@@ -121,8 +121,46 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 transform=transform,
             )
 
+        if "split" in self._style:
+            self._add_subedges(
+                len(patches),
+                self._style["split"],
+            )
+
+    def _add_subedges(
+        self,
+        nedges,
+        style,
+    ):
+        """Add subedges to shadow the current edges."""
+        segments = [np.zeros((2, 2)) for i in range(nedges)]
+        kwargs = {
+            "linewidths": [],
+            "edgecolors": [],
+            "linestyles": [],
+        }
+        for i in range(nedges):
+            stylei = rotate_style(style, index=i)
+            for key, values in kwargs.items():
+                # iplotx uses singular style properties
+                key = key.rstrip("s")
+                # "color" has higher priority than "edgecolor"
+                if (key == "edgecolor") and ("color" in stylei):
+                    val = stylei["color"]
+                else:
+                    val = stylei.get(key.rstrip("s"), getattr(self, f"get_{key}")()[i])
+                values.append(val)
+
+        self._subedges = mpl.collections.LineCollection(
+            segments,
+            transform=self.get_transform(),
+            **kwargs,
+        )
+
     def get_children(self) -> tuple:
         children = []
+        if hasattr(self, "_subedges"):
+            children.append(self._subedges)
         if hasattr(self, "_arrows"):
             children.append(self._arrows)
         if hasattr(self, "_label_collection"):
@@ -341,6 +379,17 @@ class EdgeCollection(mpl.collections.PatchCollection):
             if (offset != 0).any():
                 path.vertices[:] = trans_inv(trans(path.vertices) + offset)
 
+            # If splitting is active, split the path here, shedding off the last straight
+            # segment but only if waypoints were used
+            if hasattr(self, "_subedges") and waypoints != "none":
+                # NOTE: we are already in the middle of a redraw, so we can happily avoid
+                # causing stale of the subedges. They are already scheduled to be redrawn
+                # at the end of this function.
+                self._subedges._paths[i].vertices[:] = path.vertices[-2:].copy()
+                # NOTE: instead of shortening the path, we just make the last bit invisible
+                # that makes it easier on memory management etc.
+                path.vertices[-1] = path.vertices[-2]
+
             # Collect angles for this vertex, to be used for loops plotting below
             if vinfo.get("loops", True):
                 if v1 in loop_vertex_dict:
@@ -409,6 +458,9 @@ class EdgeCollection(mpl.collections.PatchCollection):
                         idx += 1
 
         self._paths = paths
+        # FIXME:??
+        # if hasattr(self, "_subedges"):
+        #    self._subedges.stale = True
 
     def _update_labels(self):
         if self._labels is None:
@@ -473,13 +525,13 @@ class EdgeCollection(mpl.collections.PatchCollection):
         if not self.get_visible():
             return
 
+        # This includes the subedges if present
         self._update_paths()
         # This sets the arrow offsets
         self._update_children()
 
         super().draw(renderer)
         for child in self.get_children():
-            # This sets the arrow sizes with dpi scaling
             child.draw(renderer)
 
     def get_ports(self) -> Optional[LeafProperty[Pair[Optional[str]]]]:
@@ -648,6 +700,7 @@ def make_stub_patch(**kwargs):
         "paralleloffset",
         "cmap",
         "norm",
+        "split",
     ]
     for prop in forbidden_props:
         if prop in kwargs:
