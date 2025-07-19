@@ -99,6 +99,55 @@ style_library = {
             "deep": False,
         },
     },
+    # Dashed depth tree branches
+    "dashdepth": {
+        "vertex": {
+            "size": 2,
+            "label": {
+                "color": "black",
+                "size": 10,
+                "verticalalignment": "center",
+                "bbox": {
+                    "facecolor": "none",
+                    "edgecolor": "none",
+                },
+            },
+        },
+        "edge": {
+            "linewidth": 1.5,
+            "split": {
+                "linestyle": ":",
+            },
+        },
+        "leaf": {
+            "deep": False,
+        },
+    },
+    # Dashed depth tree branches
+    "dashwidth": {
+        "vertex": {
+            "size": 2,
+            "label": {
+                "color": "black",
+                "size": 10,
+                "verticalalignment": "center",
+                "bbox": {
+                    "facecolor": "none",
+                    "edgecolor": "none",
+                },
+            },
+        },
+        "edge": {
+            "linewidth": 1.5,
+            "linestyle": ":",
+            "split": {
+                "linestyle": "-",
+            },
+        },
+        "leaf": {
+            "deep": False,
+        },
+    },
     # Greyscale style
     "greyscale": {
         "vertex": {
