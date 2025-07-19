@@ -2,6 +2,7 @@ from typing import (
     Any,
     Optional,
 )
+import warnings
 import numpy as np
 import pandas as pd
 
@@ -54,11 +55,19 @@ class CascadeCollection(mpl.collections.PatchCollection):
         # These patches need at least a facecolor (usually) or an edgecolor
         # so it's safe to make a list from these
         nodes_unordered = set()
-        for prop in ("facecolor", "edgecolor"):
+        for prop in ("facecolor", "edgecolor", "linewidth", "linestyle"):
             if prop in style:
                 value = style[prop]
                 if isinstance(value, dict):
                     nodes_unordered |= set(value.keys())
+
+        if len(nodes_unordered) == 0:
+            warnings.warn(
+                "No nodes found in the style for the cascading patches. "
+                "Please provide a style with at least one dict-like "
+                "specification among the following properties: 'facecolor', "
+                "'edgecolor', 'color', 'linewidth', or 'linestyle'.",
+            )
 
         # Draw the patches from the closest to the root (earlier drawing)
         # to the closer to the leaves (later drawing).
@@ -72,25 +81,10 @@ class CascadeCollection(mpl.collections.PatchCollection):
                 f"Cascading patches not implemented for layout: {layout_name}.",
             )
 
-        nleaves = sum(1 for leaf in provider(tree).get_leaves())
-        extend_mode = style.get("extend", False)
-        if extend_mode and (extend_mode != "leaf_labels"):
-            if layout_name == "horizontal":
-                if orientation == "right":
-                    maxdepth = layout.values[:, 0].max()
-                else:
-                    maxdepth = layout.values[:, 0].min()
-            elif layout_name == "vertical":
-                if orientation == "descending":
-                    maxdepth = layout.values[:, 1].min()
-                else:
-                    maxdepth = layout.values[:, 1].max()
-            elif layout_name == "radial":
-                # layout values are: r, theta
-                maxdepth = layout.values[:, 0].max()
         self._maxdepth = maxdepth
 
         cascading_patches = []
+        nleaves = sum(1 for leaf in provider(tree).get_leaves())
         for node in drawing_order:
             stylei = rotate_style(style, key=node)
             stylei.pop("extend", None)
@@ -198,6 +192,7 @@ class CascadeCollection(mpl.collections.PatchCollection):
             for path in self.get_paths():
                 # Old radii
                 r2old = np.linalg.norm(path.vertices[-2])
+                # Update the outer part of the wedge patch
                 path.vertices[(len(path.vertices) - 1) // 2 :] *= self.get_maxdepth() / r2old
             return
 

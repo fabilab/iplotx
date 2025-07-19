@@ -43,7 +43,7 @@ def test_curved():
 
 
 def test_split():
-    with ipx.style.style.context("dashdepth"):
+    with ipx.style.context("dashdepth"):
         style = ipx.style.get_style(".edge")
         edge_collection(style=style)
 

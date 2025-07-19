@@ -42,14 +42,19 @@ def make_small_tree(layout="horizontal"):
 def make_cascade(layout="horizontal", orientation="right", style={}):
     small_tree = make_small_tree(layout=layout)
     with ipx.style.context(style):
+        style = ipx.style.get_style(".cascade")
+        style["color"] = {
+            small_tree["tree"].clade[0, 1]: "blue",
+        }
         return CascadeCollection(
             tree=small_tree["tree"],
             layout=small_tree["layout"],
             layout_name=layout,
             orientation=orientation,
-            style=ipx.style.get_style(".cascade"),
+            style=style,
             provider=small_tree["provider"],
             transform=mpl.transforms.IdentityTransform(),
+            maxdepth=5,
         )
 
 
@@ -83,20 +88,40 @@ def test_update_maxdepth_unsupported():
 
 
 def test_extend_true():
-    make_cascade(
-        style={
-            "cascade": {
-                "extend": True,
-            }
-        }
-    )
+    for layout, orientation in [
+        ("horizontal", "right"),
+        ("horizontal", "left"),
+        ("vertical", "ascending"),
+        ("vertical", "descending"),
+        ("radial", "clockwise"),
+        ("radial", "counterclockwise"),
+    ]:
+        make_cascade(
+            layout=layout,
+            orientation=orientation,
+            style={
+                "cascade": {
+                    "extend": True,
+                }
+            },
+        )
 
 
 def test_extend_leaflabels():
-    make_cascade(
-        style={
-            "cascade": {
-                "extend": "leaf_labels",
+    for layout, orientation in [
+        ("horizontal", "right"),
+        ("horizontal", "left"),
+        ("vertical", "ascending"),
+        ("vertical", "descending"),
+        ("radial", "clockwise"),
+        ("radial", "counterclockwise"),
+    ]:
+        make_cascade(
+            layout=layout,
+            orientation=orientation,
+            style={
+                "cascade": {
+                    "extend": "leaf_labels",
+                },
             },
-        },
-    )
+        )

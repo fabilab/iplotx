@@ -66,3 +66,27 @@ def test_draw_invisible(tree):
         assert art.draw(fig.canvas.get_renderer()) is None
     finally:
         plt.close(fig)
+
+
+def test_cascade_maxdepth(tree):
+    for layout, orientation in [
+        ("horizontal", "right"),
+        ("horizontal", "left"),
+        ("vertical", "ascending"),
+        ("vertical", "descending"),
+        ("radial", "clockwise"),
+        ("radial", "counterclockwise"),
+    ]:
+        with ipx.style.context(
+            [
+                "tree",
+                {
+                    "cascade": {"facecolor": {tree.children[0]: "blue"}},
+                    "layout": {"orientation": orientation},
+                },
+            ]
+        ):
+            ipx.artists.TreeArtist(
+                tree,
+                layout=layout,
+            )

@@ -461,7 +461,24 @@ class TreeArtist(mpl.artist.Artist):
         """Add cascade patches."""
         # NOTE: If leaf labels are present and the cascades are requested to wrap around them,
         # we have to compute the max extend of the cascades from the leaf labels.
-        maxdepth = None
+        layout = self.get_layout()
+        layout_name = self._ipx_internal_data["layout_name"]
+        orientation = self._ipx_internal_data["orientation"]
+        maxdepth = 1e-10
+        if layout_name == "horizontal":
+            if orientation == "right":
+                maxdepth = layout.values[:, 0].max()
+            else:
+                maxdepth = layout.values[:, 0].min()
+        elif layout_name == "vertical":
+            if orientation == "descending":
+                maxdepth = layout.values[:, 1].min()
+            else:
+                maxdepth = layout.values[:, 1].max()
+        elif layout_name == "radial":
+            # layout values are: r, theta
+            maxdepth = layout.values[:, 0].max()
+
         style_cascade = get_style(".cascade")
         extend_to_labels = style_cascade.get("extend", False) == "leaf_labels"
         has_leaf_labels = self.get_leaf_labels() is not None
@@ -473,9 +490,9 @@ class TreeArtist(mpl.artist.Artist):
 
         self._cascades = CascadeCollection(
             tree=self.tree,
-            layout=self.get_layout(),
-            layout_name=self._ipx_internal_data["layout_name"],
-            orientation=self._ipx_internal_data["orientation"],
+            layout=layout,
+            layout_name=layout_name,
+            orientation=orientation,
             style=style_cascade,
             provider=data_providers["tree"][self._ipx_internal_data["tree_library"]],
             transform=self.get_offset_transform(),
