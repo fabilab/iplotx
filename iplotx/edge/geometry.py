@@ -96,7 +96,6 @@ def _get_shorter_edge_coords(vpath, vsize, theta):
         xe = v1[0]
     else:
         m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
-        print(m12, mtheta)
         xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
     ye = mtheta * xe
     ve = np.array([xe, ye])
@@ -199,7 +198,6 @@ def _compute_edge_path_straight(
 
     # Angle of the straight line
     theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
-    print(vcoord_data_cart, vcoord_fig, theta)
 
     # Shorten at starting vertex
     vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta) + vcoord_fig[0]
