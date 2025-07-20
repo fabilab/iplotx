@@ -4,6 +4,9 @@
 [![Coverage Status](https://coveralls.io/repos/github/fabilab/iplotx/badge.svg?branch=main)](https://coveralls.io/github/fabilab/iplotx?branch=main)
 ![pylint](assets/pylint.svg)
 
+![Banner](docs/source/_static/banner.png)
+
+
 # iplotx
 Visualise networks and trees in Python, with style.
 
