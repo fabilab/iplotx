@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.046** total execution time for 55 files **from all galleries**:
+**00:00.060** total execution time for 56 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_tree_plot_style_tree.py` (``../../gallery/tree/plot_style_tree.py``)
-     - 00:01.046
+   * - :ref:`sphx_glr_gallery_plot_elements.py` (``../../gallery/plot_elements.py``)
+     - 00:00.060
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -72,9 +72,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_edit_artists.py` (``../../gallery/plot_edit_artists.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_elements.py` (``../../gallery/plot_elements.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
@@ -167,6 +164,9 @@ Computation times
    * - :ref:`sphx_glr_gallery_tree_plot_cogent3_tree.py` (``../../gallery/tree/plot_cogent3_tree.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_elements_tree.py` (``../../gallery/tree/plot_elements_tree.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_ete4.py` (``../../gallery/tree/plot_ete4.py``)
      - 00:00.000
      - 0.0
@@ -183,6 +183,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_split_edges.py` (``../../gallery/tree/plot_split_edges.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_style_tree.py` (``../../gallery/tree/plot_style_tree.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_support.py` (``../../gallery/tree/plot_support.py``)

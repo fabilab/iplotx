@@ -1,6 +1,6 @@
 """
-Element showroom
-================
+Network element showroom
+========================
 
 This example showcases various plot elements that can be styled in ``iplotx``.
 """
