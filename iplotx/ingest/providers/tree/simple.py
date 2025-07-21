@@ -21,6 +21,7 @@ class SimpleTree:
 
     children: Sequence[Self] = []
     branch_length: float = 1
+    name: str = ""
 
     @classmethod
     def from_dict(cls, data: dict) -> Self:
@@ -35,6 +36,7 @@ class SimpleTree:
         """
         tree = cls()
         tree.branch_length = data.get("branch_length", 1)
+        tree.name = data.get("name", "")
         tree.children = [cls.from_dict(child) for child in data.get("children", [])]
         return tree
 
