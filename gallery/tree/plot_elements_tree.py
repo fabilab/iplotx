@@ -36,7 +36,10 @@ ipx.tree(
     vertex_linewidth=1.5,
     vertex_labels=True,
     vertex_label_hmargin=0,
-    leaf_labels=True,
+    leaf_labels={tree.children[0].children[0]: "LL"},
+    leaf_label_bbox_facecolor="lightcoral",
+    leaf_label_bbox_edgecolor="black",
+    leaf_label_bbox_alpha=0.9,
     leaf_deep=True,
     cascade_facecolor={
         tree.children[0].children[1]: "gold",
@@ -45,5 +48,6 @@ ipx.tree(
     edge_split_linewidth=[4] + [2] * 6,
     edge_split_linestyle=["-."] + ["-"] * 6,
     edge_split_color=["tomato"] + ["black"] * 6,
+    margins=(0.08, 0.02),
 )
 plt.ion(); plt.show()
