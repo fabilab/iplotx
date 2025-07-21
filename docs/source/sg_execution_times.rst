@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:21.369** total execution time for 53 files **from all galleries**:
+**00:00.056** total execution time for 54 files **from all galleries**:
 
 .. container::
 
@@ -32,13 +32,13 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_arrowlawn.py` (``../../gallery/plot_arrowlawn.py``)
-     - 00:21.319
-     - 0.0
-   * - :ref:`sphx_glr_gallery_plot_redblack.py` (``../../gallery/plot_redblack.py``)
-     - 00:00.050
+   * - :ref:`sphx_glr_gallery_plot_elements.py` (``../../gallery/plot_elements.py``)
+     - 00:00.056
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_arrowlawn.py` (``../../gallery/plot_arrowlawn.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_arrows.py` (``../../gallery/plot_arrows.py``)
@@ -114,6 +114,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_ports.py` (``../../gallery/plot_ports.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_redblack.py` (``../../gallery/plot_redblack.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)

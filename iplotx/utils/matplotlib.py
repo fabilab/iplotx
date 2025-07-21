@@ -90,6 +90,9 @@ def _get_label_width_height(text, hpadding=18, vpadding=12, dpi=72.0, **kwargs):
         very accurate. Yet, it is often good enough and easier to implement than a careful
         orchestration of Figure.draw_without_rendering.
     """
+    if len(text) == 0:
+        return (0, 0)
+
     if "fontsize" in kwargs:
         kwargs["size"] = kwargs.pop("fontsize")
     forbidden_props = [

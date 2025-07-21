@@ -230,7 +230,11 @@ class EdgeCollection(mpl.collections.PatchCollection):
         # NOTE: The superclass also sets stale = True
         super().update_scalarmappable()
         # Now self._edgecolors has the correct colorspace values
-        if hasattr(self, "_arrows"):
+        # NOTE: The following line should include a condition on
+        # whether the arrows are allowing color matching to the
+        # edges. For now, we assume that if the edges are colormapped
+        # we would want the arrows to be as well.
+        if hasattr(self, "_arrows") and (self._A is not None):
             self._arrows.set_colors(self.get_edgecolor())
 
     def get_labels(self) -> Optional[LabelCollection]:

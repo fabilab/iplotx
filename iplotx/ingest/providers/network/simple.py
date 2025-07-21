@@ -79,6 +79,10 @@ class SimpleNetworkDataProvider(NetworkDataProvider):
             edge_df = pd.DataFrame(columns=["_ipx_source", "_ipx_target"])
         del tmp
 
+        # Edge labels
+        if edge_labels is not None:
+            edge_df["label"] = edge_labels
+
         network_data = {
             "vertex_df": vertex_df,
             "edge_df": edge_df,

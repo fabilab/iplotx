@@ -370,4 +370,5 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
         path,
         **kwargs,
     )
+
     return patch, size_max
