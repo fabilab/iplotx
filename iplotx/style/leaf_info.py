@@ -38,6 +38,7 @@ nonrotating_leaves = (
     "deep",
     "angular",
     "curved",
+    "capstyle",
 )
 
 # Union of all style leaves (rotating and nonrotating)

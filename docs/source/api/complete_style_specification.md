@@ -69,6 +69,9 @@
         # unless the "norm" option is used.
         "color": str | float | Any,
 
+        # How to cap the edge line. Should be "butt" (default), "round", or "projecting".
+        "capstyle": str,
+
         # Matplotlib color map used to map floating numbers into RGBA colors. Only
         # used when the previous option "color" is set to floats.
         "cmap": str | matplotlib.colors.Colormap,
@@ -180,6 +183,17 @@
             "bbox": dict,  # Bounding box properties for the label (see vertex labels)
 
         },
+
+        ############################################################################
+        # The following edge properties are only valid for trees via `iplotx.tree`
+        "split": {
+            # NOTE: This takes any properties of "edge" except for itself (i.e. no
+            # "nested" split) and applies it to the last segment of split edges.
+            "color": str | Any,  # Color of the split edge
+
+            # ...
+        },
+
     },
 
     # The following entry is used by networks ONLY (not trees as plotted by `iplotx.tree`)

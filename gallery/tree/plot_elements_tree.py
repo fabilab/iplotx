@@ -9,11 +9,11 @@ import matplotlib.pyplot as plt
 import iplotx as ipx
 
 tree = {
-    "name": "V1",
+    "name": "Vertex\nlabel",
     "children": [
         {
             "children": [
-                {"name": "V2"},
+                {},
                 {
                     "children": [{}, {}]
                 },
@@ -24,19 +24,19 @@ tree = {
 }
 tree = ipx.ingest.providers.tree.simple.SimpleTree.from_dict(tree)
 
-fig, ax = plt.subplots(figsize=(4, 4))
+fig, ax = plt.subplots(figsize=(3.9, 3.3))
 ipx.tree(
     tree,
     ax=ax,
-    vertex_size=[(25, 20)] + [0] * 5 + [(25, 20)],
+    vertex_size=[0] * 6 + [(45, 35)],
     vertex_marker="r",
-    vertex_facecolor=["darkorange"] + ["none"] * 5 + ["tomato"],
+    vertex_facecolor=["none"] * 6 + ["orange"],
     vertex_alpha=0.5,
     vertex_edgecolor="black",
     vertex_linewidth=1.5,
     vertex_labels=True,
     vertex_label_hmargin=0,
-    leaf_labels={tree.children[0].children[0]: "LL"},
+    leaf_labels={tree.children[0].children[0]: "Leaf\nlabel"},
     leaf_label_bbox_facecolor="lightcoral",
     leaf_label_bbox_edgecolor="black",
     leaf_label_bbox_alpha=0.9,
@@ -44,10 +44,12 @@ ipx.tree(
     cascade_facecolor={
         tree.children[0].children[1]: "gold",
     },
-    edge_linewidth=2,
-    edge_split_linewidth=[4] + [2] * 6,
+    edge_linewidth=3,
+    edge_split_linewidth=3,
     edge_split_linestyle=["-."] + ["-"] * 6,
     edge_split_color=["tomato"] + ["black"] * 6,
-    margins=(0.08, 0.02),
+    edge_capstyle="round",
+    edge_split_capstyle="round",
+    margins=(0.21, 0.08),
 )
 plt.ion(); plt.show()

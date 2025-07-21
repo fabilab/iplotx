@@ -105,6 +105,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
         # NOTE: This should also set the transform
         super().__init__(patches, transform=transform, *args, **kwargs)
 
+        # Apparenyly capstyle is lost upon collection creation
+        if "capstyle" in self._style:
+            self.set_capstyle(self._style["capstyle"])
+
         # This is important because it prepares the right flags for scalarmappable
         self.set_facecolor("none")
 
@@ -157,6 +161,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
             transform=self.get_transform(),
             **kwargs,
         )
+
+        # Apparently capstyle is lost upon collection creation
+        if "capstyle" in style:
+            self._subedges.set_capstyle(style["capstyle"])
 
     def get_children(self) -> tuple:
         children = []
