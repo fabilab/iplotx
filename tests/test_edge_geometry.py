@@ -57,7 +57,7 @@ def test_compute_path_straight_polar(args_make_paths):
     assert np.round(angles[0] - angles[1] + np.pi, 2) == 0.0
 
 
-@pytest.mark.parametrize("waypoints,expected", [["y0x1", [10, 0]], ["x0y1", [0, 5]]])
+@pytest.mark.parametrize("waypoints,expected", [["y0x1", [10, 0]], ["x0y1", [0, 5]], [[0, 5]] * 2])
 def test_compute_waypoints(args_make_paths, waypoints, expected):
     vpath, trans, trans_inv = args_make_paths
     epath, angles = geometry._compute_edge_path_waypoints(
