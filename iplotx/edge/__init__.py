@@ -360,9 +360,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
             if waypoints != "none":
                 ports = edge_stylei.get("ports", (None, None))
 
-            if not isinstance(waypoints, str):
-                __import__("ipdb").set_trace()
-
             # Compute actual edge path
             path, angles = _compute_edge_path(
                 vcoord_data,

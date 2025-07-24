@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:01.192** total execution time for 56 files **from all galleries**:
+**00:00.041** total execution time for 57 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_tree_plot_elements_tree.py` (``../../gallery/tree/plot_elements_tree.py``)
-     - 00:01.192
+   * - :ref:`sphx_glr_gallery_plot_waypoints.py` (``../../gallery/plot_waypoints.py``)
+     - 00:00.041
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -165,6 +165,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_cogent3_tree.py` (``../../gallery/tree/plot_cogent3_tree.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_elements_tree.py` (``../../gallery/tree/plot_elements_tree.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_ete4.py` (``../../gallery/tree/plot_ete4.py``)

@@ -2,7 +2,10 @@
 Support module with geometry- and path-related functions for edges.
 """
 
-from typing import Optional
+from typing import (
+    Optional,
+    Sequence,
+)
 from math import atan2, tan, pi
 import numpy as np
 import matplotlib as mpl
@@ -228,7 +231,37 @@ def _compute_edge_path_waypoints(
     ports: Pair[Optional[str]] = (None, None),
     **kwargs,
 ):
-    if waypoints in ("x0y1", "y0x1"):
+    if not isinstance(waypoints, str):
+        # Only cartesian coordinates supported for numerical waypoints for now
+        assert layout_coordinate_system == "cartesian"
+
+        waypoints = trans(np.array(waypoints, ndmin=2))
+
+        # Coordinates in figure (default) coords
+        vcoord_fig = trans(vcoord_data)
+
+        # Angles of the straight lines
+        thetas = [None, None]
+        vshorts = [None, None]
+        for i in range(2):
+            # This picks always the first waypoint for i == 0,
+            # the last waypoint for i == 1. They might be the same.
+            waypoint = waypoints[-i]
+            if ports[i] is None:
+                thetas[i] = atan2(*((waypoint - vcoord_fig[i])[::-1]))
+            else:
+                thetas[i] = atan2(*(_get_port_unit_vector(ports[i], trans_inv)[::-1]))
+
+            # Shorten at vertex border
+            vshorts[i] = (
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i]) + vcoord_fig[i]
+            )
+
+        points = [vshorts[0]] + list(waypoints) + [vshorts[1]]
+        codes = ["MOVETO"] + ["LINETO"] * len(waypoints) + ["LINETO"]
+        angles = tuple(thetas)
+
+    elif waypoints in ("x0y1", "y0x1"):
         assert layout_coordinate_system == "cartesian"
 
         # Coordinates in figure (default) coords
@@ -422,7 +455,7 @@ def _compute_edge_path_curved(
 def _compute_edge_path(
     *args,
     tension: float = 0,
-    waypoints: str = "none",
+    waypoints: str | tuple[float, float] | Sequence[tuple[float, float]] | np.ndarray = "none",
     ports: Pair[Optional[str]] = (None, None),
     layout_coordinate_system: str = "cartesian",
     **kwargs,
