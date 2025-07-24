@@ -77,6 +77,12 @@ class LabelCollection(mpl.artist.Artist):
             child.set_figure(fig)
         self._update_offsets(dpi=fig.dpi)
 
+    def get_texts(self):
+        """Get the texts of the labels."""
+        return [child.get_text() for child in self.get_children()]
+
+    get_text = get_texts
+
     def _get_margins_with_dpi(self, dpi: float = 72.0) -> np.ndarray:
         return self._margins * dpi / 72.0
 

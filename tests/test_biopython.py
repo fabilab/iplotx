@@ -1,7 +1,6 @@
 from io import StringIO
-import importlib
-import unittest
 import pytest
+import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
@@ -11,11 +10,8 @@ import iplotx as ipx
 
 from utils import image_comparison
 
-
-if importlib.util.find_spec("Bio") is None:
-    raise unittest.SkipTest("biopython not found, skipping tests")
-else:
-    from Bio import Phylo
+Bio = pytest.importorskip("Bio")
+from Bio import Phylo  # noqa: E402
 
 
 @pytest.fixture
@@ -144,6 +140,21 @@ def test_style_subtree(tree):
     art.style_subtree(
         tree.clade[0, 1],
         {"edge": {"color": "red"}},
+    )
+
+
+def test_get_edge_labels(tree):
+    art = ipx.artists.TreeArtist(
+        tree,
+        edge_labels=["A", "B", "C", "D", "E", "F"],
+    )
+    np.testing.assert_array_equal(
+        art.get_edge_labels().get_texts()[:6],
+        np.array(["A", "B", "C", "D", "E", "F"]),
+    )
+    np.testing.assert_array_equal(
+        art.get_edge_labels().get_text()[:6],
+        np.array(["A", "B", "C", "D", "E", "F"]),
     )
 
 

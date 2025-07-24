@@ -294,7 +294,7 @@ class TreeArtist(mpl.artist.Artist):
             layout=self.get_layout(),
             layout_coordinate_system=self._ipx_internal_data.get(
                 "layout_coordinate_system",
-                "catesian",
+                "cartesian",
             ),
             style=get_style(".vertex"),
             labels=self._get_label_series("vertex"),
@@ -586,10 +586,9 @@ class TreeArtist(mpl.artist.Artist):
                     waypointsi = "y0x1"
                 elif layout_name == "radial":
                     waypointsi = "r0a1"
-                else:
-                    raise ValueError(
-                        f"Layout not supported: {layout_name}. ",
-                    )
+                # NOTE: no need to catch the default case, it's caught
+                # when making the layout already. We should *never* be
+                # in an "else" case here.
             waypoints.append(waypointsi)
 
             # These are not the actual edges drawn, only stubs to establish

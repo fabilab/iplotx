@@ -323,6 +323,12 @@ class TreeDataProvider(Protocol):
         edge_df = pd.DataFrame(edge_data)
         tree_data["edge_df"] = edge_df
 
+        # Add edge labels
+        # NOTE: Partial support only for now, only lists
+        if edge_labels is not None:
+            # Cycling sequence
+            edge_df["label"] = [edge_labels[i % len(edge_labels)] for i in range(len(edge_df))]
+
         # Add branch support
         if hasattr(self, "get_support"):
             support = self.get_support()
