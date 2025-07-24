@@ -5,6 +5,12 @@ import pytest
 import iplotx as ipx
 
 
+def test_reset():
+    ipx.style.use("hollow")
+    ipx.style.reset()
+    assert ipx.style.current == ipx.style.styles["default"]
+
+
 def test_get_nonexistent_style():
     with pytest.raises(TypeError):
         ipx.style.get_style(".vertex.size.")
@@ -15,11 +21,51 @@ def test_get_style_invalid():
         ipx.style.get_style("default", {}, "third_arg")
 
 
+def test_get_style_args():
+    assert ipx.style.get_style(".vertex.curved", 80) == 80
+
+
+def test_rotate_type_fallback():
+    style = {
+        "size": {"hello": 80},
+    }
+    assert ipx.style.rotate_style(
+        style,
+        key="world",
+    ) == {"size": 0}
+
+
+def test_rotate_style_key2():
+    style = {
+        "size": {"hello": 80},
+    }
+    assert ipx.style.rotate_style(
+        style,
+        key="world",
+        key2="hello",
+    ) == {"size": 80}
+
+
+def test_rotate_style_noargs():
+    style = {
+        "size": {"hello": 80},
+    }
+    with pytest.raises(ValueError):
+        ipx.style.rotate_style(style)
+
+
+def test_use_style_invalid():
+    with pytest.raises(TypeError):
+        ipx.style.use(["hollow", ".vertex.size."])
+    assert ipx.style.current == ipx.style.styles["default"]
+
+
 def test_flat_style():
     with ipx.style.context(
         dict(
             vertex_size=80,
             edge_label_bbox_facecolor="yellow",
+            zorder=80,
         ),
     ):
         current = ipx.style.current
