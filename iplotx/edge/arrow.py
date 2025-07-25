@@ -272,6 +272,22 @@ def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
             codes=[getattr(mpl.path.Path, x) for x in codes],
             closed=False,
         )
+    elif marker == "(":
+        kwargs["facecolor"] = "none"
+        if "color" in kwargs:
+            kwargs["edgecolor"] = kwargs.pop("color")
+        codes = ["MOVETO", "CURVE3", "CURVE3"]
+        path = mpl.path.Path(
+            np.array(
+                [
+                    [height * 0.5, width * 0.5],
+                    [-height * 0.5, 0],
+                    [height * 0.5, -width * 0.5],
+                ]
+            ),
+            codes=[getattr(mpl.path.Path, x) for x in codes],
+            closed=False,
+        )
     elif marker == "|":
         kwargs["facecolor"] = "none"
         if "color" in kwargs:
