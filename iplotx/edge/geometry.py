@@ -103,7 +103,7 @@ def _get_shorter_edge_coords(vpath, vsize, theta, padding=0):
         ye = mtheta * xe
         ve = np.array([xe, ye])
 
-    ve *= vsize
+    ve = ve * vsize
 
     # Padding (assuming dpi scaling is already applied to the padding)
     ve += padding * np.array([np.cos(theta), np.sin(theta)])

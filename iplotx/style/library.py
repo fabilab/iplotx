@@ -58,6 +58,28 @@ style_library = {
             },
         }
     },
+    # Feedback, for regulatory networks
+    "feedback": {
+        "edge": {
+            "linewidth": 4,
+            "padding": 10,
+            "arrow": {
+                "marker": ")>",
+                "width": 20,
+                "height": 28,
+            },
+        },
+        "vertex": {
+            "size": 35,
+            "color": None,
+            "facecolor": "white",
+            "edgecolor": "black",
+            "linewidth": 4,
+            "label": {
+                "color": "black",
+            },
+        },
+    },
     # Tree style, with zero-size vertices
     "tree": {
         "vertex": {

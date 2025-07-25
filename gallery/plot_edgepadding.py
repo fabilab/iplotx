@@ -6,7 +6,7 @@ This example illustrates how to pad edges, i.e. leave a bit of empty space betwe
 edge cap (end) and the border of its source/target vertices.
 """
 
-import iplotx as px
+import iplotx as ipx
 
 graph = {
     "edges": [

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.041** total execution time for 57 files **from all galleries**:
+**00:00.045** total execution time for 59 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_plot_waypoints.py` (``../../gallery/plot_waypoints.py``)
-     - 00:00.041
+   * - :ref:`sphx_glr_gallery_plot_feedbacks.py` (``../../gallery/plot_feedbacks.py``)
+     - 00:00.045
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
      - 00:00.000
@@ -69,6 +69,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_directed.py` (``../../gallery/plot_directed.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_edgepadding.py` (``../../gallery/plot_edgepadding.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_edit_artists.py` (``../../gallery/plot_edit_artists.py``)
@@ -147,6 +150,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_voronoi.py` (``../../gallery/plot_voronoi.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_plot_waypoints.py` (``../../gallery/plot_waypoints.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
