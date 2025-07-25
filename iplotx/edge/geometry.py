@@ -64,45 +64,51 @@ def _compute_loops_per_angle(nloops, angles):
     ]
 
 
-def _get_shorter_edge_coords(vpath, vsize, theta):
+def _get_shorter_edge_coords(vpath, vsize, theta, padding=0):
     # Bound theta from -pi to pi (why is that not guaranteed?)
     theta = (theta + pi) % (2 * pi) - pi
 
     # Size zero vertices need no shortening
     if vsize == 0:
-        return np.array([0, 0])
-
-    for i in range(len(vpath)):
-        v1 = vpath.vertices[i]
-        v2 = vpath.vertices[(i + 1) % len(vpath)]
-        theta1 = atan2(*((v1)[::-1]))
-        theta2 = atan2(*((v2)[::-1]))
-
-        # atan2 ranges ]-3.14, 3.14]
-        # so it can be that theta1 is -3 and theta2 is +3
-        # therefore we need two separate cases, one that cuts at pi and one at 0
-        cond1 = theta1 <= theta <= theta2
-        cond2 = (
-            (theta1 + 2 * pi) % (2 * pi)
-            <= (theta + 2 * pi) % (2 * pi)
-            <= (theta2 + 2 * pi) % (2 * pi)
-        )
-        if cond1 or cond2:
-            break
+        ve = np.array([0, 0])
     else:
-        raise ValueError("Angle for patch not found")
+        for i in range(len(vpath)):
+            v1 = vpath.vertices[i]
+            v2 = vpath.vertices[(i + 1) % len(vpath)]
+            theta1 = atan2(*((v1)[::-1]))
+            theta2 = atan2(*((v2)[::-1]))
 
-    # The edge meets the patch of the vertex on the v1-v2 size,
-    # at angle theta from the center
-    mtheta = tan(theta)
-    if v2[0] == v1[0]:
-        xe = v1[0]
-    else:
-        m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
-        xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
-    ye = mtheta * xe
-    ve = np.array([xe, ye])
-    return ve * vsize
+            # atan2 ranges ]-3.14, 3.14]
+            # so it can be that theta1 is -3 and theta2 is +3
+            # therefore we need two separate cases, one that cuts at pi and one at 0
+            cond1 = theta1 <= theta <= theta2
+            cond2 = (
+                (theta1 + 2 * pi) % (2 * pi)
+                <= (theta + 2 * pi) % (2 * pi)
+                <= (theta2 + 2 * pi) % (2 * pi)
+            )
+            if cond1 or cond2:
+                break
+        else:
+            raise ValueError("Angle for patch not found")
+
+        # The edge meets the patch of the vertex on the v1-v2 size,
+        # at angle theta from the center
+        mtheta = tan(theta)
+        if v2[0] == v1[0]:
+            xe = v1[0]
+        else:
+            m12 = (v2[1] - v1[1]) / (v2[0] - v1[0])
+            xe = (v1[1] - m12 * v1[0]) / (mtheta - m12)
+        ye = mtheta * xe
+        ve = np.array([xe, ye])
+
+    ve *= vsize
+
+    # Padding (assuming dpi scaling is already applied to the padding)
+    ve += padding * np.array([np.cos(theta), np.sin(theta)])
+
+    return ve
 
 
 def _fix_parallel_edges_straight(
@@ -139,11 +145,12 @@ def _compute_loop_path(
     angle2,
     trans_inv,
     looptension,
+    padding=0,
 ):
     # Shorten at starting angle
-    start = _get_shorter_edge_coords(vpath, vsize, angle1) + vcoord_fig
+    start = _get_shorter_edge_coords(vpath, vsize, angle1, padding) + vcoord_fig
     # Shorten at end angle
-    end = _get_shorter_edge_coords(vpath, vsize, angle2) + vcoord_fig
+    end = _get_shorter_edge_coords(vpath, vsize, angle2, padding) + vcoord_fig
 
     aux1 = (start - vcoord_fig) * looptension + vcoord_fig
     aux2 = (end - vcoord_fig) * looptension + vcoord_fig
@@ -175,6 +182,7 @@ def _compute_edge_path_straight(
     trans,
     trans_inv,
     layout_coordinate_system: str = "cartesian",
+    padding: float = 0,
     **kwargs,
 ):
     if layout_coordinate_system not in ("cartesian", "polar"):
@@ -203,11 +211,11 @@ def _compute_edge_path_straight(
     theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
 
     # Shorten at starting vertex
-    vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta) + vcoord_fig[0]
+    vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta, padding) + vcoord_fig[0]
     points.append(vs)
 
     # Shorten at end vertex
-    ve = _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi) + vcoord_fig[1]
+    ve = _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi, padding) + vcoord_fig[1]
     points.append(ve)
 
     codes = ["MOVETO", "LINETO"]
@@ -229,6 +237,7 @@ def _compute_edge_path_waypoints(
     layout_coordinate_system: str = "cartesian",
     points_per_curve: int = 30,
     ports: Pair[Optional[str]] = (None, None),
+    padding: float = 0,
     **kwargs,
 ):
     if not isinstance(waypoints, str):
@@ -254,7 +263,8 @@ def _compute_edge_path_waypoints(
 
             # Shorten at vertex border
             vshorts[i] = (
-                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i]) + vcoord_fig[i]
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], padding)
+                + vcoord_fig[i]
             )
 
         points = [vshorts[0]] + list(waypoints) + [vshorts[1]]
@@ -283,7 +293,8 @@ def _compute_edge_path_waypoints(
 
             # Shorten at vertex border
             vshorts[i] = (
-                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i]) + vcoord_fig[i]
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], padding)
+                + vcoord_fig[i]
             )
 
         # Shorten waypoints to keep the angles right
@@ -331,7 +342,9 @@ def _compute_edge_path_waypoints(
                 theta = atan2(*(_get_port_unit_vector(ports[i], trans_inv)[::-1]))
 
             # Shorten at vertex border
-            vshort = _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], theta) + vcoord_fig[i]
+            vshort = (
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], theta, padding) + vcoord_fig[i]
+            )
             thetas.append(theta)
             vshorts.append(vshort)
 
@@ -378,6 +391,7 @@ def _compute_edge_path_curved(
     trans,
     trans_inv,
     ports: Pair[Optional[str]] = (None, None),
+    padding: float = 0,
 ):
     """Shorten the edge path along a cubic Bezier between the vertex centres.
 
@@ -430,7 +444,9 @@ def _compute_edge_path_curved(
     thetas = [None, None]
     for i in range(2):
         thetas[i] = atan2(*((auxs[i] - vcoord_fig[i])[::-1]))
-        vs[i] = _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i]) + vcoord_fig[i]
+        vs[i] = (
+            _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], padding) + vcoord_fig[i]
+        )
 
     path = {
         "vertices": [

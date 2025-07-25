@@ -72,6 +72,10 @@
         # How to cap the edge line. Should be "butt" (default), "round", or "projecting".
         "capstyle": str,
 
+        # Whether to leave any space between edge cap and vertex border. This is
+        # in figure points and autoscales correctly with dpi.
+        "padding": float,
+
         # Matplotlib color map used to map floating numbers into RGBA colors. Only
         # used when the previous option "color" is set to floats.
         "cmap": str | matplotlib.colors.Colormap,

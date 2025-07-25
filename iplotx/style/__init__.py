@@ -60,7 +60,7 @@ def get_style(name: str = "", *args) -> dict[str, Any]:
                 style = style[namei]
             # NOTE: if asking for a nonexistent, non-leaf style
             # give the benefit of the doubt and set an empty dict
-            # which will not fail unless the uder tries to enter it
+            # which will not fail unless the user tries to enter it
             elif namei not in style_leaves:
                 style = {}
             elif len(args) > 0:

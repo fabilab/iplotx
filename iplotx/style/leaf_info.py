@@ -22,6 +22,7 @@ rotating_leaves = (
     "vpadding",
     "hmargin",
     "vmargin",
+    "padding",
     "ports",
     "width",
     "height",

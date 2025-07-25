@@ -349,6 +349,10 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 tension = 0
                 ports = None
 
+            # Scale padding by dpi
+            dpi = self.figure.dpi if hasattr(self, "figure") else 72.0
+            padding = dpi / 72.0 * edge_stylei.pop("padding", 0)
+
             # False is a synonym for "none"
             waypoints = edge_stylei.get("waypoints", "none")
             if waypoints is False or waypoints is np.False_:
@@ -371,6 +375,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 waypoints=waypoints,
                 ports=ports,
                 layout_coordinate_system=self._vertex_collection.get_layout_coordinate_system(),
+                padding=padding,
             )
 
             offset = edge_stylei.get("offset", 0)
@@ -384,7 +389,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
                     offset = offset * vrot
             offset = np.asarray(offset, dtype=float)
             # Scale by dpi
-            dpi = self.figure.dpi if hasattr(self, "figure") else 72.0
             offset *= dpi / 72.0
             if (offset != 0).any():
                 path.vertices[:] = trans_inv(trans(path.vertices) + offset)
@@ -711,6 +715,7 @@ def make_stub_patch(**kwargs):
         "cmap",
         "norm",
         "split",
+        "padding",
     ]
     for prop in forbidden_props:
         if prop in kwargs:
