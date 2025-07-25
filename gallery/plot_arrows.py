@@ -9,7 +9,7 @@ import networkx as nx
 import matplotlib.pyplot as plt
 import iplotx as ipx
 
-arrow_markers = ["|>", "|/", "|\\", ">", ">>", ")>", ")", "(", "]", "[", "|",
+arrow_markers = ["|>", "|/", "|\\", ">", "<", ">>", ")>", ")", "(", "]", "[", "|",
                  "x", "s", "d", "p", "q"]
 n = len(arrow_markers)
 G = nx.DiGraph()

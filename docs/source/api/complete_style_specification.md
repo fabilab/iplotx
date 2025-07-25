@@ -145,6 +145,7 @@
             # |/
             # |\\ (double slash needed to avoid character escaping)
             # >
+            # <
             # >>
             # )>
             # )
