@@ -245,3 +245,11 @@ def test_leafedges(tree):
         tree,
         leaf_labels={leaf: str(i + 1) for i, leaf in enumerate(tree.get_terminals())},
     )
+
+
+@image_comparison(baseline_images=["directed_child"], remove_text=True)
+def test_directed_child(tree):
+    ipx.plotting.tree(
+        tree,
+        directed=True,
+    )

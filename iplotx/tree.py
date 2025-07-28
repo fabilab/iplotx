@@ -63,7 +63,7 @@ class TreeArtist(mpl.artist.Artist):
         self,
         tree,
         layout: Optional[str] = "horizontal",
-        directed: bool | str = False,
+        directed: bool = False,
         vertex_labels: Optional[bool | list[str] | dict[Hashable, str] | pd.Series] = None,
         edge_labels: Optional[Sequence | dict[Hashable, str] | pd.Series] = None,
         leaf_labels: Optional[Sequence | dict[Hashable, str]] | pd.Series = None,
@@ -76,8 +76,7 @@ class TreeArtist(mpl.artist.Artist):
         Parameters:
             tree: The tree to plot.
             layout: The layout to use for the tree. Can be "horizontal", "vertical", or "radial".
-            directed: Whether the tree is directed. Can be a boolean or a string with the
-                following choices: "parent" or "child".
+            directed: Whether the tree is directed. Must be a boolean.
             vertex_labels: Labels for the vertices. Can be a list, dictionary, or pandas Series.
             edge_labels: Labels for the edges. Can be a sequence of strings.
             leaf_labels: Labels for the leaves. Can be a sequence of strings or a pandas Series.
@@ -611,7 +610,6 @@ class TreeArtist(mpl.artist.Artist):
         else:
             edge_style["waypoints"] = waypoints
 
-        # NOTE: Trees are directed is their "directed" property is True, "child", or "parent"
         self._edges = EdgeCollection(
             edgepatches,
             vertex_ids=adjacent_vertex_ids,

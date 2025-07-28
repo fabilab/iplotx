@@ -254,12 +254,12 @@ class TreeDataProvider(Protocol):
         self,
         layout: str | LayoutType,
         layout_style: Optional[dict[str, int | float | str]] = None,
-        directed: bool | str = False,
+        directed: bool = False,
         vertex_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series | bool] = None,
         edge_labels: Optional[Sequence[str] | dict] = None,
         leaf_labels: Optional[Sequence[str] | dict[Hashable, str] | pd.Series | bool] = None,
     ) -> TreeData:
-        """Create tree data object for iplotx from ete4.core.tre.Tree classes.
+        """Create tree data object for iplotx from any tree provider.
 
         NOTE: This function needs NOT be implemented by individual providers.
         """
@@ -314,12 +314,8 @@ class TreeDataProvider(Protocol):
         edge_data = {"_ipx_source": [], "_ipx_target": []}
         for node in self.preorder():
             for child in self.get_children(node):
-                if directed == "parent":
-                    edge_data["_ipx_source"].append(child)
-                    edge_data["_ipx_target"].append(node)
-                else:
-                    edge_data["_ipx_source"].append(node)
-                    edge_data["_ipx_target"].append(child)
+                edge_data["_ipx_source"].append(node)
+                edge_data["_ipx_target"].append(child)
         edge_df = pd.DataFrame(edge_data)
         tree_data["edge_df"] = edge_df
 

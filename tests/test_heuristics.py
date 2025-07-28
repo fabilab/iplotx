@@ -1,6 +1,7 @@
 import importlib
 import unittest
 import pytest
+import numpy as np
 import pandas as pd
 from iplotx.ingest import heuristics
 
@@ -21,6 +22,12 @@ def test_empty_layout():
 
     res = heuristics.normalise_layout(None, network=None, nvertices=0)
     assert res is None
+
+
+def test_array_layout():
+    res = heuristics.normalise_layout(np.zeros((3, 2)), network={}, nvertices=3)
+    assert isinstance(res, pd.DataFrame)
+    assert res.shape == (3, 2)
 
 
 def test_igraph_layouts():
@@ -50,52 +57,20 @@ def test_networkx_layouts():
     assert res.shape == (5, 2)
 
 
-def test_igraph_clustering():
+accepted_groupings = [
+    [{0, 1}, {0, 2}, {2, 4}],
+    [0, 1, 0, 2, 2],
+    {0: {0, 1}, 1: {0, 2}},
+    {0: 0, 1: 1, 2: 0, 3: 0},
+    ig.clustering.Clustering([0, 0, 1, 2, 2]),
+    ig.clustering.Cover([[0, 1], [0, 1, 2], [2, 4]]),
+]
+
+
+@pytest.mark.parametrize("grouping", accepted_groupings)
+def test_grouping_dict(grouping):
     g = ig.Graph.Ring(5)
     layout = g.layout_circle()
-    clu = ig.clustering.Clustering([0, 0, 1, 2, 2])
-    res = heuristics.normalise_grouping(
-        clu,
-        layout,
-    )
-    assert isinstance(res, dict)
-    for k, v in res.items():
-        assert isinstance(k, int)
-        assert isinstance(v, (set, frozenset))
-
-
-def test_igraph_cover():
-    g = ig.Graph.Ring(5)
-    layout = g.layout_circle()
-    cover = ig.clustering.Cover([[0, 1], [0, 1, 2], [2, 4]])
-    res = heuristics.normalise_grouping(
-        cover,
-        layout,
-    )
-    assert isinstance(res, dict)
-    for k, v in res.items():
-        assert isinstance(k, int)
-        assert isinstance(v, (set, frozenset))
-
-
-def test_grouping_sequence_sets():
-    g = ig.Graph.Ring(5)
-    layout = g.layout_circle()
-    grouping = [{0, 1}, {0, 2}, {2, 4}]
-    res = heuristics.normalise_grouping(
-        grouping,
-        layout,
-    )
-    assert isinstance(res, dict)
-    for k, v in res.items():
-        assert isinstance(k, int)
-        assert isinstance(v, (set, frozenset))
-
-
-def test_grouping_sequence_ints():
-    g = ig.Graph.Ring(5)
-    layout = g.layout_circle()
-    grouping = [0, 1, 0, 2, 2]
     res = heuristics.normalise_grouping(
         grouping,
         layout,

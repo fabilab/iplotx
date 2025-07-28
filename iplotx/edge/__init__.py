@@ -196,7 +196,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         return self._directed
 
     @directed.setter
-    def directed(self, value) -> None:
+    def directed(self, value: bool) -> None:
         """Setter for the directed property.
 
         Changing this property triggers the addition/removal of arrows from the plot.

@@ -139,8 +139,7 @@ def tree(
     Parameters:
         tree: The tree to plot. Can be a BioPython.Phylo.Tree object.
         layout: The layout to use for plotting.
-        directed: If False, donot draw arrows. If True or "child", draw arrows from parent to child
-            node. If "parent", draw arrows the other way around.
+        directed: If False, do not draw arrows.
         show_support: If True, show the support values for the nodes (assumed to be from 0 to 100,
             rounded to nearest integer). If both this parameter and vertex_labels are set,
             show_support takes precedence and hides the vertex labels.

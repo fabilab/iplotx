@@ -75,3 +75,27 @@ def test_offset():
     edges = edge_collection()
     edges.set_offset(None)
     edges.set_offset(2)
+
+
+def test_arrow_marker():
+    for marker in [
+        "|>",
+        "|/",
+        "|\\",
+        ">",
+        "<",
+        ">>",
+        ")>",
+        ")",
+        "(",
+        "]",
+        "[",
+        "|",
+        "x",
+        "s",
+        "d",
+        "p",
+        "q",
+    ]:
+        with ipx.style.context(edge_arrow_marker=marker):
+            edge_collection(directed=True, style=ipx.style.get_style(".edge"))

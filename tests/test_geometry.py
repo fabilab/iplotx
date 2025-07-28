@@ -103,6 +103,62 @@ def test_hull_internal_repetition_internal(four_points):
     np.testing.assert_array_equal(hull, [0, 5, 4, 1])
 
 
+def test_hull_internal_repetition_internal_backtrack():
+    points = np.array(
+        [
+            (0, 0),
+            (1, 0),
+            (0.5, 0.5),
+            # This has a larger angle but created a concave bay that needs backtracking
+            (1, 1.1),
+            (0, 1),
+        ]
+    )
+    hull = geometry._convex_hull_Graham_scan(points)
+    # NOTE: It's ok to start from a different point, as layout_small_ring
+    # as the subsequent is the same
+    np.testing.assert_array_equal(hull, [0, 4, 3, 1])
+
+
+def test_hull_internal_repetition_internal_dlast():
+    points = np.array(
+        [
+            (0, 0),
+            (1, 0),
+            (1, 1),
+            # This has a same angle as last but shorter distance, should be ignored
+            (0.5, 0.5),
+            (0, 1),
+        ]
+    )
+    hull = geometry._convex_hull_Graham_scan(points)
+    # NOTE: It's ok to start from a different point, as layout_small_ring
+    # as the subsequent is the same
+    np.testing.assert_array_equal(hull, [0, 4, 2, 1])
+
+
+def test_vertexpadding_none(three_points):
+    hull_idx = geometry.convex_hull(three_points[:1])
+    hull = three_points[hull_idx]
+    padding = geometry._compute_group_path_with_vertex_padding(
+        hull,
+        np.array([three_points[0]] * 31),
+        mpl.transforms.IdentityTransform(),
+        vertexpadding=0,
+    )
+    assert len(padding) == 31
+
+
+def test_vertexpadding_zero():
+    padding = geometry._compute_group_path_with_vertex_padding(
+        [],
+        np.array([]),
+        mpl.transforms.IdentityTransform(),
+        vertexpadding=0,
+    )
+    assert padding is None
+
+
 def test_vertexpadding_one(three_points):
     hull_idx = geometry.convex_hull(three_points[:1])
     hull = three_points[hull_idx]
