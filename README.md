@@ -23,8 +23,6 @@ Supports:
 
 In addition to the above, *any* network or tree analysis library can register an [entry point](https://iplotx.readthedocs.io/en/latest/providers.html#creating-a-custom-data-provider) to gain compatibility with `iplotx` with no intervention from our side.
 
-**NOTE**: This is currently late beta quality software. The API and functionality might break rarely.
-
 ## Installation
 ```bash
 pip install iplotx
