@@ -3,6 +3,8 @@
 ![RTD](https://readthedocs.org/projects/iplotx/badge/?version=latest)
 [![Coverage Status](https://coveralls.io/repos/github/fabilab/iplotx/badge.svg?branch=main)](https://coveralls.io/github/fabilab/iplotx?branch=main)
 ![pylint](assets/pylint.svg)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16599333.svg)](https://doi.org/10.5281/zenodo.16599333)
+
 
 # iplotx
 [![Banner](docs/source/_static/banner.png)](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
