@@ -232,10 +232,12 @@ class VertexCollection(PatchCollection):
         else:
             cmap_fun = None
 
-        if style.get("size", 20) == "label":
+        size_tmp = style.get("size", 20)
+        if isinstance(size_tmp, str) and (size_tmp == "label"):
             if self._labels is None:
                 warnings.warn("No labels found, cannot resize vertices based on labels.")
                 style["size"] = get_style("default.vertex")["size"]
+        del size_tmp
 
         if "cmap" in style:
             colorarray = []

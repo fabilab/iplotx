@@ -1,5 +1,5 @@
 """
-This module focuses on how to ingest network data into standard data structures no matter what library they come from.
+This module focuses on how to ingest network/tree data into standard data structures no matter what library they come from.
 """
 
 import pathlib

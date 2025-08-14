@@ -1,4 +1,5 @@
 import unittest
+import numpy as np
 import importlib
 import matplotlib as mpl
 
@@ -37,6 +38,18 @@ class GraphTestRunner(unittest.TestCase):
         g = ig.Graph.Ring(5, directed=True)
         fig, ax = plt.subplots(figsize=(3, 3))
         ipx.plot(g, ax=ax, layout=self.layout_small_ring)
+
+    @image_comparison(baseline_images=["graph_vertexsize"], remove_text=True)
+    def test_vertexsize(self):
+        g = ig.Graph.Ring(5)
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ipx.plot(
+            g,
+            ax=ax,
+            layout=self.layout_small_ring,
+            vertex_size=np.linspace(10, 30, 5),
+            margins=0.15,
+        )
 
     @image_comparison(baseline_images=["graph_labels"], remove_text=True)
     def test_labels(self):
