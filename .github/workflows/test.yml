@@ -39,6 +39,8 @@ jobs:
 
     - name: Coveralls
       uses: coverallsapp/github-action@v2
+      with:
+        fail-on-error: false
 
     - name: Run flake8
       run: uv run flake8 iplotx --count --exit-zero --max-complexity=20 --max-line-length=127 --statistics
