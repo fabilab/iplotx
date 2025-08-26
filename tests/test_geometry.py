@@ -38,28 +38,32 @@ def assert_array_equal_upon_cycling(points1, points2):
     Returns:
         True if the arrays are equal upon cycling, False otherwise.
     """
-    if len(points1) != len(points2):
-        return False
 
-    points1 = np.asarray(points1)
-    points2 = np.asarray(points2).astype(points1.dtype)
+    def _fun(points1, points2):
+        if len(points1) != len(points2):
+            return False
 
-    if (points1.ndim != 1) or (points2.ndim != 1):
-        raise ValueError("Only 1D arrays are supported.")
+        points1 = np.asarray(points1)
+        points2 = np.asarray(points2).astype(points1.dtype)
 
-    if (points1 == points2).all():
-        return True
+        if (points1.ndim != 1) or (points2.ndim != 1):
+            raise ValueError("Only 1D arrays are supported.")
 
-    # Cycle
-    points2 = np.concatenate([points2, points2])
-    i0 = np.flatnonzero((points2 == points1[0]))
-    if len(i0) != 2:
-        return False
-    i0 = i0[0]
-    points2 = points2[i0 : i0 + len(points1)]
+        if (points1 == points2).all():
+            return True
 
-    # Check again
-    return bool((points1 == points2).all())
+        # Cycle
+        points2 = np.concatenate([points2, points2])
+        i0 = np.flatnonzero((points2 == points1[0]))
+        if len(i0) != 2:
+            return False
+        i0 = i0[0]
+        points2 = points2[i0 : i0 + len(points1)]
+
+        # Check again
+        return bool((points1 == points2).all())
+
+    assert _fun(points1, points2)
 
 
 def test_squared_bezier(three_points):
