@@ -42,14 +42,15 @@ def convex_hull(points):
         pass
 
     # Otherwise, try scipy
-    try:
-        from scipy.spatial import ConvexHull
+    if hull_idx is None:
+        try:
+            from scipy.spatial import ConvexHull
 
-        # NOTE: scipy guarantees counterclockwise ordering in 2D
-        # https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.ConvexHull.html
-        hull_idx = ConvexHull(points).vertices[::-1]
-    except ImportError:
-        pass
+            # NOTE: scipy guarantees counterclockwise ordering in 2D
+            # https://docs.scipy.org/doc/scipy/reference/generated/scipy.spatial.ConvexHull.html
+            hull_idx = ConvexHull(points).vertices[::-1]
+        except ImportError:
+            pass
 
     # Last resort: our own Graham scan
     if hull_idx is None:
