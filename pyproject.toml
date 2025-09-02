@@ -97,4 +97,4 @@ explicit = true
 
 [tool.ruff]
 line-length = 100
-extend-exclude = ["gallery/**/plot_*.py"]
+extend-exclude = ["gallery/**/plot_*.py", "gallery/**/data/*"]
