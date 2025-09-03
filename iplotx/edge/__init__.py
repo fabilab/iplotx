@@ -357,6 +357,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
             waypoints = edge_stylei.get("waypoints", "none")
             if waypoints is False or waypoints is np.False_:
                 waypoints = "none"
+            elif isinstance(waypoints, (list, tuple)) and len(waypoints) == 0:
+                waypoints = "none"
             elif waypoints is True or waypoints is np.True_:
                 raise ValueError(
                     "Could not determine automatically type of edge waypoints.",

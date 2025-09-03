@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:12.069** total execution time for 62 files **from all galleries**:
+**00:00.060** total execution time for 63 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,11 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
+   * - :ref:`sphx_glr_gallery_other_plot_train.py` (``../../gallery/other/plot_train.py``)
+     - 00:00.060
+     - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_antibody_clone.py` (``../../gallery/biology/plot_antibody_clone.py``)
-     - 00:12.069
+     - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_pollinators.py` (``../../gallery/biology/plot_pollinators.py``)
      - 00:00.000
@@ -41,130 +44,130 @@ Computation times
    * - :ref:`sphx_glr_gallery_biology_plot_ppi.py` (``../../gallery/biology/plot_ppi.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_animation.py` (``../../gallery/plot_animation.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_animation.py` (``../../gallery/networks/plot_animation.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_arrowlawn.py` (``../../gallery/plot_arrowlawn.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_arrowlawn.py` (``../../gallery/networks/plot_arrowlawn.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_arrows.py` (``../../gallery/plot_arrows.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_arrows.py` (``../../gallery/networks/plot_arrows.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_basic.py` (``../../gallery/plot_basic.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_basic.py` (``../../gallery/networks/plot_basic.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_big_curves.py` (``../../gallery/plot_big_curves.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_big_curves.py` (``../../gallery/networks/plot_big_curves.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_chess_masters.py` (``../../gallery/plot_chess_masters.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_chess_masters.py` (``../../gallery/networks/plot_chess_masters.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_cliques.py` (``../../gallery/plot_cliques.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_cliques.py` (``../../gallery/networks/plot_cliques.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_cluster_layout.py` (``../../gallery/plot_cluster_layout.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_cluster_layout.py` (``../../gallery/networks/plot_cluster_layout.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_company_structure.py` (``../../gallery/plot_company_structure.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_company_structure.py` (``../../gallery/networks/plot_company_structure.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_complex.py` (``../../gallery/plot_complex.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_complex.py` (``../../gallery/networks/plot_complex.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_dag.py` (``../../gallery/plot_dag.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_dag.py` (``../../gallery/networks/plot_dag.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_directed.py` (``../../gallery/plot_directed.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_directed.py` (``../../gallery/networks/plot_directed.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_edgepadding.py` (``../../gallery/plot_edgepadding.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_edgepadding.py` (``../../gallery/networks/plot_edgepadding.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_edit_artists.py` (``../../gallery/plot_edit_artists.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_edit_artists.py` (``../../gallery/networks/plot_edit_artists.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_elements.py` (``../../gallery/plot_elements.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_elements.py` (``../../gallery/networks/plot_elements.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_feedbacks.py` (``../../gallery/plot_feedbacks.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_feedbacks.py` (``../../gallery/networks/plot_feedbacks.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_four_grids.py` (``../../gallery/plot_four_grids.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_four_grids.py` (``../../gallery/networks/plot_four_grids.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_grouping.py` (``../../gallery/plot_grouping.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_grouping.py` (``../../gallery/networks/plot_grouping.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_halfarrows.py` (``../../gallery/plot_halfarrows.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_halfarrows.py` (``../../gallery/networks/plot_halfarrows.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_house.py` (``../../gallery/plot_house.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_house.py` (``../../gallery/networks/plot_house.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_knuth_miles.py` (``../../gallery/plot_knuth_miles.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_knuth_miles.py` (``../../gallery/networks/plot_knuth_miles.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_labels_and_colors.py` (``../../gallery/plot_labels_and_colors.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_labels_and_colors.py` (``../../gallery/networks/plot_labels_and_colors.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_loops.py` (``../../gallery/plot_loops.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_loops.py` (``../../gallery/networks/plot_loops.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_max_bipartite_matching.py` (``../../gallery/plot_max_bipartite_matching.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_max_bipartite_matching.py` (``../../gallery/networks/plot_max_bipartite_matching.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_minimum_spanning_trees.py` (``../../gallery/plot_minimum_spanning_trees.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_minimum_spanning_trees.py` (``../../gallery/networks/plot_minimum_spanning_trees.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_mouse_hover.py` (``../../gallery/plot_mouse_hover.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_mouse_hover.py` (``../../gallery/networks/plot_mouse_hover.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_multipartite_layout.py` (``../../gallery/plot_multipartite_layout.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_multipartite_layout.py` (``../../gallery/networks/plot_multipartite_layout.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_multistyle.py` (``../../gallery/plot_multistyle.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_multistyle.py` (``../../gallery/networks/plot_multistyle.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_parallel_igraph_networkx.py` (``../../gallery/plot_parallel_igraph_networkx.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_parallel_igraph_networkx.py` (``../../gallery/networks/plot_parallel_igraph_networkx.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_ports.py` (``../../gallery/plot_ports.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_ports.py` (``../../gallery/networks/plot_ports.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_redblack.py` (``../../gallery/plot_redblack.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_redblack.py` (``../../gallery/networks/plot_redblack.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_shortest_path.py` (``../../gallery/plot_shortest_path.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_shortest_path.py` (``../../gallery/networks/plot_shortest_path.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simple_networkx.py` (``../../gallery/plot_simple_networkx.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_simple_networkx.py` (``../../gallery/networks/plot_simple_networkx.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simple_path.py` (``../../gallery/plot_simple_path.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_simple_path.py` (``../../gallery/networks/plot_simple_path.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_simplenetworkdataprovider.py` (``../../gallery/plot_simplenetworkdataprovider.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_simplenetworkdataprovider.py` (``../../gallery/networks/plot_simplenetworkdataprovider.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_style.py` (``../../gallery/plot_style.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_style.py` (``../../gallery/networks/plot_style.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_tension.py` (``../../gallery/plot_tension.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_tension.py` (``../../gallery/networks/plot_tension.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_traveling_salesman.py` (``../../gallery/plot_traveling_salesman.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_traveling_salesman.py` (``../../gallery/networks/plot_traveling_salesman.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_vertexmarkers.py` (``../../gallery/plot_vertexmarkers.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_vertexmarkers.py` (``../../gallery/networks/plot_vertexmarkers.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_voronoi.py` (``../../gallery/plot_voronoi.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_voronoi.py` (``../../gallery/networks/plot_voronoi.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_waypoints.py` (``../../gallery/plot_waypoints.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_waypoints.py` (``../../gallery/networks/plot_waypoints.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_plot_with_colorbar.py` (``../../gallery/plot_with_colorbar.py``)
+   * - :ref:`sphx_glr_gallery_networks_plot_with_colorbar.py` (``../../gallery/networks/plot_with_colorbar.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_angular_waypoints.py` (``../../gallery/tree/plot_angular_waypoints.py``)
