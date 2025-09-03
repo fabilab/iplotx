@@ -53,5 +53,8 @@ def test_label_size_emptystring():
 
 
 def test_build_cmap_fun():
-    res = ipx.utils.matplotlib._build_cmap_fun(0, "Greys")
+    res = ipx.utils.matplotlib._build_cmap_fun(
+        {"color": 0, "cmap": "Greys"},
+        "color",
+    )
     assert np.allclose(res(0), np.ones(4))
