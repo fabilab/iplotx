@@ -311,11 +311,12 @@ class TreeDataProvider(Protocol):
         leaf_name_attrs = ("name",)
 
         # Add edge_df
-        edge_data = {"_ipx_source": [], "_ipx_target": []}
+        edge_data = {"_ipx_source": [], "_ipx_target": [], "branch_length": []}
         for node in self.preorder():
             for child in self.get_children(node):
                 edge_data["_ipx_source"].append(node)
                 edge_data["_ipx_target"].append(child)
+                edge_data["branch_length"].append(self.get_branch_length(child))
         edge_df = pd.DataFrame(edge_data)
         tree_data["edge_df"] = edge_df
 

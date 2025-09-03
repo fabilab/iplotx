@@ -329,8 +329,8 @@ class TreeArtist(mpl.artist.Artist):
 
         if "cmap" in edge_style:
             cmap_fun = _build_cmap_fun(
-                edge_style["color"],
-                edge_style["cmap"],
+                edge_style,
+                "color",
             )
         else:
             cmap_fun = None
@@ -537,15 +537,16 @@ class TreeArtist(mpl.artist.Artist):
         labels = self._get_label_series("edge")
         edge_style = get_style(".edge")
 
+        edge_df = self._ipx_internal_data["edge_df"].set_index(["_ipx_source", "_ipx_target"])
+
         if "cmap" in edge_style:
             cmap_fun = _build_cmap_fun(
-                edge_style["color"],
-                edge_style["cmap"],
+                edge_style,
+                "color",
+                internal=edge_df,
             )
         else:
             cmap_fun = None
-
-        edge_df = self._ipx_internal_data["edge_df"].set_index(["_ipx_source", "_ipx_target"])
 
         if "cmap" in edge_style:
             colorarray = []

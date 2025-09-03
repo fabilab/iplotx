@@ -73,3 +73,39 @@ coords_germline = layout[g.vs["name"].index(germline)]
 ax.scatter([coords_germline[0]], [coords_germline[1]], color="tomato", s=80, marker="*", label="Germline")
 ax.legend()
 fig.tight_layout()
+
+
+# %%
+# This graph turns out to be a tree, so we can revisualise the same data using a tree layout. As an example,
+# we use our internal tree data structure, which is a glorified dictionary:
+
+tree = {
+    "children": [],
+    "name": germline,
+    "branch_length": 0.0,
+}
+to_visit = [(tree, germline)]
+while to_visit:
+    node, key = to_visit.pop()
+    for child, dist in data.get(key, {}).items():
+        child_node = {"children": [], "branch_length": dist, "name": child}
+        node["children"].append(child_node)
+        to_visit.append((child_node, child))
+tree = ipx.ingest.providers.tree.simple.SimpleTree.from_dict(tree)
+
+fig, ax = plt.subplots(figsize=(5, 10))
+artist = ipx.tree(
+    tree,
+    ax=ax,
+    edge_color="branch_length",
+    edge_cmap=plt.cm.plasma,
+)
+fig.colorbar(
+    artist.get_edges(),
+    ax=ax,
+    label="# mutations\non branch",
+    fraction=0.07,
+    aspect=10,
+    shrink=0.5,
+)
+fig.tight_layout()

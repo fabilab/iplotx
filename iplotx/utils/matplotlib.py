@@ -1,6 +1,8 @@
+from typing import Optional, Any
 from functools import wraps, partial
 from math import atan2
 import numpy as np
+import pandas as pd
 import matplotlib as mpl
 
 from .geometry import (
@@ -162,15 +164,39 @@ def _compute_mid_coord_and_rot(path, trans):
     return coord, rot
 
 
-def _build_cmap_fun(values, cmap, norm=None):
-    """Map colormap on top of numerical values."""
+def _build_cmap_fun(
+    style: dict[str, Any],
+    key: str,
+    norm=None,
+    internal: Optional[pd.DataFrame] = None,
+):
+    """Map colormap on top of numerical values.
+
+    Parameters:
+        style: A dictionary of style properties.
+        key: The key in the style dictionary to look for values. Values can be a list/array,
+            a dictionary of numerical values, or a string, in which case the corresponding
+            column in the "internal" DataFrame is used as an array of numerical values.
+        norm: An optional matplotlib Normalize instance. If None, the values are normalized.
+        internal: An optional DataFrame, required if "values" is a string.
+    """
+    values = style[key]
+    cmap = style["cmap"]
+
     cmap = mpl.cm._ensure_cmap(cmap)
 
-    if np.isscalar(values):
-        values = [values]
+    if isinstance(values, str):
+        if not isinstance(internal, pd.DataFrame):
+            raise ValueError("If 'values' is a string, 'internal' must be a DataFrame.")
+        values = internal[values].values
+        internal[key] = values
 
-    if isinstance(values, dict):
-        values = np.array(list(values.values()))
+    else:
+        if np.isscalar(values):
+            values = [values]
+
+        if isinstance(values, dict):
+            values = np.array(list(values.values()))
 
     if norm is None:
         vmin = np.nanmin(values)

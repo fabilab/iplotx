@@ -226,8 +226,8 @@ class VertexCollection(PatchCollection):
         style = self._style or {}
         if "cmap" in style:
             cmap_fun = _build_cmap_fun(
-                style["facecolor"],
-                style["cmap"],
+                style,
+                "facecolor",
             )
         else:
             cmap_fun = None
