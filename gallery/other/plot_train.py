@@ -92,5 +92,6 @@ ipx.network(
     vertex_edgecolor=vertex_color,
     edge_color=edge_color,
     edge_capstyle="butt",
+    vertex_zorder=3,
 )
 fig.tight_layout()
