@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.060** total execution time for 63 files **from all galleries**:
+**00:00.364** total execution time for 65 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_other_plot_train.py` (``../../gallery/other/plot_train.py``)
-     - 00:00.060
+   * - :ref:`sphx_glr_gallery_biology_plot_breast_cancer_ppi.py` (``../../gallery/biology/plot_breast_cancer_ppi.py``)
+     - 00:00.364
      - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_antibody_clone.py` (``../../gallery/biology/plot_antibody_clone.py``)
      - 00:00.000
@@ -42,6 +42,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_ppi.py` (``../../gallery/biology/plot_ppi.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_biology_plot_tca_cycle.py` (``../../gallery/biology/plot_tca_cycle.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_networks_plot_animation.py` (``../../gallery/networks/plot_animation.py``)
@@ -168,6 +171,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_networks_plot_with_colorbar.py` (``../../gallery/networks/plot_with_colorbar.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_train.py` (``../../gallery/other/plot_train.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_angular_waypoints.py` (``../../gallery/tree/plot_angular_waypoints.py``)

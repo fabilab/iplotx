@@ -101,7 +101,13 @@ class NetworkXDataProvider(NetworkDataProvider):
             else:
                 if len(edge_labels) != len(edge_df):
                     raise ValueError("Edge labels must be the same length as the number of edges.")
-                edge_df["label"] = edge_labels
+                if isinstance(edge_labels, dict):
+                    edge_labels = pd.Series(edge_labels)
+                    edge_df["label"] = edge_labels.loc[
+                        edge_df.set_index(["_ipx_source", "_ipx_target"]).index
+                    ].values
+                else:
+                    edge_df["label"] = edge_labels
 
         network_data = {
             "vertex_df": vertex_df,
