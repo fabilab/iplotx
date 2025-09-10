@@ -68,7 +68,7 @@ class VertexCollection(PatchCollection):
         """
 
         self._index = layout.index
-        self._style = style
+        self._style = style if style is not None else {}
         self._layout = layout
         self._layout_coordinate_system = layout_coordinate_system
 
@@ -93,6 +93,9 @@ class VertexCollection(PatchCollection):
 
         if self._labels is not None:
             self._compute_label_collection()
+
+        zorder = self._style.get("zorder", 1)
+        self.set_zorder(zorder)
 
     def __len__(self):
         """Return the number of vertices in the collection."""

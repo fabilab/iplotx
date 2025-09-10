@@ -131,6 +131,9 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 self._style["split"],
             )
 
+        zorder = self._style.get("zorder", 2)
+        self.set_zorder(zorder)
+
     def _add_subedges(
         self,
         nedges,

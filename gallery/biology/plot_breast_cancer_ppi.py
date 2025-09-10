@@ -4,6 +4,7 @@ Breast cancer proteins
 
 This example visualises network of putatively interacting proteins according to the STRING database, filtered to include only entries related to breast cancer.
 
+Vertices are lifted above the edges by increasing their zorder above the edge level, which is 2.
 """
 
 from collections import defaultdict
@@ -38,6 +39,7 @@ ipx.network(
     vertex_edgecolor="k",
     vertex_linewidth=0.5,
     edge_alpha=0.2,
+    vertex_zorder=3,
 
 )
 fig.tight_layout()

@@ -313,8 +313,7 @@ class NetworkArtist(mpl.artist.Artist):
         if not self.get_visible():
             return
 
-        # NOTE: looks like we have to manage the zorder ourselves
-        # this is kind of funny actually
+        # Handle zorder manually, just like in AxesBase in mpl
         children = list(self.get_children())
         children.sort(key=lambda x: x.zorder)
         for art in children:
