@@ -43,5 +43,3 @@ ipx.network(
 
 )
 fig.tight_layout()
-
-plt.ion(); plt.show()
