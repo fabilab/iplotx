@@ -59,5 +59,3 @@ ax3.set_xlabel("Node PageRank")
 ax3.set_ylabel("Cumulative")
 
 fig.tight_layout()
-
-plt.ion(); plt.show()
