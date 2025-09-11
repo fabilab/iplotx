@@ -1,0 +1,216 @@
+Table S2.  212 Mammal and Plant diet mOTUs (identified to individual reference sequence) found within scats from six focal species collected from JRBP, expressed by the Count (number of scats containing prey species); FOO (Frequency Of Occurrence = number of occurrences / total scat sample size); POO (Percentage Of Occurrence = number of occurrences / total number of prey species across all samples).,,,,,,,,,,,,,,,,,,,,,,,
+,,,,,,,,,,,,,,,,,,,,,,,
+Functional Group,OTUs,Family,Genus,Rank,RefSeq,Jackrabbit (n=13),,,Deer (n=12),,,Gray Fox (n=48),,,Puma (n=12),,,Coyote (n=9),,,Bobcat (n=19),,
+,,,,,,Count,FOO,POO,Count,FOO,POO,Count,FOO,POO,Count,FOO,POO,Count,FOO,POO,Count,FOO,POO
+Large Mammal,Sus scrofa,Suidae,Sus,species,AB292606,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.08,5.9%,0,0.00,0.0%,0,0.00,0.0%
+Large Mammal,Ondatra zibethicus,Cricetidae,Ondatra,species,KU177045,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.08,5.9%,0,0.00,0.0%,0,0.00,0.0%
+Large Mammal,Procyon lotor,Procyonidae,Procyon,species,AB462203,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.08,5.9%,0,0.00,0.0%,0,0.00,0.0%
+Large Mammal,Lepus cf. californicus,Leporidae,Lepus,genus,U58924,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,4,0.44,10.3%,2,0.11,6.3%
+Large Mammal,Canis latrans,Canidae,Canis,genus,DQ480509,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.08,5.9%,0,0.00,0.0%,0,0.00,0.0%
+Large Mammal,Odocoileus hemionus,Cervidae,Odocoileus,species,AF091708,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,7,0.58,41.2%,1,0.11,2.6%,2,0.11,6.3%
+Small Mammal,Sciurus spp.,Sciuridae,Sciurus,genus,U59174,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.05,3.1%
+Small Mammal,Mus musculus,Muridae,Mus,species,AB042432,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,1,0.08,5.9%,0,0.00,0.0%,2,0.11,6.3%
+Small Mammal,Neotominae,Neotominae,NA,subfamily,KY707303,0,0.00,0.0%,0,0.00,0.0%,8,0.17,2.8%,1,0.08,5.9%,0,0.00,0.0%,2,0.11,6.3%
+Small Mammal,Thomomys cf. bottae,Geomyidae,Thomomys,genus,AM407912,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,1,0.08,5.9%,0,0.00,0.0%,4,0.21,12.5%
+Small Mammal,Scapanus latimanus,Talpidae,Scapanus,species,KX754499,0,0.00,0.0%,0,0.00,0.0%,4,0.08,1.4%,0,0.00,0.0%,3,0.33,7.7%,0,0.00,0.0%
+Small Mammal,Peromyscus spp.,Cricetidae,Peromyscus,genus,KY707306,0,0.00,0.0%,0,0.00,0.0%,5,0.10,1.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Small Mammal,Sciurus niger,Sciuridae,Sciurus,species,U67289,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,1,0.08,5.9%,2,0.22,5.1%,2,0.11,6.3%
+Small Mammal,Sylvilagus bachmani macrorhinus,Leporidae,Sylvilagus,subspecies,KU057239,0,0.00,0.0%,0,0.00,0.0%,4,0.08,1.4%,1,0.08,5.9%,0,0.00,0.0%,4,0.21,12.5%
+Small Mammal,Arvicolinae,Cricetidae,NA,subfamily,AJ972918,0,0.00,0.0%,0,0.00,0.0%,8,0.17,2.8%,1,0.08,5.9%,1,0.11,2.6%,8,0.42,25.0%
+Small Mammal,Neotoma cf. fuscipes,Cricetidae,Neotoma,genus,KU745736,0,0.00,0.0%,0,0.00,0.0%,6,0.13,2.1%,0,0.00,0.0%,0,0.00,0.0%,5,0.26,15.6%
+Grass,Triticinae,Poaceae,NA,subtribe,KF482081,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Poinae,Poaceae,NA,subtribe,AY237838,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Phleum pratense,Poaceae,Phleum,species,EU792341,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Bromus catharticus,Poaceae,Bromus,species,MF508972,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Cynodon,Poaceae,Cynodon,genus,KP205451,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Poeae,Poaceae,NA,tribe,AY237857,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Loliinae,Poaceae,NA,subtribe,Y09814,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Triticum,Poaceae,Triticum,genus,FJ196304,1,0.08,0.5%,0,0.00,0.0%,3,0.06,1.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Aveninae,Poaceae,NA,subtribe,AY216261,1,0.08,0.5%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Triticum aestivum,Poaceae,Triticum,species,FJ609737,1,0.08,0.5%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Poa,Poaceae,Poa,genus,EU792414,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Poeae,Poaceae,NA,tribe,AJ632229,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Aveninae,Poaceae,NA,subtribe,AY881171,0,0.00,0.0%,1,0.08,0.4%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Dactylis glomerata,Poaceae,Dactylis,species,AM503893,2,0.15,1.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Hainardia cylindrica,Poaceae,Hainardia,species,KJ598947,2,0.15,1.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Loliinae,Poaceae,NA,subtribe,AJ240151,1,0.08,0.5%,3,0.25,1.2%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Avena,Poaceae,Avena,genus,DQ092755,0,0.00,0.0%,3,0.25,1.2%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Briza maxima,Poaceae,Briza,species,EU532607,4,0.31,2.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Loliinae,Poaceae,NA,subtribe,EU050655,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Poa infirma,Poaceae,Poa,species,KJ598912,1,0.08,0.5%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Festuca bromoides,Poaceae,Festuca,species,KJ598933,1,0.08,0.5%,1,0.08,0.4%,4,0.08,1.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Nassella,Poaceae,Nassella,genus,KC129443,5,0.38,2.5%,5,0.42,1.9%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Bromus tectorum,Poaceae,Bromus,species,KX147532,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Grass,Lolium,Poaceae,Lolium,genus,X99974,1,0.08,0.5%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Brachypodium,Poaceae,Brachypodium,genus,KX282040,3,0.23,1.5%,5,0.42,1.9%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Amelichloa,Poaceae,Amelichloa,genus,KF294127,6,0.46,2.9%,4,0.33,1.5%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Lolium,Poaceae,Lolium,genus,AJ240137,1,0.08,0.5%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Festuca,Poaceae,Festuca,genus,EF397150,0,0.00,0.0%,1,0.08,0.4%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Hordeinae,Poaceae,NA,subtribe,AY740812,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Lolium,Poaceae,Lolium,genus,KJ598997,2,0.15,1.0%,4,0.33,1.5%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Gastridium phleoides,Poaceae,Gastridium,species,LR588231,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Leymus,Poaceae,Leymus,genus,EF581916,2,0.15,1.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Grass,Phalaris angusta,Poaceae,Phalaris,species,KX873129,2,0.15,1.0%,4,0.33,1.5%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Sorghum halepense,Poaceae,Sorghum,species,KT933738,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Grass,Bromus,Poaceae,Bromus,genus,KM077298,0,0.00,0.0%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Grass,Lolium,Poaceae,Lolium,genus,AJ240139,1,0.08,0.5%,3,0.25,1.2%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Raphanus,Brassicaceae,Raphanus,genus,AF128105,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Sonchus asper,Asteraceae,Sonchus,species,KY968828,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Plantago erecta,Plantaginaceae,Plantago,species,AY101909,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Vicia sativa,Fabaceae,Vicia,species,DQ312198,1,0.08,0.5%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Verbeneae,Verbenaceae,NA,tribe,FJ867408,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Calandrinia ciliata,Montiaceae,Calandrinia,species,AY764087,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Rumex,Polygonaceae,Rumex,genus,AF189730,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Lythrum,Lythraceae,Lythrum,genus,MH711465,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Fagopyrum esculentum,Polygonaceae,Fagopyrum,species,KY945283,1,0.08,0.5%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Medicago sativa,Fabaceae,Medicago,species,AF053142,1,0.08,0.5%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Mentheae,Lamiaceae,NA,tribe,DQ017561,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Ipomoea,Convolvulaceae,Ipomoea,genus,MG730288,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Helianthus,Asteraceae,Helianthus,genus,JN115024,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Eurybia radulina,Asteraceae,Eurybia,species,MF964085,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Hedera rhombea,Araliaceae,Hedera,species,AB817811,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Plantago,Plantaginaceae,Plantago,genus,FJ024621,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Spergularia rubra,Caryophyllaceae,Spergularia,species,KU662347,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Bellardia trixago,Orobanchaceae,Bellardia,species,KX958618,2,0.15,1.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Spinacia oleracea,Chenopodiaceae,Spinacia,species,EU606218,1,0.08,0.5%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Dittrichia,Asteraceae,Dittrichia,genus,GU818558,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Trifolium,Fabaceae,Trifolium,genus,DQ312017,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Cerastium,Caryophyllaceae,Cerastium,genus,GU444015,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Carduus,Asteraceae,Carduus,genus,MH711464,2,0.15,1.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Crataegus heldreichii,Rosaceae,Crataegus,species,EF127016,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Galinsoga,Asteraceae,Galinsoga,genus,FJ696962,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Euphorbia amygdaloides,Euphorbiaceae,Euphorbia,species,JN010024,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Osmorhiza berteroi,Apiaceae,Osmorhiza,species,AF480090,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Erigeron canadensis,Asteraceae,Erigeron,species,EF108397,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Plantago,Plantaginaceae,Plantago,genus,AB281171,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Solanum,Solanaceae,Solanum,genus,MF963977,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Sinapis arvensis,Brassicaceae,Sinapis,species,KY968829,2,0.15,1.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Brassica rapa,Brassicaceae,Brassica,species,LR031570.11,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Brassica,Brassicaceae,Brassica,genus,KX709377,2,0.15,1.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Kickxia spuria,Plantaginaceae,Kickxia,species,KT031913,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Gnaphalieae,Asteraceae,NA,tribe,MF963967,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Claytonia,Montiaceae,Claytonia,genus,AY764040,1,0.08,0.5%,1,0.08,0.4%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Cynoglossum amabile,Boraginaceae,Cynoglossum,species,KU927683,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Helenium,Asteraceae,Helenium,genus,GU818553,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Alternaria,Pleosporaceae,Alternaria,genus,MN258559,1,0.08,0.5%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Hypochaeris glabra,Asteraceae,Hypochaeris,species,MF405670,1,0.08,0.5%,2,0.17,0.8%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Polygonum,Polygonaceae,Polygonum,genus,HM357902,2,0.15,1.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Clematis,Ranunculaceae,Clematis,genus,JF714638,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Ludwigia,Onagraceae,Ludwigia,genus,KX168323,1,0.08,0.5%,1,0.08,0.4%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Geranium robertianum,Geraniaceae,Geranium,species,AB689038,0,0.00,0.0%,2,0.17,0.8%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Agoseris,Asteraceae,Agoseris,genus,L13954,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Erodium cicutarium,Geraniaceae,Erodium,species,KX282130,1,0.08,0.5%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Lonicera dioica,Caprifoliaceae,Lonicera,species,GU269247,0,0.00,0.0%,4,0.33,1.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Cardamine hirsuta,Brassicaceae,Cardamine,species,AM905719,0,0.00,0.0%,1,0.08,0.4%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Ranunculus,Ranunculaceae,Ranunculus,genus,MH710907,0,0.00,0.0%,1,0.08,0.4%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Solanoideae,Solanaceae,NA,subfamily,AB373813,1,0.08,0.5%,1,0.08,0.4%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Helminthotheca echioides,Asteraceae,Helminthotheca,species,AF528491,1,0.08,0.5%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Calycadenia,Asteraceae,Calycadenia,genus,MF964028,1,0.08,0.5%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Rumex,Polygonaceae,Rumex,genus,KT438752,3,0.23,1.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Cucumis melo,Cucurbitaceae,Cucumis,species,EU312157,1,0.08,0.5%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Erodium,Geraniaceae,Erodium,genus,KX147523,0,0.00,0.0%,3,0.25,1.2%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Geranium dissectum,Geraniaceae,Geranium,species,AY944413,1,0.08,0.5%,4,0.33,1.5%,3,0.06,1.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Silybum marianum,Asteraceae,Silybum,species,AJ831537,4,0.31,2.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Cucumis sativus,Cucurbitaceae,Cucumis,species,KX231331,3,0.23,1.5%,1,0.08,0.4%,7,0.15,2.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Myriophyllum aquaticum,Haloragaceae,Myriophyllum,species,AF513836,0,0.00,0.0%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Marah macrocarpa,Cucurbitaceae,Marah,species,JN560192,1,0.08,0.5%,0,0.00,0.0%,4,0.08,1.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Persicaria viscosa,Polygonaceae,Persicaria,species,HQ843140,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Torilis,Apiaceae,Torilis,genus,AY548223,4,0.31,2.0%,0,0.00,0.0%,4,0.08,1.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Trifolium,Fabaceae,Trifolium,genus,DQ312091,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Brassica,Brassicaceae,Brassica,genus,KX709351,5,0.38,2.5%,1,0.08,0.4%,2,0.04,0.7%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Hedera helix,Araliaceae,Hedera,species,AM503887,2,0.15,1.0%,1,0.08,0.4%,11,0.23,3.8%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Plantago,Plantaginaceae,Plantago,genus,AY101883,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Trifolium hirtum,Fabaceae,Trifolium,species,AF053158,1,0.08,0.5%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Clematis,Ranunculaceae,Clematis,genus,MH710901,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Lotus unifoliolatus,Fabaceae,Lotus,species,DQ311969,3,0.23,1.5%,4,0.33,1.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Epilobium,Onagraceae,Epilobium,genus,MH703261,0,0.00,0.0%,4,0.33,1.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Carduus,Asteraceae,Carduus,genus,KY242483,5,0.38,2.5%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Lotus,Fabaceae,Lotus,genus,DQ311974,4,0.31,2.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Convolvulus arvensis,Convolvulaceae,Convolvulus,species,AY558826,1,0.08,0.5%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Castilleja rubicundula,Orobanchaceae,Castilleja,subspecies,EF103685,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Crepis erythia,Asteraceae,Crepis,species,MF405668,1,0.08,0.5%,4,0.33,1.5%,3,0.06,1.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Medicago polymorpha,Fabaceae,Medicago,species,DQ311981,7,0.54,3.4%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Plantago coronopus,Plantaginaceae,Plantago,species,AJ548987,3,0.23,1.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Plantago,Plantaginaceae,Plantago,genus,AF313036,6,0.46,2.9%,6,0.50,2.3%,1,0.02,0.3%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Trifolium,Fabaceae,Trifolium,genus,DQ312062,0,0.00,0.0%,1,0.08,0.4%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Carduus pycnocephalus,Asteraceae,Carduus,species,KY242484,5,0.38,2.5%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Centaurea solstitialis,Asteraceae,Centaurea,species,KU295763,4,0.31,2.0%,2,0.17,0.8%,2,0.04,0.7%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Herb,Verbena lasiostachys,Verbenaceae,Verbena,species,FJ867417,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Herb,Hemizonia,Asteraceae,Hemizonia,genus,MF964056,4,0.31,2.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Woody,Fagaceae,Fagaceae,NA,family,FM244079,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Prunus,Rosaceae,Prunus,genus,JQ776883,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Toxicodendron,Anacardiaceae,Toxicodendron,genus,AY677202,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Platanus,Platanaceae,Platanus,genus,AM491936,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Arbutus menziesii,Ericaceae,Arbutus,species,KU350155,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rubus,Rosaceae,Rubus,genus,AF055756,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rosa,Rosaceae,Rosa,genus,AB043005,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Woody,Malus domestica,Rosaceae,Malus,species,MH633844,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Morus,Moraceae,Morus,genus,AM041998,1,0.08,0.5%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Syzygium australe,Myrtaceae,Syzygium,species,KM064931,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Woody,Rhamneae,Rhamnaceae,NA,tribe,KP093131,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Salix,Salicaceae,Salix,genus,EF060372,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM243947,0,0.00,0.0%,1,0.08,0.4%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Fraxinus,Oleaceae,Fraxinus,genus,EF190035,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Ulmus,Ulmaceae,Ulmus,genus,AF174642,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Salix,Salicaceae,Salix,genus,AJ006426,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM244054,2,0.15,1.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Ficus palmata,Moraceae,Ficus,species,LC375804,0,0.00,0.0%,0,0.00,0.0%,4,0.08,1.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Cornus,Cornaceae,Cornus,genus,MH711198,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Prunus,Rosaceae,Prunus,genus,AF318756,0,0.00,0.0%,1,0.08,0.4%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Salix,Salicaceae,Salix,genus,JQ898640,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM244150,2,0.15,1.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM243956,0,0.00,0.0%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Hedera,Araliaceae,Hedera,genus,U63186,0,0.00,0.0%,1,0.08,0.4%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,AF174633,2,0.15,1.0%,2,0.17,0.8%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Toxicodendron,Anacardiaceae,Toxicodendron,genus,FJ945954,1,0.08,0.5%,3,0.25,1.2%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Pyracantha,Rosaceae,Pyracantha,genus,MH703351,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Pistacia chinensis,Anacardiaceae,Pistacia,species,DQ390466,4,0.31,2.0%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rubus odoratus,Rosaceae,Rubus,species,KM037678,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Castanea,Fagaceae,Castanea,genus,EU016360,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM243939,2,0.15,1.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Eucalyptus,Myrtaceae,Eucalyptus,genus,KM064783,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rosa phoenicia,Rosaceae,Rosa,species,AB043828,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Platanus,Platanaceae,Platanus,genus,AM492040,1,0.08,0.5%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Diospyros,Ebenaceae,Diospyros,genus,KF206046,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Prunus,Rosaceae,Prunus,genus,KX192139,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Ulmus parvifolia,Ulmaceae,Ulmus,species,KC539586,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM243988,3,0.23,1.5%,5,0.42,1.9%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Artemisia,Asteraceae,Artemisia,genus,MH092832,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Woody,Artemisia californica,Asteraceae,Artemisia,species,KX147536,1,0.08,0.5%,2,0.17,0.8%,3,0.06,1.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM244074,4,0.31,2.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Anacardiaceae,Anacardiaceae,NA,family,FJ945947,0,0.00,0.0%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Prunus,Rosaceae,Prunus,genus,KX192124,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Diospyros,Ebenaceae,Diospyros,genus,JQ975102,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Salix alba,Salicaceae,Salix,species,AJ006423,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rosa,Rosaceae,Rosa,genus,AB043836,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Nageia,Podocarpaceae,Nageia,genus,AB023989,3,0.23,1.5%,2,0.17,0.8%,6,0.13,2.1%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Ceanothus cuneatus,Rhamnaceae,Ceanothus,species,KR083063,0,0.00,0.0%,0,0.00,0.0%,6,0.13,2.1%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Pinus,Pinaceae,Pinus,genus,X87936,1,0.08,0.5%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Woody,Ceanothus,Rhamnaceae,Ceanothus,genus,KR083062,0,0.00,0.0%,1,0.08,0.4%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,JF980309,5,0.38,2.5%,5,0.42,1.9%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Salix,Salicaceae,Salix,genus,AJ006428,0,0.00,0.0%,3,0.25,1.2%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM244145,5,0.38,2.5%,1,0.08,0.4%,4,0.08,1.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Prunus,Rosaceae,Prunus,genus,EU669097,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Fagaceae,Fagaceae,NA,family,KM978077,1,0.08,0.5%,7,0.58,2.7%,5,0.10,1.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rosa gallica,Rosaceae,Rosa,species,AB043824,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rhamneae,Rhamnaceae,NA,tribe,KR083182,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Prunus salicina,Rosaceae,Prunus,species,KX192132,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Morella californica,Myricaceae,Morella,species,AJ626782,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,1,0.11,2.6%,0,0.00,0.0%
+Woody,Toxicodendron diversilobum,Anacardiaceae,Toxicodendron,species,MF964008,2,0.15,1.0%,7,0.58,2.7%,4,0.08,1.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Salix lucida,Salicaceae,Salix,species,EF060382,0,0.00,0.0%,2,0.17,0.8%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Vitis,Vitaceae,Vitis,genus,AM462492,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Vitis heyneana,Vitaceae,Vitis,species,MH711238,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Cedrus deodara,Pinaceae,Cedrus,species,DQ975357,6,0.46,2.9%,4,0.33,1.5%,10,0.21,3.5%,0,0.00,0.0%,2,0.22,5.1%,0,0.00,0.0%
+Woody,Fagaceae,Fagaceae,NA,family,FM244015,1,0.08,0.5%,9,0.75,3.5%,9,0.19,3.1%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Prunus,Rosaceae,Prunus,genus,AF318755,0,0.00,0.0%,2,0.17,0.8%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Corylus,Betulaceae,Corylus,genus,AF297338,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Fagaceae,Fagaceae,NA,family,KU568518,2,0.15,1.0%,11,0.92,4.2%,9,0.19,3.1%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Diospyros lotus,Ebenaceae,Diospyros,species,AB175011,0,0.00,0.0%,0,0.00,0.0%,1,0.02,0.3%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rhamneae,Rhamnaceae,NA,tribe,KR083168,0,0.00,0.0%,0,0.00,0.0%,2,0.04,0.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Rubus,Rosaceae,Rubus,genus,JF980336,1,0.08,0.5%,7,0.58,2.7%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus muehlenbergii,Fagaceae,Quercus,species,KM200972,4,0.31,2.0%,10,0.83,3.9%,5,0.10,1.7%,0,0.00,0.0%,2,0.22,5.1%,0,0.00,0.0%
+Woody,Rosa,Rosaceae,Rosa,genus,FJ527717,0,0.00,0.0%,1,0.08,0.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Quercus,Fagaceae,Quercus,genus,FM244151,1,0.08,0.5%,10,0.83,3.9%,4,0.08,1.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Baccharis pilularis subsp. consanguinea,Asteraceae,Baccharis,subspecies,MF963972,4,0.31,2.0%,3,0.25,1.2%,8,0.17,2.8%,0,0.00,0.0%,3,0.33,7.7%,0,0.00,0.0%
+Woody,Ficus,Moraceae,Ficus,genus,AY730123,0,0.00,0.0%,0,0.00,0.0%,7,0.15,2.4%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%
+Woody,Prunus ilicifolia subsp. lyonii,Rosaceae,Prunus,subspecies,AF318743,2,0.15,1.0%,0,0.00,0.0%,14,0.29,4.9%,0,0.00,0.0%,0,0.00,0.0%,0,0.00,0.0%

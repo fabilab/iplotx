@@ -7,7 +7,6 @@ This example visualises protein protein interactions involved in the "cell cycle
 It also shows how to use ``iplotx`` to combine network plots with other matplotlib chart types.
 """
 
-from collections import defaultdict
 import numpy as np
 import pandas as pd
 import networkx as nx

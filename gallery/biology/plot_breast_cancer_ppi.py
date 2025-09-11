@@ -7,7 +7,6 @@ This example visualises network of putatively interacting proteins according to 
 Vertices are lifted above the edges by increasing their zorder above the edge level, which is 2.
 """
 
-from collections import defaultdict
 import numpy as np
 import pandas as pd
 import networkx as nx
