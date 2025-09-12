@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.171** total execution time for 68 files **from all galleries**:
+**00:00.066** total execution time for 69 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_biology_plot_foraging_table.py` (``../../gallery/biology/plot_foraging_table.py``)
-     - 00:00.171
+   * - :ref:`sphx_glr_gallery_other_plot_social_network_circles.py` (``../../gallery/other/plot_social_network_circles.py``)
+     - 00:00.066
      - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_antibody_clone.py` (``../../gallery/biology/plot_antibody_clone.py``)
      - 00:00.000
@@ -45,6 +45,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_food_network.py` (``../../gallery/biology/plot_food_network.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_biology_plot_foraging_table.py` (``../../gallery/biology/plot_foraging_table.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_pollinators.py` (``../../gallery/biology/plot_pollinators.py``)
