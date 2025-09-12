@@ -67,6 +67,7 @@ ipx.network(
     vertex_zorder=3,
     vertex_label_color="black",
     vertex_labels=list(g.vs["name"]),
+    zorder=3,
 )
 
 for radius in radii:
