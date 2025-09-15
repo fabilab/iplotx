@@ -140,7 +140,10 @@ class NetworkArtist(mpl.artist.Artist):
         return self
 
     def get_children(self):
-        return (self._vertices, self._edges)
+        if hasattr(self, "_edges"):
+            return (self._vertices, self._edges)
+        else:
+            return (self._vertices,)
 
     def set_figure(self, fig):
         super().set_figure(fig)
@@ -184,12 +187,14 @@ class NetworkArtist(mpl.artist.Artist):
         if len(layout) == 0:
             return mpl.transforms.Bbox([[0, 0], [1, 1]])
 
-        bbox = mpl.transforms.Bbox.union(
-            [
-                self._vertices.get_datalim(transData),
+        bboxes = [
+            self._vertices.get_datalim(transData),
+        ]
+        if hasattr(self, "_edges"):
+            bboxes.append(
                 self._edges.get_datalim(transData),
-            ]
-        )
+            )
+        bbox = mpl.transforms.Bbox.union(bboxes)
 
         bbox = bbox.expanded(sw=(1.0 + pad), sh=(1.0 + pad))
         return bbox
@@ -240,6 +245,9 @@ class NetworkArtist(mpl.artist.Artist):
         edge_style = get_style(".edge")
 
         edge_df = self._ipx_internal_data["edge_df"].set_index(["_ipx_source", "_ipx_target"])
+
+        if len(edge_df) == 0:
+            return
 
         if "cmap" in edge_style:
             cmap_fun = _build_cmap_fun(
