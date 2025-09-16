@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.226** total execution time for 70 files **from all galleries**:
+**00:00.103** total execution time for 71 files **from all galleries**:
 
 .. container::
 
@@ -32,11 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_other_plot_social_network_circles.py` (``../../gallery/other/plot_social_network_circles.py``)
-     - 00:00.114
-     - 0.0
-   * - :ref:`sphx_glr_gallery_other_plot_financial_network.py` (``../../gallery/other/plot_financial_network.py``)
-     - 00:00.112
+   * - :ref:`sphx_glr_gallery_other_plot_graph.py` (``../../gallery/other/plot_graph.py``)
+     - 00:00.103
      - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_antibody_clone.py` (``../../gallery/biology/plot_antibody_clone.py``)
      - 00:00.000
@@ -186,6 +183,12 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_networks_plot_with_colorbar.py` (``../../gallery/networks/plot_with_colorbar.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_financial_network.py` (``../../gallery/other/plot_financial_network.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_social_network_circles.py` (``../../gallery/other/plot_social_network_circles.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_train.py` (``../../gallery/other/plot_train.py``)

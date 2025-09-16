@@ -28,6 +28,7 @@ def network(
     title: Optional[str] = None,
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
+    strip_axes: bool = True,
     **kwargs,
 ) -> list[mpl.artist.Artist]:
     """Plot this network and/or vertex grouping using the specified layout.
@@ -53,6 +54,7 @@ def network(
             used as a quick fix when some vertex shapes reach beyond the plot edge. This is
             a fraction of the data limits, so 0.1 means 10% of the data limits will be left
             as margin.
+        strip_axes: If True, remove axis spines and ticks.
         kwargs: Additional arguments are treated as an alternate way to specify style. If
             both "style" and additional **kwargs are provided, they are both applied in that
             order (style, then **kwargs).
@@ -110,7 +112,7 @@ def network(
         if aspect is not None:
             ax.set_aspect(aspect)
 
-        _postprocess_axis(ax, artists)
+        _postprocess_axes(ax, artists, strip=strip_axes)
 
         if np.isscalar(margins):
             margins = (margins, margins)
@@ -132,6 +134,7 @@ def tree(
     title: Optional[str] = None,
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
+    strip_axes: bool = True,
     **kwargs,
 ) -> TreeArtist:
     """Plot a tree using the specified layout.
@@ -143,6 +146,7 @@ def tree(
         show_support: If True, show the support values for the nodes (assumed to be from 0 to 100,
             rounded to nearest integer). If both this parameter and vertex_labels are set,
             show_support takes precedence and hides the vertex labels.
+        strip_axes: If True, remove axis spines and ticks.
 
     Returns:
         A TreeArtist object, set as a direct child of the matplotlib Axes.
@@ -173,7 +177,7 @@ def tree(
         if aspect is not None:
             ax.set_aspect(aspect)
 
-        _postprocess_axis(ax, [artist])
+        _postprocess_axes(ax, [artist], strip=strip_axes)
 
         if np.isscalar(margins):
             margins = (margins, margins)
@@ -184,18 +188,19 @@ def tree(
 
 
 # INTERNAL ROUTINES
-def _postprocess_axis(ax, artists):
+def _postprocess_axes(ax, artists, strip=True):
     """Postprocess axis after plotting."""
 
-    # Despine
-    ax.spines["right"].set_visible(False)
-    ax.spines["top"].set_visible(False)
-    ax.spines["left"].set_visible(False)
-    ax.spines["bottom"].set_visible(False)
+    if strip:
+        # Despine
+        ax.spines["right"].set_visible(False)
+        ax.spines["top"].set_visible(False)
+        ax.spines["left"].set_visible(False)
+        ax.spines["bottom"].set_visible(False)
 
-    # Remove axis ticks
-    ax.set_xticks([])
-    ax.set_yticks([])
+        # Remove axis ticks
+        ax.set_xticks([])
+        ax.set_yticks([])
 
     # Set new data limits
     bboxes = []
