@@ -138,11 +138,13 @@ class TreeDataProvider(Protocol):
 
         Note: This is a default implemntation that can be overridden by the provider.
         """
-        root_attr = self.tree.root
-        if callable(root_attr):
-            return root_attr()
-        else:
-            return root_attr
+        if hasattr(self.tree, "root"):
+            root_attr = self.tree.root
+            if callable(root_attr):
+                return root_attr()
+            else:
+                return root_attr
+        return self.tree.get_root()
 
     def get_leaves(self) -> Sequence[Any]:
         """Get the tree leaves/tips in a provider-specific data structure.
