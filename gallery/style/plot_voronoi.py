@@ -1,6 +1,6 @@
 """
-iplotx and other visualisations
-===============================
+Voronoi tessellation
+====================
 
 This example shows how to combine `iplotx` visualisations with other tools
 such as `scipy` and vanilla `matplotlib`. This is one of the key strengths

@@ -1,8 +1,8 @@
 """
-Style specifications
-====================
+Loops
+=====
 
-This minimal example shows how to style a plot in a few different ways.
+This minimal example shows how to style a plot loops.
 """
 
 import networkx as nx
