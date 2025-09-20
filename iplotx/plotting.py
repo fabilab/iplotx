@@ -29,6 +29,7 @@ def network(
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
     strip_axes: bool = True,
+    figsize: Optional[tuple[float, float]] = None,
     **kwargs,
 ) -> list[mpl.artist.Artist]:
     """Plot this network and/or vertex grouping using the specified layout.
@@ -55,6 +56,9 @@ def network(
             a fraction of the data limits, so 0.1 means 10% of the data limits will be left
             as margin.
         strip_axes: If True, remove axis spines and ticks.
+        figsize: If ax is None, a new matplotlib Figure is created. This argument specifies
+            the (width, height) dimension of the figure in inches. If ax is not None, this
+            argument is ignored. If None, the default matplotlib figure size is used.
         kwargs: Additional arguments are treated as an alternate way to specify style. If
             both "style" and additional **kwargs are provided, they are both applied in that
             order (style, then **kwargs).
@@ -71,7 +75,7 @@ def network(
             raise ValueError("At least one of network or grouping must be provided.")
 
         if ax is None:
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=figsize)
 
         artists = []
         if network is not None:
@@ -135,6 +139,7 @@ def tree(
     aspect: Optional[str | float] = None,
     margins: float | tuple[float, float] = 0,
     strip_axes: bool = True,
+    figsize: Optional[tuple[float, float]] = None,
     **kwargs,
 ) -> TreeArtist:
     """Plot a tree using the specified layout.
@@ -143,10 +148,37 @@ def tree(
         tree: The tree to plot. Can be a BioPython.Phylo.Tree object.
         layout: The layout to use for plotting.
         directed: If False, do not draw arrows.
+        vertex_labels: The labels for the vertices. If None or False, no vertex labels. Also
+            read leaf_labels for leaf nodes.
+        leaf_labels: The labels for the leaf nodes. If None or False, no leaf labels are used
+            except if vertex_labels are specified for leaf nodes. This argument and the
+            previous vertex_labels provide somewhat redundant functionality but have quite
+            different default behaviours for distinct use cases. This argument is typically
+            useful for labels that are specific to leaf nodes only (e.g. species in a
+            phylogenetic tree), whereas vertex_labels is typically used for labels that apply
+            to internal nodes too (e.g. branch support values). This redundancy is left on
+            purpose to allow for maximal style flexibility.
         show_support: If True, show the support values for the nodes (assumed to be from 0 to 100,
             rounded to nearest integer). If both this parameter and vertex_labels are set,
             show_support takes precedence and hides the vertex labels.
+        ax: The axis to plot on. If None, a new figure and axis will be created. Defaults to
+            None.
+        style: Apply this style for the objects to plot. This can be a sequence (e.g. list)
+            of styles and they will be applied in order.
+        title: If not None, set the axes title to this value.
+        aspect: If not None, set the aspect ratio of the axis to this value. The most common
+            value is 1.0, which proportionates x- and y-axes.
+        margins: How much margin to leave around the plot. A higher value (e.g. 0.1) can be
+            used as a quick fix when some vertex shapes reach beyond the plot edge. This is
+            a fraction of the data limits, so 0.1 means 10% of the data limits will be left
+            as margin.
         strip_axes: If True, remove axis spines and ticks.
+        figsize: If ax is None, a new matplotlib Figure is created. This argument specifies
+            the (width, height) dimension of the figure in inches. If ax is not None, this
+            argument is ignored. If None, the default matplotlib figure size is used.
+        kwargs: Additional arguments are treated as an alternate way to specify style. If
+            both "style" and additional **kwargs are provided, they are both applied in that
+            order (style, then **kwargs).
 
     Returns:
         A TreeArtist object, set as a direct child of the matplotlib Axes.
@@ -155,7 +187,7 @@ def tree(
 
     with stylecontext:
         if ax is None:
-            fig, ax = plt.subplots()
+            fig, ax = plt.subplots(figsize=figsize)
 
         artist = TreeArtist(
             tree=tree,
