@@ -311,8 +311,13 @@ class TreeArtist(mpl.artist.Artist):
         if not leaf_style.get("deep", True):
             return
 
-        # Given the conditions above, we are guaranteed to have leaf labels
+        # Given the conditions above, we should have leaf labels. If not,
+        # make a None series with a valid index
         leaf_label_series = self._get_label_series("leaf")
+        if leaf_label_series is None:
+            leaf_label_series = self._ipx_internal_data["leaf_df"].copy()
+            leaf_label_series["label"] = None
+            leaf_label_series = leaf_label_series["label"]
 
         edge_style = get_style(
             ".leafedge",
