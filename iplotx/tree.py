@@ -311,13 +311,16 @@ class TreeArtist(mpl.artist.Artist):
         if not leaf_style.get("deep", True):
             return
 
+        # Given the conditions above, we are guaranteed to have leaf labels
+        leaf_label_series = self._get_label_series("leaf")
+
         edge_style = get_style(
             ".leafedge",
         )
         default_style = {
             "linestyle": "--",
             "linewidth": 1,
-            "edgecolor": "#111",
+            "color": "#111",
         }
         for key, value in default_style.items():
             if key not in edge_style:
@@ -335,14 +338,24 @@ class TreeArtist(mpl.artist.Artist):
         else:
             cmap_fun = None
 
-        leaf_shallow_layout = self.get_layout("leaf")
-
         if "cmap" in edge_style:
             colorarray = []
         edgepatches = []
         adjacent_vertex_ids = []
-        for i, vid in enumerate(leaf_shallow_layout.index):
-            edge_stylei = rotate_style(edge_style, index=i, key=vid)
+        for i, (vid, label) in enumerate(leaf_label_series.items()):
+            # Use leaf label to compute backup key for style rotation
+            # NOTE: This is quite a common use case. Users typically
+            # refer to leaves via their labels because that's what you see
+            # on screen. While an object exact match should take priority
+            # for power users, a backup based on label is useful. Beginners
+            # won't stumble upon this anyway since it's only used if
+            # a dict-like property for leaf edges is provided, which is a
+            # decently advanced thing to do.
+            # NOTE: Multiple leaves might have the same label, in which case
+            # all leaves will be style matched to this *unless* the dict-like
+            # style object *also* matches on leaf objects directly, which
+            # takes precedence since key2 is only a fallback.
+            edge_stylei = rotate_style(edge_style, index=i, key=vid, key2=label)
 
             if cmap_fun is not None:
                 colorarray.append(edge_stylei["color"])
