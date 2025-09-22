@@ -247,7 +247,11 @@ class VertexCollection(PatchCollection):
         patches = []
         sizes = []
         for i, (vid, row) in enumerate(self._layout.iterrows()):
-            stylei = rotate_style(style, index=i, key=vid)
+            # Use vertex labels if present as a fallback key for style rotation
+            # This way one can be very specific via the exact object or cast
+            # a looser net with the label string
+            key2 = self._labels.iloc[i] if self._labels is not None else None
+            stylei = rotate_style(style, index=i, key=vid, key2=key2)
             if stylei.get("size", 20) == "label":
                 stylei["size"] = _get_label_width_height(
                     str(self._labels[vid]), **style.get("label", {})

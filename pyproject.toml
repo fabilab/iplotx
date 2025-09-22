@@ -55,7 +55,7 @@ test = [
   "igraph>=0.11.8",
   "networkx>=3.4.2",
   "biopython>=1.85",
-  "cogent3>=2025.5.8a6",
+  "cogent3>=2025.9.8a2",
   "ete4>=4.3.0",
   "mypy>=1.15.0",
   "scikit-bio>=0.6.3",
@@ -72,9 +72,9 @@ docs = [
   "igraph>=0.11.8",
   "networkx>=3.4.2",
   "biopython>=1.85",
-  "cogent3>=2025.5.8a6",
   "ete4>=4.3.0",
   "scikit-bio>=0.6.3",
+  "cogent3>=2025.9.8a2",
 ]
 typing = ["mypy", "types-requests"]
 typing-test = [{include-group = "typing"}, {include-group = "test"}, "useful-types"]
