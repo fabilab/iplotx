@@ -1,16 +1,24 @@
+"""
+Main style module for iplotx.
+"""
+
 from typing import (
     Any,
     Iterable,
     Optional,
     Sequence,
 )
-from collections import defaultdict
 from collections.abc import Hashable
 from contextlib import contextmanager
 import numpy as np
 import pandas as pd
 
-from ..utils.style import copy_with_deep_values
+from ..utils.style import (
+    copy_with_deep_values,
+    sanitize_leaves,
+    update_style,
+    sanitize_ambiguous,
+)
 from .library import style_library
 from .leaf_info import (
     style_leaves,
@@ -83,94 +91,16 @@ def merge_styles(
     Returns:
         The composite style as a dict.
     """
-    try:
-        import networkx as nx
-    except ImportError:
-        nx = None
-
-    def _sanitize_leaves(style: dict):
-        for key, value in style.items():
-            if key in style_leaves:
-                # Networkx has a few lazy data structures
-                # TODO: move this code to provider
-                if nx is not None:
-                    if isinstance(value, nx.classes.reportviews.NodeView):
-                        style[key] = dict(value)
-                    elif isinstance(value, nx.classes.reportviews.EdgeViewABC):
-                        style[key] = [v for *e, v in value]
-
-            elif isinstance(value, dict):
-                _sanitize_leaves(value)
-
-    def _update(style: dict, current: dict):
-        for key, value in style.items():
-            if key not in current:
-                current[key] = value
-                continue
-
-            # Style non-leaves are either recurred into or deleted
-            if key not in style_leaves:
-                if isinstance(value, dict):
-                    _update(value, current[key])
-                elif value is None:
-                    del current[key]
-                else:
-                    raise ValueError(
-                        f"Setting non-leaf style value to a non-dict: {key}, {value}",
-                    )
-            else:
-                # Style leaves could be incomplete, ensure a sensible default
-                if value is None:
-                    del current[key]
-                    continue
-
-                if not isinstance(value, dict):
-                    current[key] = value
-                    continue
-
-                if hasattr(value, "default_factory"):
-                    current[key] = value
-                    continue
-
-                if hasattr(current[key], "default_factory"):
-                    default_value = current[key].default_factory()
-                else:
-                    default_value = current[key]
-                current[key] = defaultdict(
-                    lambda: default_value,
-                    value,
-                )
-
-    def _sanitize_ambiguous(style: dict):
-        """Fix a few ambiguous cases in the style dict."""
-
-        # Accept "node" style as "vertex" style for user flexibility
-        if "node" in style:
-            style_node = style.pop("node")
-            if "vertex" not in style:
-                style["vertex"] = style_node
-            else:
-                # "node" style applies on TOP of "vertex" style
-                _update(style_node, style["vertex"])
-
-        # NOTE: Deprecate edge_padding for edge_shrink
-        for edgekey in ["edge", "leafedge"]:
-            if "padding" in style.get(edgekey, {}):
-                # shrink takes over
-                if "shrink" in style[edgekey]:
-                    del style[edgekey]["padding"]
-                else:
-                    style[edgekey]["shrink"] = style[edgekey].pop("padding")
 
     merged = {}
     for style in styles:
         if isinstance(style, str):
             style = get_style(style)
         else:
-            _sanitize_leaves(style)
+            sanitize_leaves(style)
             unflatten_style(style)
-            _sanitize_ambiguous(style)
-        _update(style, merged)
+            sanitize_ambiguous(style)
+        update_style(style, merged)
 
     return merged
 
