@@ -62,7 +62,7 @@ ipx.network(
     ax=ax,
     vertex_marker="s",
     vertex_facecolor="red",
-    edge_padding=3,
+    edge_shrink=3,
     edge_zorder=2,
     vertex_zorder=3,
     vertex_label_color="black",

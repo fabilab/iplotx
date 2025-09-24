@@ -352,9 +352,9 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 tension = 0
                 ports = None
 
-            # Scale padding by dpi
+            # Scale shrink by dpi
             dpi = self.figure.dpi if hasattr(self, "figure") else 72.0
-            padding = dpi / 72.0 * edge_stylei.pop("padding", 0)
+            shrink = dpi / 72.0 * edge_stylei.pop("shrink", 0)
 
             # False is a synonym for "none"
             waypoints = edge_stylei.get("waypoints", "none")
@@ -380,7 +380,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 waypoints=waypoints,
                 ports=ports,
                 layout_coordinate_system=self._vertex_collection.get_layout_coordinate_system(),
-                padding=padding,
+                shrink=shrink,
             )
 
             offset = edge_stylei.get("offset", 0)
@@ -720,6 +720,8 @@ def make_stub_patch(**kwargs):
         "cmap",
         "norm",
         "split",
+        "shrink",
+        # DEPRECATED
         "padding",
     ]
     for prop in forbidden_props:

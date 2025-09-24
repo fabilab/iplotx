@@ -34,7 +34,7 @@ ipx.network(
     edge_arrow_width=30,
     edge_arrow_height=40,
     edge_arrow_marker=[")>", "|", "|"],
-    edge_padding=15,
+    edge_shrink=15,
     edge_curved=True,
     edge_tension=[2, 2, 2],
     vertex_facecolor=["#26677FFF", "#635C72FF", "#89374FFF"],

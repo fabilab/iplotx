@@ -40,6 +40,37 @@ def test_vertex_node():
     assert "color" in style.get("vertex", {"label": {}}).get("label", {})
 
 
+def test_edgepadding():
+    style = ipx.style.merge_styles(
+        [
+            {
+                "edge": {
+                    "padding": 8,
+                    "shrink": 2,
+                }
+            },
+        ]
+    )
+    assert isinstance(style, dict)
+    assert "edge" in style
+    assert "shrink" in style.get("edge", {})
+    assert "padding" not in style.get("edge", {})
+
+    style = ipx.style.merge_styles(
+        [
+            {
+                "edge": {
+                    "padding": 8,
+                }
+            },
+        ]
+    )
+    assert isinstance(style, dict)
+    assert "edge" in style
+    assert "shrink" in style.get("edge", {})
+    assert "padding" not in style.get("edge", {})
+
+
 def test_rotate_type_fallback():
     style = {
         "size": {"hello": 80},

@@ -62,6 +62,7 @@ test = [
   "pandas-stubs>=2.2.3.250527",
   "types-networkx>=3.5.0.20250610",
   "pytest-cov>=6.2.1",
+  "networkx>=2.0.0,<=3.4.2",
 ]
 docs = [
   "sphinx",

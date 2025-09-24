@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:04.186** total execution time for 72 files **from all galleries**:
+**00:00.798** total execution time for 72 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,22 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_biology_plot_animal_phylogeny.py` (``../../gallery/biology/plot_animal_phylogeny.py``)
-     - 00:04.186
+     - 00:00.614
+     - 0.0
+   * - :ref:`sphx_glr_gallery_network_science_plot_social_network_circles.py` (``../../gallery/network_science/plot_social_network_circles.py``)
+     - 00:00.051
+     - 0.0
+   * - :ref:`sphx_glr_gallery_basic_plot_house.py` (``../../gallery/basic/plot_house.py``)
+     - 00:00.049
+     - 0.0
+   * - :ref:`sphx_glr_gallery_style_plot_arrows.py` (``../../gallery/style/plot_arrows.py``)
+     - 00:00.037
+     - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_feedbacks.py` (``../../gallery/other/plot_feedbacks.py``)
+     - 00:00.025
+     - 0.0
+   * - :ref:`sphx_glr_gallery_style_plot_edgepadding.py` (``../../gallery/style/plot_edgepadding.py``)
+     - 00:00.021
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_basic.py` (``../../gallery/basic/plot_basic.py``)
      - 00:00.000
@@ -48,9 +63,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_grouping.py` (``../../gallery/basic/plot_grouping.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_basic_plot_house.py` (``../../gallery/basic/plot_house.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_loops.py` (``../../gallery/basic/plot_loops.py``)
@@ -131,9 +143,6 @@ Computation times
    * - :ref:`sphx_glr_gallery_network_science_plot_simple_networkx.py` (``../../gallery/network_science/plot_simple_networkx.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_network_science_plot_social_network_circles.py` (``../../gallery/network_science/plot_social_network_circles.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_gallery_network_science_plot_traveling_salesman.py` (``../../gallery/network_science/plot_traveling_salesman.py``)
      - 00:00.000
      - 0.0
@@ -146,9 +155,6 @@ Computation times
    * - :ref:`sphx_glr_gallery_other_plot_edit_artists.py` (``../../gallery/other/plot_edit_artists.py``)
      - 00:00.000
      - 0.0
-   * - :ref:`sphx_glr_gallery_other_plot_feedbacks.py` (``../../gallery/other/plot_feedbacks.py``)
-     - 00:00.000
-     - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_graph.py` (``../../gallery/other/plot_graph.py``)
      - 00:00.000
      - 0.0
@@ -156,12 +162,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_train.py` (``../../gallery/other/plot_train.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_style_plot_arrows.py` (``../../gallery/style/plot_arrows.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_style_plot_edgepadding.py` (``../../gallery/style/plot_edgepadding.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_elements.py` (``../../gallery/style/plot_elements.py``)

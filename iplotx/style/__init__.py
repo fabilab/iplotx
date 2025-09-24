@@ -141,7 +141,9 @@ def merge_styles(
                     value,
                 )
 
-    def _sanitize_internal(style: dict):
+    def _sanitize_ambiguous(style: dict):
+        """Fix a few ambiguous cases in the style dict."""
+
         # Accept "node" style as "vertex" style for user flexibility
         if "node" in style:
             style_node = style.pop("node")
@@ -151,6 +153,15 @@ def merge_styles(
                 # "node" style applies on TOP of "vertex" style
                 _update(style_node, style["vertex"])
 
+        # NOTE: Deprecate edge_padding for edge_shrink
+        for edgekey in ["edge", "leafedge"]:
+            if "padding" in style.get(edgekey, {}):
+                # shrink takes over
+                if "shrink" in style[edgekey]:
+                    del style[edgekey]["padding"]
+                else:
+                    style[edgekey]["shrink"] = style[edgekey].pop("padding")
+
     merged = {}
     for style in styles:
         if isinstance(style, str):
@@ -158,7 +169,7 @@ def merge_styles(
         else:
             _sanitize_leaves(style)
             unflatten_style(style)
-            _sanitize_internal(style)
+            _sanitize_ambiguous(style)
         _update(style, merged)
 
     return merged

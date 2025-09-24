@@ -7,8 +7,12 @@
 
 ```python
 {
-    # Vertex style
-    "vertex": {
+    # Vertex/node style
+    # NOTE: you can use "node" or "vertex" interchangeably. If both are specified
+    # at the SAME time, these styles are merged, with conflicts resolved in favour
+    # of "node". In other words, "vertex" is applied first, then "node" on top of it.
+
+    "vertex" | "node": {
         # Size of the vertex in points. If a pair, it indicates width and height
         # of the marker. If "label", set the size dynamically based on the vertex
         # label (a label is needed in this case)
@@ -74,7 +78,8 @@
 
         # Whether to leave any space between edge cap and vertex border. This is
         # in figure points and autoscales correctly with dpi.
-        "padding": float,
+        # DEPRECATED: "padding" is a synonym for this option, but it is deprecated.
+        "shrink": float,
 
         # Matplotlib color map used to map floating numbers into RGBA colors. Only
         # used when the previous option "color" is set to floats.

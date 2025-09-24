@@ -64,7 +64,7 @@ def _compute_loops_per_angle(nloops, angles):
     ]
 
 
-def _get_shorter_edge_coords(vpath, vsize, theta, padding=0):
+def _get_shorter_edge_coords(vpath, vsize, theta, shrink=0):
     # Bound theta from -pi to pi (why is that not guaranteed?)
     theta = (theta + pi) % (2 * pi) - pi
 
@@ -105,8 +105,8 @@ def _get_shorter_edge_coords(vpath, vsize, theta, padding=0):
 
     ve = ve * vsize
 
-    # Padding (assuming dpi scaling is already applied to the padding)
-    ve += padding * np.array([np.cos(theta), np.sin(theta)])
+    # Shrink (assuming dpi scaling is already applied to the shrink)
+    ve += shrink * np.array([np.cos(theta), np.sin(theta)])
 
     return ve
 
@@ -145,12 +145,12 @@ def _compute_loop_path(
     angle2,
     trans_inv,
     looptension,
-    padding=0,
+    shrink=0,
 ):
     # Shorten at starting angle
-    start = _get_shorter_edge_coords(vpath, vsize, angle1, padding) + vcoord_fig
+    start = _get_shorter_edge_coords(vpath, vsize, angle1, shrink) + vcoord_fig
     # Shorten at end angle
-    end = _get_shorter_edge_coords(vpath, vsize, angle2, padding) + vcoord_fig
+    end = _get_shorter_edge_coords(vpath, vsize, angle2, shrink) + vcoord_fig
 
     aux1 = (start - vcoord_fig) * looptension + vcoord_fig
     aux2 = (end - vcoord_fig) * looptension + vcoord_fig
@@ -182,7 +182,7 @@ def _compute_edge_path_straight(
     trans,
     trans_inv,
     layout_coordinate_system: str = "cartesian",
-    padding: float = 0,
+    shrink: float = 0,
     **kwargs,
 ):
     if layout_coordinate_system not in ("cartesian", "polar"):
@@ -211,11 +211,11 @@ def _compute_edge_path_straight(
     theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
 
     # Shorten at starting vertex
-    vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta, padding) + vcoord_fig[0]
+    vs = _get_shorter_edge_coords(vpath_fig[0], vsize_fig[0], theta, shrink) + vcoord_fig[0]
     points.append(vs)
 
     # Shorten at end vertex
-    ve = _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi, padding) + vcoord_fig[1]
+    ve = _get_shorter_edge_coords(vpath_fig[1], vsize_fig[1], theta + pi, shrink) + vcoord_fig[1]
     points.append(ve)
 
     codes = ["MOVETO", "LINETO"]
@@ -237,7 +237,7 @@ def _compute_edge_path_waypoints(
     layout_coordinate_system: str = "cartesian",
     points_per_curve: int = 30,
     ports: Pair[Optional[str]] = (None, None),
-    padding: float = 0,
+    shrink: float = 0,
     **kwargs,
 ):
     if not isinstance(waypoints, str):
@@ -263,7 +263,7 @@ def _compute_edge_path_waypoints(
 
             # Shorten at vertex border
             vshorts[i] = (
-                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], padding)
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], shrink)
                 + vcoord_fig[i]
             )
 
@@ -293,7 +293,7 @@ def _compute_edge_path_waypoints(
 
             # Shorten at vertex border
             vshorts[i] = (
-                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], padding)
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], shrink)
                 + vcoord_fig[i]
             )
 
@@ -343,7 +343,7 @@ def _compute_edge_path_waypoints(
 
             # Shorten at vertex border
             vshort = (
-                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], theta, padding) + vcoord_fig[i]
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], theta, shrink) + vcoord_fig[i]
             )
             thetas.append(theta)
             vshorts.append(vshort)
@@ -391,7 +391,7 @@ def _compute_edge_path_curved(
     trans,
     trans_inv,
     ports: Pair[Optional[str]] = (None, None),
-    padding: float = 0,
+    shrink: float = 0,
 ):
     """Shorten the edge path along a cubic Bezier between the vertex centres.
 
@@ -445,7 +445,7 @@ def _compute_edge_path_curved(
     for i in range(2):
         thetas[i] = atan2(*((auxs[i] - vcoord_fig[i])[::-1]))
         vs[i] = (
-            _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], padding) + vcoord_fig[i]
+            _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], shrink) + vcoord_fig[i]
         )
 
     path = {

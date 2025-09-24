@@ -1,8 +1,8 @@
 """
-Edge padding
-============
+Edge shrink
+===========
 
-This example illustrates how to pad edges, i.e. leave a bit of empty space between
+This example illustrates how to shrink edges, i.e. leave a bit of empty space between
 edge cap (end) and the border of its source/target vertices.
 """
 
@@ -31,7 +31,7 @@ ipx.network(
     graph,
     layout,
     style="rededge",
-    edge_padding=5,
+    edge_shrink=5,
     vertex_labels=True,
     vertex_size={"A": 20, "B": 20, "C": 20, "D": 20, "E": 20, "Bingo": 50},
 )

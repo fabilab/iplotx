@@ -31,7 +31,8 @@ ipx.plot(
             "alpha": 0.5,
             "linewidth": 6,
         },
-        "vertex": {
+        # You could use "vertex" instead of "node"
+        "node": {
             "size": G.nodes.data("size"),
             "facecolor": G.nodes.data("color"),
             "edgecolor": "k",

@@ -62,7 +62,7 @@ style_library = {
     "feedback": {
         "edge": {
             "linewidth": 4,
-            "padding": 10,
+            "shrink": 10,
             "arrow": {
                 "marker": ")>",
                 "width": 20,

@@ -22,10 +22,12 @@ rotating_leaves = (
     "vpadding",
     "hmargin",
     "vmargin",
-    "padding",
     "ports",
     "width",
     "height",
+    "shrink",
+    # DEPRECATED
+    "padding",
 )
 
 # These properties are also terminal style properties, but they cannot be rotated.

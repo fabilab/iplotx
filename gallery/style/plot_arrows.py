@@ -25,7 +25,7 @@ ipx.network(
     vertex_size=12,
     edge_arrow_marker=arrow_markers,
     edge_arrow_height="width",
-    edge_padding=8,
+    edge_shrink=8,
     edge_color="steelblue",
     title="Arrow markers",
 )

@@ -126,7 +126,7 @@ class GraphTestRunner(unittest.TestCase):
             G,
             layout=pos,
             style={
-                "vertex": {
+                "node": {
                     "facecolor": node_color,
                     "linewidth": 0,
                     "size": 21,
@@ -149,12 +149,12 @@ class GraphTestRunner(unittest.TestCase):
 
         fig, ax = plt.subplots(figsize=(6, 4))
 
-        arts = ipx.plot(
+        arts = ipx.network(
             network=G,
             ax=ax,
             layout=pos,
             style={
-                "vertex": {
+                "node": {
                     "size": node_sizes,
                     "facecolor": "indigo",
                     "edgecolor": "none",
