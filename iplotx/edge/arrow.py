@@ -2,7 +2,7 @@
 Module for edge arrows in iplotx.
 """
 
-from typing import Never
+from typing import Never, Optional
 
 import numpy as np
 import matplotlib as mpl
@@ -149,10 +149,35 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
         super().draw(renderer)
 
 
-def make_arrow_patch(marker: str = "|>", width: float = 8, **kwargs):
-    """Make a patch of the given marker shape and size."""
-    height = kwargs.pop("height", width * 1.3)
-    if height == "width":
+def make_arrow_patch(
+    marker: str = "|>",
+    width: float = 8,
+    height: Optional[float | str] = None,
+    **kwargs,
+):
+    """Make a patch of the given marker shape and size.
+
+    Parameters:
+        marker: The marker shape to use. Supported markers are:
+            "|>", "|/", "|\\", ">", "<", ">>", ")>", ")", "(", "]", "[", "|",
+            "x", "s", "d", "p", "q". Dashes at the start of this string will
+            be ignored, so "->" is equivalent to ">".
+        width: The width of the marker in points. Height is by default 1.3 the
+            width, unless specified separately.
+        height: The height of the marker in points. If not specified, it is
+            1.3 times the width. This can also be the string "width", in which
+            case the height will be equal to the width.
+        **kwargs: Additional keyword arguments passed to the PathPatch.
+
+    Returns:
+        A pair with the patch and the max size of the patch in points.
+    """
+    # Forget any leading dashes
+    marker = marker.lstrip("-")
+
+    if height is None:
+        height = width * 1.3
+    elif height == "width":
         height = width
 
     # Normalise by the max size, this is taken care of in _transforms

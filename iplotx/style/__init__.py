@@ -141,6 +141,16 @@ def merge_styles(
                     value,
                 )
 
+    def _sanitize_internal(style: dict):
+        # Accept "node" style as "vertex" style for user flexibility
+        if "node" in style:
+            style_node = style.pop("node")
+            if "vertex" not in style:
+                style["vertex"] = style_node
+            else:
+                # "node" style applies on TOP of "vertex" style
+                _update(style_node, style["vertex"])
+
     merged = {}
     for style in styles:
         if isinstance(style, str):
@@ -148,6 +158,7 @@ def merge_styles(
         else:
             _sanitize_leaves(style)
             unflatten_style(style)
+            _sanitize_internal(style)
         _update(style, merged)
 
     return merged

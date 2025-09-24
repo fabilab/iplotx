@@ -25,6 +25,21 @@ def test_get_style_args():
     assert ipx.style.get_style(".vertex.curved", 80) == 80
 
 
+def test_vertex_node():
+    style = ipx.style.merge_styles(
+        [
+            dict(vertex_size=80),
+            dict(node_label_color="grey"),
+        ]
+    )
+    assert isinstance(style, dict)
+    assert "vertex" in style
+    assert "node" not in style
+    assert "size" in style.get("vertex", {})
+    assert "label" in style.get("vertex", {})
+    assert "color" in style.get("vertex", {"label": {}}).get("label", {})
+
+
 def test_rotate_type_fallback():
     style = {
         "size": {"hello": 80},
