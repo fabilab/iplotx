@@ -193,6 +193,10 @@ class TreeArtist(mpl.artist.Artist):
         """Get vertex or edge layout."""
         layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
 
+        # Equivalence vertex <-> node
+        if kind == "node":
+            kind = "vertex"
+
         if kind == "vertex":
             layout = self._ipx_internal_data["vertex_df"][layout_columns]
             return layout
@@ -245,6 +249,10 @@ class TreeArtist(mpl.artist.Artist):
         return bbox
 
     def _get_label_series(self, kind: str) -> Optional[pd.Series]:
+        # Equivalence vertex <-> node
+        if kind == "node":
+            kind = "vertex"
+
         if "label" in self._ipx_internal_data[f"{kind}_df"].columns:
             return self._ipx_internal_data[f"{kind}_df"]["label"]
         else:
@@ -254,6 +262,8 @@ class TreeArtist(mpl.artist.Artist):
         """Get VertexCollection artist."""
         return self._vertices
 
+    get_nodes = get_vertices
+
     def get_edges(self) -> EdgeCollection:
         """Get EdgeCollection artist."""
         return self._edges
@@ -261,6 +271,8 @@ class TreeArtist(mpl.artist.Artist):
     def get_leaf_vertices(self) -> Optional[VertexCollection]:
         """Get leaf VertexCollection artist."""
         return self._leaf_vertices
+
+    get_leaf_nodes = get_leaf_vertices
 
     def get_leaf_edges(self) -> Optional[LeafEdgeCollection]:
         """Get LeafEdgeCollection artist if present."""
@@ -271,6 +283,8 @@ class TreeArtist(mpl.artist.Artist):
     def get_vertex_labels(self) -> LabelCollection:
         """Get list of vertex label artists."""
         return self._vertices.get_labels()
+
+    get_node_labels = get_vertex_labels
 
     def get_edge_labels(self) -> LabelCollection:
         """Get list of edge label artists."""

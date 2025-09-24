@@ -162,6 +162,8 @@ class NetworkArtist(mpl.artist.Artist):
         """Get VertexCollection artist."""
         return self._vertices
 
+    get_nodes = get_vertices
+
     def get_edges(self):
         """Get EdgeCollection artist."""
         return self._edges
@@ -169,6 +171,8 @@ class NetworkArtist(mpl.artist.Artist):
     def get_vertex_labels(self):
         """Get list of vertex label artists."""
         return self._vertices.get_labels()
+
+    get_node_labels = get_vertex_labels
 
     def get_edge_labels(self):
         """Get list of edge label artists."""
@@ -211,6 +215,10 @@ class NetworkArtist(mpl.artist.Artist):
         return vertex_layout_df
 
     def _get_label_series(self, kind):
+        # Equivalence vertex/node
+        if kind == "node":
+            kind = "vertex"
+
         if "label" in self._ipx_internal_data[f"{kind}_df"].columns:
             return self._ipx_internal_data[f"{kind}_df"]["label"]
         else:
