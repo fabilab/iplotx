@@ -4,6 +4,7 @@ Module for vertex groupings code, especially the GroupingArtist class.
 
 from typing import Union
 import numpy as np
+import pandas as pd
 import matplotlib as mpl
 from matplotlib.collections import PatchCollection
 
@@ -64,6 +65,9 @@ class GroupingArtist(PatchCollection):
         self._points_per_curve = points_per_curve
 
         network = kwargs.pop("network", None)
+        self.layout = normalise_layout(layout, network=network)
+        self.ndim = layout.shape[1]
+
         patches, grouping, coords_hulls = self._create_patches(
             grouping,
             layout,
@@ -89,6 +93,10 @@ class GroupingArtist(PatchCollection):
         self._compute_paths(self.get_figure(root=True).dpi)
         return ret
 
+    def get_layout(self) -> pd.DataFrame:
+        """Get the layout used for this grouping."""
+        return self.layout
+
     def get_vertexpadding(self) -> float:
         """Get the vertex padding of each group."""
         return self._vertexpadding
@@ -98,7 +106,6 @@ class GroupingArtist(PatchCollection):
         return self.get_vertexpadding() * dpi / 72.0 * self._factor
 
     def _create_patches(self, grouping, layout, network, **kwargs):
-        layout = normalise_layout(layout, network=network)
         grouping = normalise_grouping(grouping, layout)
         style = get_style(".grouping")
         style.pop("vertexpadding", None)

@@ -63,6 +63,9 @@ class NetworkArtist(mpl.artist.Artist):
                 will be drawn. If a list, the labels are taken from the list. If a dict, the keys
                 should be the vertex IDs and the values should be the labels.
             edge_labels: The labels for the edges. If None, no edge labels will be drawn.
+            transform: The transform to use for the vertices. Default is IdentityTransform.
+            offset_transform: The transform to use for the edges. Default is None, but this should
+                eventually be set to ax.transData once the artist is added to an Axes.
 
         """
         self.network = network
@@ -157,6 +160,10 @@ class NetworkArtist(mpl.artist.Artist):
     def set_offset_transform(self, offset_transform):
         """Set the offset transform (for vertices/edges)."""
         self._offset_transform = offset_transform
+        if hasattr(self, "_vertices"):
+            self._vertices.set_offset_transform(offset_transform)
+        if hasattr(self, "_edges"):
+            self._edges.set_transform(offset_transform)
 
     def get_vertices(self):
         """Get VertexCollection artist."""

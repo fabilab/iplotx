@@ -77,6 +77,17 @@ class LabelCollection(mpl.artist.Artist):
             child.set_figure(fig)
         self._update_offsets(dpi=fig.dpi)
 
+    def set_transform(self, transform: mpl.transforms.Transform) -> None:
+        """Set the transform for this artist and children.
+
+        Parameters:
+            transform: The transform to set.
+        """
+        super().set_transform(transform)
+        if hasattr(self, "_labelartists"):
+            for art in self._labelartists:
+                art.set_transform(transform)
+
     def get_texts(self):
         """Get the texts of the labels."""
         return [child.get_text() for child in self.get_children()]

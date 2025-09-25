@@ -30,23 +30,22 @@ class IGraphDataProvider(NetworkDataProvider):
         edge_labels: Optional[Sequence[str] | dict[str]] = None,
     ) -> NetworkData:
         """Create network data object for iplotx from an igraph object."""
-        network = self.network
-        directed = self.is_directed()
 
-        # Recast vertex_labels=False as vertex_labels=None
-        if np.isscalar(vertex_labels) and (not vertex_labels):
-            vertex_labels = None
-
-        # Vertices are ordered integers, no gaps
+        # Get layout
         vertex_df = normalise_layout(
             layout,
-            network=network,
+            network=self.network,
             nvertices=self.number_of_vertices(),
         )
         ndim = vertex_df.shape[1]
         vertex_df.columns = _make_layout_columns(ndim)
 
+        # Vertices are ordered integers, no gaps
+
         # Vertex labels
+        # Recast vertex_labels=False as vertex_labels=None
+        if np.isscalar(vertex_labels) and (not vertex_labels):
+            vertex_labels = None
         if vertex_labels is not None:
             if np.isscalar(vertex_labels):
                 vertex_df["label"] = vertex_df.index.astype(str)
@@ -57,7 +56,7 @@ class IGraphDataProvider(NetworkDataProvider):
 
         # Edges are a list of tuples, because of multiedges
         tmp = []
-        for edge in network.es:
+        for edge in self.network.es:
             row = {"_ipx_source": edge.source, "_ipx_target": edge.target}
             row.update(edge.attributes())
             tmp.append(row)
@@ -76,7 +75,7 @@ class IGraphDataProvider(NetworkDataProvider):
         network_data = {
             "vertex_df": vertex_df,
             "edge_df": edge_df,
-            "directed": directed,
+            "directed": self.is_directed(),
             "ndim": ndim,
         }
         return network_data

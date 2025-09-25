@@ -193,6 +193,16 @@ class EdgeCollection(mpl.collections.PatchCollection):
         self._update_arrows()
         self._update_labels()
 
+    def set_transform(self, transform: mpl.transforms.Transform) -> None:
+        """Set the transform for the edges and their children."""
+        super().set_transform(transform)
+        if hasattr(self, "_subedges"):
+            self._subedges.set_transform(transform)
+        if hasattr(self, "_arrows"):
+            self._arrows.set_offset_transform(transform)
+        if hasattr(self, "_label_collection"):
+            self._label_collection.set_transform(transform)
+
     @property
     def directed(self) -> bool:
         """Whether the network is directed."""

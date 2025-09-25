@@ -3,6 +3,7 @@ from contextlib import nullcontext
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
+from mpl_toolkits.mplot3d.axes3d import Axes3D
 import matplotlib.pyplot as plt
 
 from .typing import (
@@ -28,7 +29,7 @@ def network(
     style: str | dict | Sequence[str | dict] = (),
     title: Optional[str] = None,
     aspect: Optional[str | float] = None,
-    margins: float | tuple[float, float] = 0,
+    margins: float | tuple[float, float] | tuple[float, float, float] = 0,
     strip_axes: bool = True,
     figsize: Optional[tuple[float, float]] = None,
     **kwargs,
@@ -53,13 +54,15 @@ def network(
         style: Apply this style for the objects to plot. This can be a sequence (e.g. list)
             of styles and they will be applied in order.
         title: If not None, set the axes title to this value.
-        aspect: If not None, set the aspect ratio of the axis to this value. The most common
-            value is 1.0, which proportionates x- and y-axes.
+        aspect: If not None, set the aspect ratio of the axis to this value. In 2D, the most
+            common value is 1.0, which proportionates x- and y-axes. In 3D, only string
+            values are accepted (see the documentation of Axes.set_aspect).
         margins: How much margin to leave around the plot. A higher value (e.g. 0.1) can be
             used as a quick fix when some vertex shapes reach beyond the plot edge. This is
             a fraction of the data limits, so 0.1 means 10% of the data limits will be left
-            as margin.
-        strip_axes: If True, remove axis spines and ticks.
+            as margin. A pair (in 2D) or triplet (in 3D) of floats can also be provided and
+            applied to each axis separately.
+        strip_axes: If True, remove axis spines and ticks. In 3D, only ticks are removed.
         figsize: If ax is None, a new matplotlib Figure is created. This argument specifies
             the (width, height) dimension of the figure in inches. If ax is not None, this
             argument is ignored. If None, the default matplotlib figure size is used.
@@ -83,9 +86,6 @@ def network(
         if (network is None) and (grouping is None):
             raise ValueError("At least one of network or grouping must be provided.")
 
-        if ax is None:
-            fig, ax = plt.subplots(figsize=figsize)
-
         artists = []
         if network is not None:
             nwkart = NetworkArtist(
@@ -94,30 +94,55 @@ def network(
                 vertex_labels=vertex_labels,
                 edge_labels=edge_labels,
                 transform=mpl.transforms.IdentityTransform(),
-                offset_transform=ax.transData,
             )
-            ax.add_artist(nwkart)
-
-            # Set the figure, which itself sets the dpi scale for vertices, edges,
-            # arrows, etc. Now data limits can be computed correctly
-            nwkart.set_figure(ax.figure)
-
             artists.append(nwkart)
-
-            # Set normailsed layout since we have it by now
             layout = nwkart.get_layout()
+        else:
+            nwkart = None
 
         if grouping is not None:
             grpart = GroupingArtist(
                 grouping,
                 layout,
                 network=network,
-                transform=ax.transData,
             )
-            ax.add_artist(grpart)
-
-            grpart.set_figure(ax.figure)
+            layout = grpart.get_layout()
             artists.append(grpart)
+        else:
+            grpart = None
+
+        if (nwkart is not None) or (grpart is not None):
+            ndim = layout.shape[1]
+        else:
+            ndim = None
+
+        if ax is None:
+            if ndim == 3:
+                fig = plt.figure(figsize=figsize)
+                ax = fig.add_subplot(111, projection="3d")
+            else:
+                fig, ax = plt.subplots(figsize=figsize)
+                ndim = 2
+        else:
+            # Check that the expected axis projection is used (3d for 3d layouts)
+            if ndim == 3:
+                assert isinstance(ax, Axes3D)
+            elif ndim == 2:
+                # NOTE: technically we probably want it to be cartesian (not polar, etc.)
+                # but let's be flexible for now and let that request bubble up from users
+                assert not isinstance(ax, Axes3D)
+
+        if nwkart is not None:
+            # Set the figure, which itself sets the dpi scale for vertices, edges,
+            # arrows, etc. Now data limits can be computed correctly
+            nwkart.set_offset_transform(ax.transData)
+            ax.add_artist(nwkart)
+            nwkart.set_figure(ax.figure)
+
+        if grpart is not None:
+            grpart.set_transform(ax.transData)
+            ax.add_artist(grpart)
+            grpart.set_figure(ax.figure)
 
         if title is not None:
             ax.set_title(title)
@@ -128,8 +153,8 @@ def network(
         _postprocess_axes(ax, artists, strip=strip_axes)
 
         if np.isscalar(margins):
-            margins = (margins, margins)
-        if (margins[0] != 0) or (margins[1] != 0):
+            margins = [margins] * ndim
+        if (margins[0] != 0) or (margins[1] != 0) or ((len(margins) == 3) and (margins[2] != 0)):
             ax.margins(*margins)
 
         return artists
@@ -247,15 +272,18 @@ def _postprocess_axes(ax, artists, strip=True):
     """Postprocess axis after plotting."""
 
     if strip:
-        # Despine
-        ax.spines["right"].set_visible(False)
-        ax.spines["top"].set_visible(False)
-        ax.spines["left"].set_visible(False)
-        ax.spines["bottom"].set_visible(False)
+        if not isinstance(ax, Axes3D):
+            # Despine
+            ax.spines["right"].set_visible(False)
+            ax.spines["top"].set_visible(False)
+            ax.spines["left"].set_visible(False)
+            ax.spines["bottom"].set_visible(False)
 
         # Remove axis ticks
         ax.set_xticks([])
         ax.set_yticks([])
+        if isinstance(ax, Axes3D):
+            ax.set_zticks([])
 
     # Set new data limits
     bboxes = []

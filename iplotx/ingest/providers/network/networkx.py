@@ -33,25 +33,24 @@ class NetworkXDataProvider(NetworkDataProvider):
 
         import networkx as nx
 
-        network = self.network
-
-        directed = self.is_directed()
-
         # Recast vertex_labels=False as vertex_labels=None
         if np.isscalar(vertex_labels) and (not vertex_labels):
             vertex_labels = None
 
-        # Vertices are indexed by node ID
+        # Get layout
         vertex_df = normalise_layout(
             layout,
-            network=network,
+            network=self.network,
             nvertices=self.number_of_vertices(),
-        ).loc[pd.Index(network.nodes)]
+        )
         ndim = vertex_df.shape[1]
         vertex_df.columns = _make_layout_columns(ndim)
 
+        # Vertices are indexed by node ID
+        vertex_df = vertex_df.loc[pd.Index(self.network.nodes)]
+
         # Vertex internal properties
-        tmp = pd.DataFrame(dict(network.nodes.data())).T
+        tmp = pd.DataFrame(dict(self.network.nodes.data())).T
         # Arrays become a single column, which we have already anyway
         if isinstance(layout, str) and (layout in tmp.columns):
             del tmp[layout]
@@ -78,7 +77,7 @@ class NetworkXDataProvider(NetworkDataProvider):
 
         # Edges are a list of tuples, because of multiedges
         tmp = []
-        for u, v, d in network.edges.data():
+        for u, v, d in self.network.edges.data():
             row = {"_ipx_source": u, "_ipx_target": v}
             row.update(d)
             tmp.append(row)
@@ -112,7 +111,7 @@ class NetworkXDataProvider(NetworkDataProvider):
         network_data = {
             "vertex_df": vertex_df,
             "edge_df": edge_df,
-            "directed": directed,
+            "directed": self.is_directed(),
             "ndim": ndim,
         }
         return network_data

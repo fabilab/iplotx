@@ -221,6 +221,16 @@ class VertexCollection(PatchCollection):
         self._update_offsets_from_layout()
         self.stale = True
 
+    def set_offset_transform(self, transform: mpl.transforms.Transform) -> None:
+        """Set the offset transform for the vertices.
+
+        Parameters:
+            transform: The matplotlib transform to use for the offsets.
+        """
+        super().set_offset_transform(transform)
+        if hasattr(self, "_label_collection"):
+            self._label_collection.set_transform(transform)
+
     def get_style(self) -> Optional[dict[str, Any]]:
         """Get the style dictionary for the vertices."""
         return self._style
