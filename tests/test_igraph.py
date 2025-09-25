@@ -31,19 +31,19 @@ class GraphTestRunner(unittest.TestCase):
     def test_basic(self):
         g = ig.Graph.Ring(5)
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(g, ax=ax, layout=self.layout_small_ring)
+        ipx.graph(g, ax=ax, layout=self.layout_small_ring)
 
     @image_comparison(baseline_images=["graph_directed"], remove_text=True)
     def test_directed(self):
         g = ig.Graph.Ring(5, directed=True)
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(g, ax=ax, layout=self.layout_small_ring)
+        ipx.graph(g, ax=ax, layout=self.layout_small_ring)
 
     @image_comparison(baseline_images=["graph_vertexsize"], remove_text=True)
     def test_vertexsize(self):
         g = ig.Graph.Ring(5)
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(
+        ipx.graph(
             g,
             ax=ax,
             layout=self.layout_small_ring,
@@ -55,7 +55,7 @@ class GraphTestRunner(unittest.TestCase):
     def test_labels(self):
         g = ig.Graph.Ring(5)
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(
+        ipx.graph(
             network=g,
             ax=ax,
             layout=self.layout_small_ring,
@@ -76,14 +76,14 @@ class GraphTestRunner(unittest.TestCase):
         g = ig.Graph.Ring(5)
         layout = g.layout("circle")
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(g, layout=layout, ax=ax)
+        ipx.graph(g, layout=layout, ax=ax)
 
     @image_comparison(baseline_images=["graph_layout_attribute"], remove_text=True)
     def test_layout_attribute_alt(self):
         g = ig.Graph.Ring(5)
         g["layout"] = ig.Layout([(x, x) for x in range(g.vcount())])
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(g, layout="layout", ax=ax)
+        ipx.graph(g, layout="layout", ax=ax)
 
     @image_comparison(baseline_images=["graph_directed_curved_loops"], remove_text=True)
     def test_directed_curved_loops(self):
@@ -94,7 +94,7 @@ class GraphTestRunner(unittest.TestCase):
         fig, ax = plt.subplots(figsize=(4, 4))
         # ax.set_xlim(-1.2, 1.2)
         # ax.set_ylim(-1.2, 1.2)
-        ipx.plot(
+        ipx.graph(
             g,
             ax=ax,
             layout=self.layout_small_ring,
@@ -112,7 +112,7 @@ class GraphTestRunner(unittest.TestCase):
     def test_mark_groups_squares(self):
         g = ig.Graph.Ring(5, directed=True)
         fig, ax = plt.subplots(figsize=(3, 3))
-        ipx.plot(
+        ipx.graph(
             g,
             ax=ax,
             layout=self.layout_small_ring,
@@ -125,7 +125,7 @@ class GraphTestRunner(unittest.TestCase):
     def test_edit_children(self):
         g = ig.Graph.Ring(5)
         fig, ax = plt.subplots(figsize=(4, 4))
-        ipx.plot(
+        ipx.graph(
             g,
             ax=ax,
             style={"vertex": {"marker": "o"}},
@@ -148,7 +148,7 @@ class GraphTestRunner(unittest.TestCase):
         fig, ax = plt.subplots()
         lo = g.layout("circle")
         lo.scale(3)
-        ipx.plot(
+        ipx.graph(
             g,
             ax=ax,
             layout=lo,
@@ -176,7 +176,7 @@ class GraphTestRunner(unittest.TestCase):
         fig, ax = plt.subplots()
         lo = g.layout("circle")
         lo.scale(3)
-        ipx.plot(
+        ipx.graph(
             g,
             ax=ax,
             layout=lo,
@@ -201,7 +201,7 @@ class GraphTestRunner(unittest.TestCase):
     def test_null_graph(self):
         g = ig.Graph()
         fig, ax = plt.subplots()
-        ipx.plot(g, ax=ax)
+        ipx.graph(g, ax=ax)
         ax.set_aspect(1.0)
 
 
@@ -278,14 +278,14 @@ class ClusteringTestRunner(unittest.TestCase):
         g = ig.Graph.Ring(5, directed=True)
         clu = ig.VertexClustering(g, [0] * 5)
         fig, ax = plt.subplots()
-        ipx.plot(g, grouping=clu, ax=ax, layout=self.layout_small_ring)
+        ipx.graph(g, grouping=clu, ax=ax, layout=self.layout_small_ring)
 
     @image_comparison(baseline_images=["clustering_directed_large"], remove_text=True)
     def test_clustering_directed_large(self):
         g = ig.Graph.Ring(50, directed=True)
         clu = ig.VertexClustering(g, [0] * 3 + [1] * 17 + [2] * 30)
         fig, ax = plt.subplots()
-        ipx.plot(
+        ipx.graph(
             g,
             grouping=clu,
             style={

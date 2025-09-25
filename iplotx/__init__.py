@@ -9,19 +9,19 @@ library was used to construct the network.
 from .version import __version__
 from .plotting import (
     network,
+    graph,
     tree,
+    plot,
 )
 import iplotx.artists as artists
 import iplotx.style as style
 
 
-# Shortcut to iplotx.plotting.network
-plot = network
-
 __all__ = [
     "network",
     "tree",
     "plot",
+    "graph",
     "artists",
     "style",
     "__version__",

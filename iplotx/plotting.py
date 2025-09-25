@@ -22,6 +22,7 @@ def network(
     layout: Optional[LayoutType] = None,
     grouping: Optional[GroupingType] = None,
     vertex_labels: Optional[list | dict | pd.Series | bool] = None,
+    node_labels: Optional[list | dict | pd.Series | bool] = None,
     edge_labels: Optional[Sequence] = None,
     ax: Optional[mpl.axes.Axes] = None,
     style: str | dict | Sequence[str | dict] = (),
@@ -42,6 +43,9 @@ def network(
             will be drawn. If a list, the labels are taken from the list. If a dict, the keys
             should be the vertex IDs and the values should be the labels. If True (a single
             bool value), the vertex IDs will be used as labels.
+        node_labels: Same meaning as vertex_labels. This is an alias to help users who prefer
+            the word "node" over "vertex". If both vertex_labels and node_labels are specified,
+            "node_labels" overrides "vertex_labels".
         edge_labels: The labels for the edges. If None, no edge labels will be drawn. Defaults
             to None.
         ax: The axis to plot on. If None, a new figure and axis will be created. Defaults to
@@ -68,6 +72,11 @@ def network(
         The list can have one or two elements, depending on whether you are requesting to
         plot a network, a grouping, or both.
     """
+    # Equivalence of node_labels and vertex_labels
+    if node_labels is not None:
+        vertex_labels = node_labels
+    del node_labels
+
     stylecontext = context(style, **kwargs) if style or kwargs else nullcontext()
 
     with stylecontext:
@@ -126,11 +135,17 @@ def network(
         return artists
 
 
+# Aliases
+plot = network
+graph = network
+
+
 def tree(
     tree: Optional[TreeType] = None,
     layout: str | LayoutType = "horizontal",
     directed: bool | str = False,
     vertex_labels: Optional[list | dict | pd.Series | bool] = None,
+    node_labels: Optional[list | dict | pd.Series | bool] = None,
     leaf_labels: Optional[list | dict | pd.Series | bool] = None,
     show_support: bool = False,
     ax: Optional[mpl.axes.Axes] = None,
@@ -150,6 +165,9 @@ def tree(
         directed: If False, do not draw arrows.
         vertex_labels: The labels for the vertices. If None or False, no vertex labels. Also
             read leaf_labels for leaf nodes.
+        node_labels: Same meaning as vertex_labels. This is an alias to help users who prefer
+            the word "node" over "vertex". If both vertex_labels and node_labels are specified,
+            "node_labels" overrides "vertex_labels".
         leaf_labels: The labels for the leaf nodes. If None or False, no leaf labels are used
             except if vertex_labels are specified for leaf nodes. This argument and the
             previous vertex_labels provide somewhat redundant functionality but have quite
@@ -183,6 +201,11 @@ def tree(
     Returns:
         A TreeArtist object, set as a direct child of the matplotlib Axes.
     """
+    # Equivalence of node_labels and vertex_labels
+    if node_labels is not None:
+        vertex_labels = node_labels
+    del node_labels
+
     stylecontext = context(style, **kwargs) if style or kwargs else nullcontext()
 
     with stylecontext:

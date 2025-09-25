@@ -26,14 +26,14 @@ class GraphTestRunner(unittest.TestCase):
             ]
         )
         pos = {1: (0, 0), 2: (-1, 0.3), 3: (2, 0.17), 4: (4, 0.255), 5: (5, 0.03)}
-        ipx.plot(
+        ipx.network(
             G,
             layout=pos,
-            vertex_labels=False,
-            vertex_size=5,
-            vertex_facecolor="white",
-            vertex_edgecolor="black",
-            vertex_linewidth=3,
+            node_labels=False,
+            node_size=5,
+            node_facecolor="white",
+            node_edgecolor="black",
+            node_linewidth=3,
             edge_linewidth=3,
             edge_color=["grey", "black"],
             margins=0.1,
@@ -52,10 +52,10 @@ class GraphTestRunner(unittest.TestCase):
         # explicitly set positions
         pos = {1: (0, 0), 2: (-1, 0.3), 3: (2, 0.17), 4: (4, 0.255), 5: (5, 0.03)}
 
-        ipx.plot(
+        ipx.network(
             G,
             layout=pos,
-            vertex_labels=True,
+            node_labels=True,
             style={
                 "vertex": {
                     "size": "label",
@@ -224,11 +224,11 @@ class GraphTestRunner(unittest.TestCase):
         )
 
         fig, ax = plt.subplots()
-        ipx.plot(
+        ipx.network(
             G,
             ax=ax,
             layout="pos",
-            vertex_labels=True,
+            node_labels=True,
             edge_labels=True,
         )
 
@@ -298,11 +298,11 @@ class GraphTestRunner(unittest.TestCase):
         )
 
         fig, ax = plt.subplots(figsize=(5, 4))
-        ipx.plot(
+        ipx.network(
             G,
             ax=ax,
             layout="pos",
-            vertex_labels=True,
+            node_labels=True,
             style={
                 "vertex": {
                     "facecolor": G.nodes.data("color"),
