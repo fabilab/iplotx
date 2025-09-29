@@ -132,6 +132,9 @@ def network(
                 # but let's be flexible for now and let that request bubble up from users
                 assert not isinstance(ax, Axes3D)
 
+        # This is used in 3D for autoscaling
+        had_data = ax.has_data()
+
         if nwkart is not None:
             # Set the figure, which itself sets the dpi scale for vertices, edges,
             # arrows, etc. Now data limits can be computed correctly
@@ -150,7 +153,7 @@ def network(
         if aspect is not None:
             ax.set_aspect(aspect)
 
-        _postprocess_axes(ax, artists, strip=strip_axes)
+        _postprocess_axes(ax, artists, strip=strip_axes, had_data=had_data)
 
         if np.isscalar(margins):
             margins = [margins] * ndim
@@ -248,7 +251,6 @@ def tree(
             show_support=show_support,
         )
         ax.add_artist(artist)
-
         artist.set_figure(ax.figure)
 
         if title is not None:
@@ -268,7 +270,7 @@ def tree(
 
 
 # INTERNAL ROUTINES
-def _postprocess_axes(ax, artists, strip=True):
+def _postprocess_axes(ax, artists, strip=True, had_data=None):
     """Postprocess axis after plotting."""
 
     if strip:
@@ -285,12 +287,29 @@ def _postprocess_axes(ax, artists, strip=True):
         if isinstance(ax, Axes3D):
             ax.set_zticks([])
 
-    # Set new data limits
-    bboxes = []
-    for art in artists:
-        bboxes.append(art.get_datalim(ax.transData))
-    bbox = mpl.transforms.Bbox.union(bboxes)
-    ax.update_datalim(bbox)
+    # NOTE: bboxes appear to be not that well defined in 3D axes
+    # instead, there is a dedicated function that is a little
+    # pedestrian
+    if isinstance(ax, Axes3D):
+        for art in artists:
+            XYZ = art.get_layout().values.T
+            if ax._zmargin < 0.05 and XYZ[0].size > 0:
+                ax.set_zmargin(0.05)
+            ax.auto_scale_xyz(
+                *XYZ,
+                had_data=had_data,
+            )
+            # NOTE: breaking is not needed, worst case it will
+            # autoscale twice (for network and grouping), which
+            # is better, at this stage of development, than
+            # trying to be too clever by doing the math outselves
+    else:
+        # Set new data limits
+        bboxes = []
+        for art in artists:
+            bboxes.append(art.get_datalim(ax.transData))
+        bbox = mpl.transforms.Bbox.union(bboxes)
+        ax.update_datalim(bbox)
 
-    # Autoscale for x/y axis limits
-    ax.autoscale_view()
+        # Autoscale for x/y axis limits
+        ax.autoscale_view()

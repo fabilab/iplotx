@@ -30,6 +30,9 @@ from .edge import (
     EdgeCollection,
     make_stub_patch as make_undirected_edge_patch,
 )
+from .art3d.vertex import (
+    vertex_collection_2d_to_3d,
+)
 
 
 @_forwarder(
@@ -64,8 +67,9 @@ class NetworkArtist(mpl.artist.Artist):
                 should be the vertex IDs and the values should be the labels.
             edge_labels: The labels for the edges. If None, no edge labels will be drawn.
             transform: The transform to use for the vertices. Default is IdentityTransform.
-            offset_transform: The transform to use for the edges. Default is None, but this should
-                eventually be set to ax.transData once the artist is added to an Axes.
+            offset_transform: The transform to use as offset transform for the vertices and main
+                transform for the edges. Default is None, but this should eventually be set to
+                ax.transData once the artist is added to an Axes.
 
         """
         self.network = network
@@ -217,9 +221,22 @@ class NetworkArtist(mpl.artist.Artist):
         self.axes.autoscale_view(tight=tight)
 
     def get_layout(self):
-        layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
+        """Get the vertex layout.
+
+        Returns:
+            The vertex layout as a DataFrame.
+        """
+        layout_columns = [f"_ipx_layout_{i}" for i in range(self.get_ndim())]
         vertex_layout_df = self._ipx_internal_data["vertex_df"][layout_columns]
         return vertex_layout_df
+
+    def get_ndim(self):
+        """Get the dimensionality of the layout.
+
+        Returns:
+            The dimensionality of the layout (2 or 3).
+        """
+        return self._ipx_internal_data["ndim"]
 
     def _get_label_series(self, kind):
         # Equivalence vertex/node
@@ -244,6 +261,12 @@ class NetworkArtist(mpl.artist.Artist):
             transform=self.get_transform(),
             offset_transform=self.get_offset_transform(),
         )
+
+        if self.get_ndim() == 3:
+            vertex_collection_2d_to_3d(
+                self._vertices,
+                zs=self.get_layout().iloc[:, 2].values,
+            )
 
     def _add_edges(self):
         """Add edges to the network artist.

@@ -33,10 +33,6 @@ class NetworkXDataProvider(NetworkDataProvider):
 
         import networkx as nx
 
-        # Recast vertex_labels=False as vertex_labels=None
-        if np.isscalar(vertex_labels) and (not vertex_labels):
-            vertex_labels = None
-
         # Get layout
         vertex_df = normalise_layout(
             layout,
@@ -59,6 +55,9 @@ class NetworkXDataProvider(NetworkDataProvider):
         del tmp
 
         # Vertex labels
+        # Recast vertex_labels=False as vertex_labels=None
+        if np.isscalar(vertex_labels) and (not vertex_labels):
+            vertex_labels = None
         if vertex_labels is None:
             if "label" in vertex_df:
                 del vertex_df["label"]

@@ -196,7 +196,9 @@ class VertexCollection(PatchCollection):
     def _update_offsets_from_layout(self) -> None:
         """Update offsets in matplotlib coordinates from the layout DataFrame."""
         if self._layout_coordinate_system == "cartesian":
-            self._offsets = self._layout.values
+            # Make sure we accept 3D values and ignore the z component if present
+            # This makes life upstream a little more readable
+            self._offsets = self._layout.values[:, :2]
         elif self._layout_coordinate_system == "polar":
             # Convert polar coordinates (r, theta) to cartesian (x, y)
             r = self._layout.iloc[:, 0].values
