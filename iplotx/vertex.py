@@ -119,6 +119,16 @@ class VertexCollection(PatchCollection):
         for child in self.get_children():
             child.set_figure(fig)
 
+    @property
+    def axes(self):
+        return PatchCollection.axes.__get__(self)
+
+    @axes.setter
+    def axes(self, new_axes):
+        PatchCollection.axes.__set__(self, new_axes)
+        for child in self.get_children():
+            child.axes = new_axes
+
     def get_index(self):
         """Get the VertexCollection index."""
         return self._index

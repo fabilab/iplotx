@@ -93,6 +93,17 @@ class GroupingArtist(PatchCollection):
         self._compute_paths(self.get_figure(root=True).dpi)
         return ret
 
+    @property
+    def axes(self):
+        return PatchCollection.axes.__get__(self)
+
+    @axes.setter
+    def axes(self, new_axes):
+        PatchCollection.axes.__set__(self, new_axes)
+        for child in self.get_children():
+            child.axes = new_axes
+        self.set_figure(new_axes.figure)
+
     def get_layout(self) -> pd.DataFrame:
         """Get the layout used for this grouping."""
         return self.layout

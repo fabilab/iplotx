@@ -33,6 +33,9 @@ from .edge import (
 from .art3d.vertex import (
     vertex_collection_2d_to_3d,
 )
+from .art3d.edge import (
+    edge_collection_2d_to_3d,
+)
 
 
 @_forwarder(
@@ -156,6 +159,17 @@ class NetworkArtist(mpl.artist.Artist):
         super().set_figure(fig)
         for child in self.get_children():
             child.set_figure(fig)
+
+    @property
+    def axes(self):
+        return mpl.artist.Artist.axes.__get__(self)
+
+    @axes.setter
+    def axes(self, new_axes):
+        mpl.artist.Artist.axes.__set__(self, new_axes)
+        for child in self.get_children():
+            child.axes = new_axes
+        self.set_figure(new_axes.figure)
 
     def get_offset_transform(self):
         """Get the offset transform (for vertices/edges)."""
@@ -349,6 +363,12 @@ class NetworkArtist(mpl.artist.Artist):
         if "cmap" in edge_style:
             self._edges.set_array(colorarray)
 
+        if self.get_ndim() == 3:
+            edge_collection_2d_to_3d(
+                self._edges,
+                zs=self.get_layout().iloc[:, 2].values,
+            )
+
     @_stale_wrapper
     def draw(self, renderer):
         """Draw each of the children, with some buffering mechanism."""
@@ -363,6 +383,8 @@ class NetworkArtist(mpl.artist.Artist):
         children = list(self.get_children())
         children.sort(key=lambda x: x.zorder)
         for art in children:
+            if (self.get_ndim() == 3) and (art.axes is not None):
+                art.do_3d_projection()
             art.draw(renderer)
 
 

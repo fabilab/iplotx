@@ -140,12 +140,12 @@ def network(
             # arrows, etc. Now data limits can be computed correctly
             nwkart.set_offset_transform(ax.transData)
             ax.add_artist(nwkart)
-            nwkart.set_figure(ax.figure)
+            nwkart.axes = ax
 
         if grpart is not None:
             grpart.set_transform(ax.transData)
             ax.add_artist(grpart)
-            grpart.set_figure(ax.figure)
+            grpart.ax = ax
 
         if title is not None:
             ax.set_title(title)

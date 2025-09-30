@@ -1,5 +1,5 @@
 """
-Module containing code to manipulate vertex visualisations in 3D, especially the Vertex3DCollection class.
+Module containing code to manipulate edge visualisations in 3D, especially the Edge3DCollection class.
 """
 
 from typing import (
@@ -9,13 +9,13 @@ import numpy as np
 from matplotlib import (
     cbook,
 )
-from mpl_toolkits.mplot3d.art3d import Path3DCollection
+from mpl_toolkits.mplot3d.art3d import Patch3DCollection
 
 from ..utils.matplotlib import (
     _forwarder,
 )
-from ..vertex import (
-    VertexCollection,
+from ..edge import (
+    EdgeCollection,
 )
 
 
@@ -29,7 +29,7 @@ from ..vertex import (
         "set_picker",
     )
 )
-class Vertex3DCollection(VertexCollection, Path3DCollection):
+class Edge3DCollection(EdgeCollection, Patch3DCollection):
     """Collection of vertex patches for plotting."""
 
     def draw(self, renderer) -> None:
@@ -40,30 +40,32 @@ class Vertex3DCollection(VertexCollection, Path3DCollection):
         """
         with self._use_zordered_offset():
             with cbook._setattr_cm(self, _in_draw=True):
-                VertexCollection.draw(self, renderer)
+                EdgeCollection.draw(self, renderer)
 
 
-def vertex_collection_2d_to_3d(
-    col: VertexCollection,
+def edge_collection_2d_to_3d(
+    col: EdgeCollection,
     zs: np.ndarray | float | Sequence[float] = 0,
     zdir: str = "z",
     depthshade: bool = True,
     axlim_clip: bool = False,
 ):
-    """Convert a 2D VertexCollection to a 3D Vertex3DCollection.
+    """Convert a 2D EdgeCollection to a 3D Edge3DCollection.
 
     Parameters:
-        col: The 2D VertexCollection to convert.
+        col: The 2D EdgeCollection to convert.
         zs: The z coordinate(s) to use for the 3D vertices.
         zdir: The axis to use as the z axis (default is "z").
         depthshade: Whether to apply depth shading (default is True).
         axlim_clip: Whether to clip the vertices to the axes limits (default is False).
     """
-    if not isinstance(col, VertexCollection):
+    if not isinstance(col, EdgeCollection):
         raise TypeError("vertices must be a VertexCollection")
 
-    col.__class__ = Vertex3DCollection
+    col.__class__ = Edge3DCollection
     col._offset_zordered = None
     col._depthshade = depthshade
     col._in_draw = False
+
+    # FIXME: This should be actually fixed...
     col.set_3d_properties(zs, zdir, axlim_clip)
