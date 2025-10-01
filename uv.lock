@@ -676,7 +676,6 @@ dependencies = [
     { name = "matplotlib" },
     { name = "numpy" },
     { name = "pandas" },
-    { name = "pylint" },
 ]
 
 [package.optional-dependencies]
@@ -695,6 +694,7 @@ docs = [
     { name = "igraph" },
     { name = "myst-parser" },
     { name = "networkx" },
+    { name = "pylint" },
     { name = "scikit-bio" },
     { name = "sphinx" },
     { name = "sphinx-design" },
@@ -710,6 +710,7 @@ test = [
     { name = "mypy" },
     { name = "networkx" },
     { name = "pandas-stubs" },
+    { name = "pylint" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "scikit-bio" },
@@ -728,6 +729,7 @@ typing-test = [
     { name = "mypy" },
     { name = "networkx" },
     { name = "pandas-stubs" },
+    { name = "pylint" },
     { name = "pytest" },
     { name = "pytest-cov" },
     { name = "scikit-bio" },
@@ -743,7 +745,6 @@ requires-dist = [
     { name = "networkx", marker = "extra == 'networkx'", specifier = ">=2.0.0" },
     { name = "numpy", specifier = ">=2.0.0" },
     { name = "pandas", specifier = ">=2.0.0" },
-    { name = "pylint", specifier = ">=3.3.7" },
 ]
 provides-extras = ["igraph", "networkx"]
 
@@ -755,6 +756,7 @@ docs = [
     { name = "igraph", specifier = ">=0.11.8" },
     { name = "myst-parser", specifier = ">=4.0.1" },
     { name = "networkx", specifier = ">=3.4.2" },
+    { name = "pylint", specifier = ">=3.3.7" },
     { name = "scikit-bio", specifier = ">=0.6.3" },
     { name = "sphinx" },
     { name = "sphinx-design", specifier = ">=0.6.1" },
@@ -771,6 +773,7 @@ test = [
     { name = "networkx", specifier = ">=2.0.0,<=3.4.2" },
     { name = "networkx", specifier = ">=3.4.2" },
     { name = "pandas-stubs", specifier = ">=2.2.3.250527" },
+    { name = "pylint", specifier = ">=3.3.7" },
     { name = "pytest", specifier = ">=7.0.0" },
     { name = "pytest-cov", specifier = ">=6.2.1" },
     { name = "scikit-bio", specifier = ">=0.6.3" },
@@ -791,6 +794,7 @@ typing-test = [
     { name = "networkx", specifier = ">=2.0.0,<=3.4.2" },
     { name = "networkx", specifier = ">=3.4.2" },
     { name = "pandas-stubs", specifier = ">=2.2.3.250527" },
+    { name = "pylint", specifier = ">=3.3.7" },
     { name = "pytest", specifier = ">=7.0.0" },
     { name = "pytest-cov", specifier = ">=6.2.1" },
     { name = "scikit-bio", specifier = ">=0.6.3" },

@@ -10,6 +10,8 @@ from .label import LabelCollection
 from .edge.arrow import EdgeArrowCollection
 from .edge.leaf import LeafEdgeCollection
 from .cascades import CascadeCollection
+from .art3d.vertex import Vertex3DCollection
+from .art3d.edge import Edge3DCollection
 
 
 ___all__ = (
@@ -21,4 +23,6 @@ ___all__ = (
     LabelCollection,
     EdgeArrowCollection,
     CascadeCollection,
+    Vertex3DCollection,
+    Edge3DCollection,
 )

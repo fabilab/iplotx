@@ -2,14 +2,9 @@
 Module containing code to manipulate edge visualisations in 3D, especially the Edge3DCollection class.
 """
 
-from typing import (
-    Sequence,
+from mpl_toolkits.mplot3d.art3d import (
+    Line3DCollection,
 )
-import numpy as np
-from matplotlib import (
-    cbook,
-)
-from mpl_toolkits.mplot3d.art3d import Patch3DCollection
 
 from ..utils.matplotlib import (
     _forwarder,
@@ -29,23 +24,14 @@ from ..edge import (
         "set_picker",
     )
 )
-class Edge3DCollection(EdgeCollection, Patch3DCollection):
+class Edge3DCollection(Line3DCollection):
     """Collection of vertex patches for plotting."""
 
-    def draw(self, renderer) -> None:
-        """Draw the collection of vertices in 3D.
-
-        Parameters:
-            renderer: The renderer to use for drawing.
-        """
-        with self._use_zordered_offset():
-            with cbook._setattr_cm(self, _in_draw=True):
-                EdgeCollection.draw(self, renderer)
+    pass
 
 
 def edge_collection_2d_to_3d(
     col: EdgeCollection,
-    zs: np.ndarray | float | Sequence[float] = 0,
     zdir: str = "z",
     depthshade: bool = True,
     axlim_clip: bool = False,
@@ -62,10 +48,18 @@ def edge_collection_2d_to_3d(
     if not isinstance(col, EdgeCollection):
         raise TypeError("vertices must be a VertexCollection")
 
-    col.__class__ = Edge3DCollection
-    col._offset_zordered = None
-    col._depthshade = depthshade
-    col._in_draw = False
+    # TODO: if we make Edge3DCollection a dynamic drawer, this will need to change
+    # fundamentally. Also, this currently does not handle labels properly.
+    vinfo = col._get_adjacent_vertices_info()
 
-    # FIXME: This should be actually fixed...
-    col.set_3d_properties(zs, zdir, axlim_clip)
+    segments3d = []
+    for offset1, offset2 in vinfo["offsets"]:
+        segment = [tuple(offset1), tuple(offset2)]
+        segments3d.append(segment)
+
+    # NOTE: after this line, none of the EdgeCollection methods will work
+    # It's become a static drawer now
+    col.__class__ = Edge3DCollection
+
+    col.set_segments(segments3d)
+    col._axlim_clip = axlim_clip

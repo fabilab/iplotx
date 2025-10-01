@@ -34,6 +34,7 @@ from .art3d.vertex import (
     vertex_collection_2d_to_3d,
 )
 from .art3d.edge import (
+    Edge3DCollection,
     edge_collection_2d_to_3d,
 )
 
@@ -121,7 +122,7 @@ class NetworkArtist(mpl.artist.Artist):
     @classmethod
     def from_edgecollection(
         cls: "NetworkArtist",  # NOTE: This is fixed in Python 3.14
-        edge_collection: EdgeCollection,
+        edge_collection: EdgeCollection | Edge3DCollection,
     ) -> Self:
         """Create a NetworkArtist from iplotx artists.
 
@@ -135,7 +136,7 @@ class NetworkArtist(mpl.artist.Artist):
         vertex_collection = edge_collection._vertex_collection
         layout = vertex_collection._layout
         transform = vertex_collection.get_transform()
-        offset_transform = edge_collection.get_transform()
+        offset_transform = vertex_collection.get_offset_transform()
 
         # Follow the steps in the normal constructor
         self = cls(
@@ -144,6 +145,7 @@ class NetworkArtist(mpl.artist.Artist):
             transform=transform,
             offset_transform=offset_transform,
         )
+        # TODO: should we make copies here?
         self._vertices = vertex_collection
         self._edges = edge_collection
 
@@ -280,6 +282,7 @@ class NetworkArtist(mpl.artist.Artist):
             vertex_collection_2d_to_3d(
                 self._vertices,
                 zs=self.get_layout().iloc[:, 2].values,
+                depthshade=False,
             )
 
     def _add_edges(self):
@@ -366,7 +369,6 @@ class NetworkArtist(mpl.artist.Artist):
         if self.get_ndim() == 3:
             edge_collection_2d_to_3d(
                 self._edges,
-                zs=self.get_layout().iloc[:, 2].values,
             )
 
     @_stale_wrapper
