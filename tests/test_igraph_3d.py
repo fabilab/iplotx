@@ -38,3 +38,19 @@ def test_undirected(graph_and_layout_small):
         layout=graph_and_layout_small["layout3d"],
         ax=ax,
     )
+
+
+@image_comparison(baseline_images=["vertex_labels"], remove_text=True)
+def test_vertex_labels(graph_and_layout_small):
+    fig = plt.figure(figsize=(6, 6))
+    ax = fig.add_subplot(1, 1, 1, projection="3d")
+
+    ipx.network(
+        graph_and_layout_small["graph"],
+        layout=graph_and_layout_small["layout3d"],
+        ax=ax,
+        node_marker="s",
+        vertex_labels=True,
+        edge_zorder=2,
+        vertex_zorder=3,
+    )

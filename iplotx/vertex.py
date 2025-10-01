@@ -315,6 +315,10 @@ class VertexCollection(PatchCollection):
             transform=transform,
         )
 
+    def get_ndim(self):
+        """Get the number of dimensions of the layout."""
+        return self._layout.shape[1]
+
     def get_labels(self):
         """Get the vertex labels.
 

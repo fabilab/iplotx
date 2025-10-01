@@ -9,7 +9,10 @@ import numpy as np
 from matplotlib import (
     cbook,
 )
-from mpl_toolkits.mplot3d.art3d import Path3DCollection
+from mpl_toolkits.mplot3d.art3d import (
+    Path3DCollection,
+    text_2d_to_3d,
+)
 
 from ..utils.matplotlib import (
     _forwarder,
@@ -56,7 +59,7 @@ def vertex_collection_2d_to_3d(
         col: The 2D VertexCollection to convert.
         zs: The z coordinate(s) to use for the 3D vertices.
         zdir: The axis to use as the z axis (default is "z").
-        depthshade: Whether to apply depth shading (default is True).
+        depthshade: Whether to aply depth shading (default is True).
         axlim_clip: Whether to clip the vertices to the axes limits (default is False).
     """
     if not isinstance(col, VertexCollection):
@@ -67,3 +70,9 @@ def vertex_collection_2d_to_3d(
     col._depthshade = depthshade
     col._in_draw = False
     col.set_3d_properties(zs, zdir, axlim_clip)
+
+    # Labels if present
+    if col.get_labels() is not None:
+        for z, art in zip(zs, col.get_labels()._labelartists):
+            # zdir=None means the text is always horizontal facing the camera
+            text_2d_to_3d(art, z, zdir=None, axlim_clip=axlim_clip)

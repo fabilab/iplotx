@@ -77,6 +77,16 @@ class LabelCollection(mpl.artist.Artist):
             child.set_figure(fig)
         self._update_offsets(dpi=fig.dpi)
 
+    @property
+    def axes(self):
+        return mpl.artist.Artist.axes.__get__(self)
+
+    @axes.setter
+    def axes(self, new_axes):
+        mpl.artist.Artist.axes.__set__(self, new_axes)
+        for child in self.get_children():
+            child.axes = new_axes
+
     def set_transform(self, transform: mpl.transforms.Transform) -> None:
         """Set the transform for this artist and children.
 
