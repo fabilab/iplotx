@@ -9,11 +9,12 @@ from typing import (
     Optional,
     Any,
 )
-from math import atan2, cos, pi, sin
+from math import pi
 from collections import defaultdict
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
+from mpl_toolkits.mplot3d import Axes3D
 
 from ..typing import (
     Pair,
@@ -181,13 +182,23 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
     def set_figure(self, fig) -> None:
         super().set_figure(fig)
-        self._update_paths()
+        self._update_before_draw()
         # NOTE: This sets the correct offsets in the arrows,
         # but not the correct sizes (see below)
         self._update_children()
         for child in self.get_children():
             # NOTE: This sets the sizes with correct dpi scaling in the arrows
             child.set_figure(fig)
+
+    @property
+    def axes(self):
+        return mpl.artist.Artist.axes.__get__(self)
+
+    @axes.setter
+    def axes(self, new_axes):
+        mpl.artist.Artist.axes.__set__(self, new_axes)
+        for child in self.get_children():
+            child.axes = new_axes
 
     def _update_children(self):
         self._update_arrows()
@@ -303,7 +314,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
             "sizes": vsizes,
         }
 
-    def _update_paths(self, transform=None):
+    def _update_before_draw(self, transform=None):
         """Compute paths for the edges.
 
         Loops split the largest wedge left open by other
@@ -527,26 +538,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         if not hasattr(self, "_arrows"):
             return
 
-        transform = self.get_transform()
-        trans = transform.transform
-
-        for i, epath in enumerate(self.get_paths()):
-            # Offset the arrow to point to the end of the edge
-            self._arrows._offsets[i] = epath.vertices[-1]
-
-            # Rotate the arrow to point in the direction of the edge
-            apath = self._arrows._paths[i]
-            # NOTE: because the tip of the arrow is at (0, 0) in patch space,
-            # in theory it will rotate around that point already
-            v2 = trans(epath.vertices[-1])
-            v1 = trans(epath.vertices[-2])
-            dv = v2 - v1
-            theta = atan2(*(dv[::-1]))
-            theta_old = self._arrows._angles[i]
-            dtheta = theta - theta_old
-            mrot = np.array([[cos(dtheta), sin(dtheta)], [-sin(dtheta), cos(dtheta)]])
-            apath.vertices = apath.vertices @ mrot
-            self._arrows._angles[i] = theta
+        self._arrows._update_before_draw()
 
     @_stale_wrapper
     def draw(self, renderer):
@@ -555,12 +547,18 @@ class EdgeCollection(mpl.collections.PatchCollection):
             return
 
         # This includes the subedges if present
-        self._update_paths()
-        # This sets the arrow offsets
+        self._update_before_draw()
+
+        # Now you can draw the edges
+        super().draw(renderer)
+
+        # This sets the arrow and labels offsets
         self._update_children()
 
-        super().draw(renderer)
+        # Now you can draw arrows and labels
         for child in self.get_children():
+            if isinstance(child.axes, Axes3D) and hasattr(child, "do_3d_projection"):
+                child.do_3d_projection()
             child.draw(renderer)
 
     def get_ports(self) -> Optional[LeafProperty[Pair[Optional[str]]]]:

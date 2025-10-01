@@ -4,6 +4,7 @@ Module for edge arrows in iplotx.
 
 from typing import Never, Optional
 
+from math import atan2, cos, sin
 import numpy as np
 import matplotlib as mpl
 from matplotlib.patches import PathPatch
@@ -125,6 +126,28 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
             sizes.append(size)
 
         return patches, sizes
+
+    def _update_before_draw(self) -> None:
+        """Update the arrow paths and directions before drawing, based on the edge collection."""
+        trans = self.get_offset_transform().transform
+
+        for i, epath in enumerate(self._edge_collection.get_paths()):
+            # Offset the arrow to point to the end of the edge
+            self._offsets[i] = epath.vertices[-1]
+
+            # Rotate the arrow to point in the direction of the edge
+            apath = self._paths[i]
+            # NOTE: because the tip of the arrow is at (0, 0) in patch space,
+            # in theory it will rotate around that point already
+            v2 = trans(epath.vertices[-1])
+            v1 = trans(epath.vertices[-2])
+            dv = v2 - v1
+            theta = atan2(*(dv[::-1]))
+            theta_old = self._angles[i]
+            dtheta = theta - theta_old
+            mrot = np.array([[cos(dtheta), sin(dtheta)], [-sin(dtheta), cos(dtheta)]])
+            apath.vertices = apath.vertices @ mrot
+            self._angles[i] = theta
 
     def set_array(self, A: np.ndarray) -> Never:
         """Set the array for cmap/norm coloring, but keep the facecolors as set (usually 'none')."""
