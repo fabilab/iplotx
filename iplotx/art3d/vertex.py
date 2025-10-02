@@ -9,6 +9,7 @@ import numpy as np
 from matplotlib import (
     cbook,
 )
+from mpl_toolkits.mplot3d import Axes3D
 from mpl_toolkits.mplot3d.art3d import (
     Path3DCollection,
     text_2d_to_3d,
@@ -34,6 +35,14 @@ from ..vertex import (
 )
 class Vertex3DCollection(VertexCollection, Path3DCollection):
     """Collection of vertex patches for plotting."""
+
+    def _update_before_draw(self) -> None:
+        """Update the collection before drawing."""
+        # Set the sizes according to the current figure dpi
+        VertexCollection._update_before_draw(self)
+
+        if isinstance(self.axes, Axes3D) and hasattr(self, "do_3d_projection"):
+            self.do_3d_projection()
 
     def draw(self, renderer) -> None:
         """Draw the collection of vertices in 3D.

@@ -92,9 +92,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
     def set_figure(self, fig) -> None:
         """Set the figure for this artist and all children."""
         super().set_figure(fig)
-        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
-        for child in self.get_children():
-            child.set_figure(fig)
+        self._update_before_draw()
 
     def get_offset_transform(self):
         """Get offset transform for the edge arrows. This sets the tip of each arrow."""
@@ -129,6 +127,8 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
     def _update_before_draw(self) -> None:
         """Update the arrow paths and directions before drawing, based on the edge collection."""
+        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+
         trans = self.get_offset_transform().transform
 
         for i, epath in enumerate(self._edge_collection.get_paths()):
@@ -168,7 +168,7 @@ class EdgeArrowCollection(mpl.collections.PatchCollection):
 
     @mpl.artist.allow_rasterization
     def draw(self, renderer):
-        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+        self._update_before_draw()
         super().draw(renderer)
 
 

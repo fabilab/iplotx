@@ -14,7 +14,6 @@ from collections import defaultdict
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
 
 from ..typing import (
     Pair,
@@ -185,7 +184,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         self._update_before_draw()
         # NOTE: This sets the correct offsets in the arrows,
         # but not the correct sizes (see below)
-        self._update_children()
+        self._update_labels()
         for child in self.get_children():
             # NOTE: This sets the sizes with correct dpi scaling in the arrows
             child.set_figure(fig)
@@ -199,10 +198,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
         mpl.artist.Artist.axes.__set__(self, new_axes)
         for child in self.get_children():
             child.axes = new_axes
-
-    def _update_children(self):
-        self._update_arrows()
-        self._update_labels()
 
     def set_transform(self, transform: mpl.transforms.Transform) -> None:
         """Set the transform for the edges and their children."""
@@ -523,23 +518,6 @@ class EdgeCollection(mpl.collections.PatchCollection):
         if not style.get("rotate", True):
             self._label_collection.set_rotations(rotations)
 
-    def _update_arrows(
-        self,
-    ) -> None:
-        """Extract the start and/or end angles of the paths to compute arrows.
-
-        Parameters:
-            which: Which end of the edge to put an arrow on. Currently only "end" is accepted.
-
-        NOTE: This function does *not* update the arrow sizes/_transforms to the correct dpi
-        scaling. That's ok since the correct dpi scaling is set whenever there is a different
-        figure (before first draw) and whenever a draw is called.
-        """
-        if not hasattr(self, "_arrows"):
-            return
-
-        self._arrows._update_before_draw()
-
     @_stale_wrapper
     def draw(self, renderer):
         # Visibility affects the children too
@@ -552,13 +530,11 @@ class EdgeCollection(mpl.collections.PatchCollection):
         # Now you can draw the edges
         super().draw(renderer)
 
-        # This sets the arrow and labels offsets
-        self._update_children()
+        # This sets the labels offsets
+        self._update_labels()
 
         # Now you can draw arrows and labels
         for child in self.get_children():
-            if isinstance(child.axes, Axes3D) and hasattr(child, "do_3d_projection"):
-                child.do_3d_projection()
             child.draw(renderer)
 
     def get_ports(self) -> Optional[LeafProperty[Pair[Optional[str]]]]:

@@ -365,6 +365,10 @@ class VertexCollection(PatchCollection):
         rotations = np.arctan2(doffsets_fig[:, 1], doffsets_fig[:, 0])
         self.get_labels().set_rotations(rotations)
 
+    def _update_before_draw(self) -> None:
+        """Update the collection before drawing."""
+        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+
     @mpl.artist.allow_rasterization
     def draw(self, renderer):
         if not self.get_visible():
@@ -375,7 +379,8 @@ class VertexCollection(PatchCollection):
         if len(self.get_paths()) == 0:
             return
 
-        self.set_sizes(self._sizes, self.get_figure(root=True).dpi)
+        self._update_before_draw()
+        super().draw(renderer)
 
         # Set the label rotations already, hopefully this is not too early
         self._update_children()
@@ -383,7 +388,6 @@ class VertexCollection(PatchCollection):
         # NOTE: This draws the vertices first, then the labels.
         # The correct order would be vertex1->label1->vertex2->label2, etc.
         # We might fix if we manage to find a way to do it.
-        super().draw(renderer)
         for child in self.get_children():
             child.draw(renderer)
 

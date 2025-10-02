@@ -44,7 +44,6 @@ class Edge3DCollection(Line3DCollection):
     def set_figure(self, fig) -> None:
         super().set_figure(fig)
         for child in self.get_children():
-            # NOTE: This sets the sizes with correct dpi scaling in the arrows
             child.set_figure(fig)
 
     @property
@@ -57,21 +56,37 @@ class Edge3DCollection(Line3DCollection):
         for child in self.get_children():
             child.axes = new_axes
 
+    def _update_before_draw(self) -> None:
+        """Update the collection before drawing."""
+        if isinstance(self.axes, Axes3D) and hasattr(self, "do_3d_projection"):
+            self.do_3d_projection()
+
+        # TODO: Here's where we would shorten the edges to fit the vertex
+        # projections from 3D onto 2D, if we wanted to do that. Because edges
+        # in 3D are chains of segments rathen than splines, the shortening
+        # needs to be done in a different way to how it's done in 2D.
+
     def draw(self, renderer) -> None:
         """Draw the collection of vertices in 3D.
 
         Parameters:
             renderer: The renderer to use for drawing.
         """
-        # Render the Line3DCollection first
+        # Prepare the collection for drawing
+        self._update_before_draw()
+
+        # Render the Line3DCollection
+        # NOTE: we are NOT calling EdgeCollection.draw here
         super().draw(renderer)
 
-        # Now attempt to draw the children
+        # This sets the labels offsets
+        # TODO: implement labels in 3D (one could copy the function from 2D,
+        # but would also need to promote the 2D labels into 3D labels similarly to
+        # how it's done for 3D vertices).
+        # self._update_labels()
+
+        # Now attempt to draw the arrows
         for child in self.get_children():
-            if isinstance(child.axes, Axes3D) and hasattr(child, "do_3d_projection"):
-                child.do_3d_projection()
-            if hasattr(child, "_update_before_draw"):
-                child._update_before_draw()
             child.draw(renderer)
 
 
@@ -111,7 +126,7 @@ def edge_collection_2d_to_3d(
     # Convert the arrow collection if present
     if hasattr(col, "_arrows"):
         # Fix the x and y to the center of the target vertex (for now)
-        col._arrows._offsets[:] = [segment[0][:2] for segment in segments3d]
+        col._arrows._offsets[:] = [segment[-1][:2] for segment in segments3d]
         zs = [segment[-1][2] for segment in segments3d]
         arrow_collection_2d_to_3d(
             col._arrows,

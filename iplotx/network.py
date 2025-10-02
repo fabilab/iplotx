@@ -6,7 +6,6 @@ from typing import (
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
-from mpl_toolkits.mplot3d import Axes3D
 
 from .typing import (
     GraphType,
@@ -386,8 +385,6 @@ class NetworkArtist(mpl.artist.Artist):
         children = list(self.get_children())
         children.sort(key=lambda x: x.zorder)
         for child in children:
-            if isinstance(child.axes, Axes3D) and hasattr(child, "do_3d_projection"):
-                child.do_3d_projection()
             child.draw(renderer)
 
 
