@@ -65,7 +65,7 @@ class GroupingArtist(PatchCollection):
         self._points_per_curve = points_per_curve
 
         network = kwargs.pop("network", None)
-        self.layout = normalise_layout(layout, network=network)
+        self.layout = layout = normalise_layout(layout, network=network)
         self.ndim = layout.shape[1]
 
         patches, grouping, coords_hulls = self._create_patches(
