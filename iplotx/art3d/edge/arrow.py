@@ -15,10 +15,10 @@ from mpl_toolkits.mplot3d.art3d import (
     Path3DCollection,
 )
 
-from ..utils.matplotlib import (
+from ...utils.matplotlib import (
     _forwarder,
 )
-from ..edge.arrow import (
+from ...edge.arrow import (
     EdgeArrowCollection,
 )
 

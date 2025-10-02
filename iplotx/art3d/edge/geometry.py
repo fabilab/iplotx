@@ -7,19 +7,14 @@ from typing import (
     Sequence,
 )
 import numpy as np
-import matplotlib as mpl
 
-from ..typing import (
+from ...typing import (
     Pair,
 )
 
 
-def _compute_edge_path_straight(
+def _compute_edge_segments_straight(
     vcoord_data,
-    vpath_fig,
-    vsize_fig,
-    trans,
-    trans_inv,
     layout_coordinate_system: str = "cartesian",
     shrink: float = 0,
     **kwargs,
@@ -45,37 +40,11 @@ def _compute_edge_path_straight(
             f"Layout coordinate system not supported for straight edges in 3D: {layout_coordinate_system}.",
         )
 
-    vcoord_data_cart = vcoord_data
-
-    # Coordinates in figure (default) coords
-    vcoord_fig = trans(vcoord_data_cart)
-
-    points = []
-
-    # Angles of the straight line
-    # FIXME: In 2D, this is only used to make space for loops
-    # let's ignore for now
-    # theta = atan2(*((vcoord_fig[1] - vcoord_fig[0])[::-1]))
-    theta = 0
-
-    # TODO: Shorten at starting vertex (?)
-    vs = vcoord_fig[0]
-    points.append(vs)
-
-    # TODO: Shorten at end vertex (?)
-    ve = vcoord_fig[1]
-    points.append(ve)
-
-    codes = ["MOVETO", "LINETO"]
-    path = mpl.path.Path(
-        points,
-        codes=[getattr(mpl.path.Path, x) for x in codes],
-    )
-    path.vertices = trans_inv(path.vertices)
-    return path, (theta, theta + np.pi)
+    segments = [vcoord_data[0], vcoord_data[1]]
+    return segments
 
 
-def _compute_edge_path_3d(
+def _compute_edge_segments(
     *args,
     tension: float = 0,
     waypoints: str | tuple[float, float] | Sequence[tuple[float, float]] | np.ndarray = "none",
@@ -98,7 +67,7 @@ def _compute_edge_path_3d(
         # )
 
     if np.isscalar(tension) and (tension == 0):
-        return _compute_edge_path_straight(
+        return _compute_edge_segments_straight(
             *args,
             layout_coordinate_system=layout_coordinate_system,
             **kwargs,

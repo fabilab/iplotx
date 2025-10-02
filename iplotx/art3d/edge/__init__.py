@@ -7,14 +7,17 @@ from mpl_toolkits.mplot3d.art3d import (
     Line3DCollection,
 )
 
-from ..utils.matplotlib import (
+from ...utils.matplotlib import (
     _forwarder,
 )
-from ..edge import (
+from ...edge import (
     EdgeCollection,
 )
 from .arrow import (
     arrow_collection_2d_to_3d,
+)
+from .geometry import (
+    _compute_edge_segments as _compute_single_edge_segments,
 )
 
 
@@ -55,6 +58,20 @@ class Edge3DCollection(Line3DCollection):
         Line3DCollection.axes.__set__(self, new_axes)
         for child in self.get_children():
             child.axes = new_axes
+
+    _get_adjacent_vertices_info = EdgeCollection._get_adjacent_vertices_info
+
+    def _compute_edge_segments(self):
+        """Compute the edge segments for all edges."""
+        vinfo = self._get_adjacent_vertices_info()
+
+        segments3d = []
+        for vcoord_data in vinfo["offsets"]:
+            segment = _compute_single_edge_segments(
+                vcoord_data,
+            )
+            segments3d.append(segment)
+        self.set_segments(segments3d)
 
     def _update_before_draw(self) -> None:
         """Update the collection before drawing."""
@@ -107,24 +124,17 @@ def edge_collection_2d_to_3d(
     if not isinstance(col, EdgeCollection):
         raise TypeError("vertices must be a VertexCollection")
 
-    # TODO: if we make Edge3DCollection a dynamic drawer, this will need to change
-    # fundamentally. Also, this currently does not handle labels properly.
-    vinfo = col._get_adjacent_vertices_info()
-
-    segments3d = []
-    for offset1, offset2 in vinfo["offsets"]:
-        segment = [tuple(offset1), tuple(offset2)]
-        segments3d.append(segment)
-
     # NOTE: after this line, none of the EdgeCollection methods will work
-    # It's become a static drawer now
+    # It's become a static drawer now. It uses segments instead of paths.
     col.__class__ = Edge3DCollection
+    col._compute_edge_segments()
 
-    col.set_segments(segments3d)
     col._axlim_clip = axlim_clip
 
     # Convert the arrow collection if present
     if hasattr(col, "_arrows"):
+        segments3d = col._segments3d
+
         # Fix the x and y to the center of the target vertex (for now)
         col._arrows._offsets[:] = [segment[-1][:2] for segment in segments3d]
         zs = [segment[-1][2] for segment in segments3d]

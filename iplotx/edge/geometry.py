@@ -1,7 +1,7 @@
 """
 Support module with geometry- and path-related functions for edges.
 
-3D geometry is in its separate module :mod:`.geometry3d`.
+3D geometry is in a separate module.
 """
 
 from typing import (
@@ -16,7 +16,6 @@ from ..typing import (
     Pair,
 )
 from .ports import _get_port_unit_vector
-from .geometry3d import _compute_edge_path_3d
 
 
 def _compute_loops_per_angle(nloops, angles):
@@ -71,10 +70,10 @@ def _get_shorter_edge_coords(vpath, vsize, theta, shrink=0):
     """Get the coordinates of an edge tip such that it touches the vertex border.
 
     Parameters:
-        vpath: The vertex path, in figure coordinates (so scaled by dpi).
-        vsize: The vertex max size, in figure coordinates (so scaled by dpi).
-        theta: The angle of the edge inpinging into the vertex, in radians, in figure coordinates.
-        shrink: Additional shrinking of the edge, in figure coordinates (so scaled by dpi).
+        vpath: the vertex path, in figure coordinates (so scaled by dpi).
+        vsize: the vertex max size, in figure coordinates (so scaled by dpi).
+        theta: the angle of the edge inpinging into the vertex, in radians, in figure coordinates.
+        shrink: additional shrinking of the edge, in figure coordinates (so scaled by dpi).
     """
     # Bound theta from -pi to pi (why is that not guaranteed?)
     theta = (theta + pi) % (2 * pi) - pi
@@ -479,7 +478,7 @@ def _compute_edge_path_curved(
     return path, tuple(thetas)
 
 
-def _compute_edge_path_2d(
+def _compute_edge_path(
     *args,
     tension: float = 0,
     waypoints: str | tuple[float, float] | Sequence[tuple[float, float]] | np.ndarray = "none",
@@ -513,25 +512,3 @@ def _compute_edge_path_2d(
         ports=ports,
         **kwargs,
     )
-
-
-def _compute_edge_path(
-    vcoord_data,
-    *args,
-    **kwargs,
-):
-    """Compute the edge path in either 2D or 3D.
-
-    Parameters:
-        vcoord_data: The vertex coordinates in data coordinates. This is used to
-            determine the dimensionality of the layout.
-        *args: Additional arguments passed to the internal functions.
-        **kwargs: Additional keyword arguments passed to the internal functions.
-
-    Returns:
-        The computed edge path and the angles at the start and end of the edge.
-    """
-    ndim = len(vcoord_data[0])
-    if ndim == 2:
-        return _compute_edge_path_2d(vcoord_data, *args, **kwargs)
-    return _compute_edge_path_3d(vcoord_data, *args, **kwargs)
