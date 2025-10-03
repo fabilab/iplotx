@@ -63,6 +63,11 @@ plt.gca().set_aspect(1.0)
 #
 # This can also be achieved with two separate calls, the first one to draw the network and the second to draw the grouping.
 
+import igraph as ig
+import matplotlib.pyplot as plt
+import iplotx as ipx
+
+g = ig.Graph.Ring(8)
 layout = g.layout("circle")
 fig, ax = plt.subplots(figsize=(5, 5))
 ipx.network(

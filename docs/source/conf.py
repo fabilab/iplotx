@@ -67,8 +67,28 @@ exclude_patterns = []
 # -- Options for HTML output -------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#options-for-html-output
 
-html_theme = "sphinx_rtd_theme"
+html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
+html_js_files = [
+    ("custom-icons.js", {"defer": "defer"}),
+]
+
+html_theme_options = {
+    "header_links_before_dropdown": 4,
+    "icon_links": [
+        {
+            "name": "GitHub",
+            "url": "https://github.com/fabilab/iplotx",
+            "icon": "fa-brands fa-github",
+            "type": "fontawesome",
+        },
+        {
+            "name": "PyPI",
+            "url": "https://pypi.org/project/iplotx",
+            "icon": "fa-custom fa-pypi",
+        },
+    ],
+}
 
 # -----------------------------------------------------------------------------
 # Source code links (credit to the matplotlib project for this part)

@@ -51,7 +51,7 @@ A straightforward `NetworkDataProvider` implementation for this network data str
     )
 ```
 
-See <project:gallery/plot_simpledataprovider.md> for the full gallery example including vertex labels and styling.
+See <project:gallery/zero_dependencies/plot_simpledataprovider.md> for the full gallery example including vertex labels and styling.
 
 ```{tip}
   This example also shows how to use `iplotx` without installing any network analysis

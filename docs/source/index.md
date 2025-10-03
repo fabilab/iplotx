@@ -1,6 +1,6 @@
 # iplotx documentation
 
-`iplotx` is a Python library to display graphs, networks and trees using `matplotlib` as a backend. It supports multiple network analysis libraries including `networkx` and `igraph` for networks and `biopython`, `scikit-bio`, `cogent3`, and `ete4` for trees.
+[iplotx](https://github.com/fabilab/iplotx) is a Python library to display graphs/networks and trees with [matplotlib](https://matplotlib.org/). It natively supports [networkx](https://networkx.org/) and [igraph](https://python.igraph.org/) networks and [biopython](https://biopython.org/), [scikit-bio](https://scikit.bio/), [cogent3](https://cogent3.org/), and [ETE4](https://etetoolkit.github.io/ete/) trees.
 
 `iplotx` guarantees the **exact same visual appearance** independently of what library you used to construct the network/tree.
 
@@ -54,12 +54,6 @@ Either way, the result is the same:
 See <project:gallery/index.rst> for examples of plots made with `iplotx`. Feel free to suggest new examples on GitHub by opening a new issue or pull request!
 
 ## Features
-```{important}
-    If you are the maintainer of a network/graph/tree analysis library and would like
-    to propose improvements or see support for it, please reach out with an issue/PR
-    on GitHub!
-```
-
 `iplotx`'s features' include:
 - per-edge and per-vertex styling using sequences or dictionaries
 - labels
@@ -77,12 +71,13 @@ See <project:gallery/index.rst> for examples of plots made with `iplotx`. Feel f
 - correct HiDPI scaling (e.g. retina screens) including for vertex sizes, arrow sizes, and edge offsets
 - a consistent `matplotlib` artist hierarchy
 - post-plot editability (e.g. for animations)
-- plays well with other charting tools (e.g. `seaborn`)
+- interoperability with other charting tools (e.g. `seaborn`)
 - chainable style contexts
 - vertex clusterings and covers with convex hulls and rounding
-- a plugin mechanism for additional libraries (WIP)
-- animations (see <project:gallery/plot_animation.rst>)
-- mouse/keyboard interaction and events (e.g. hover, click, see <project:gallery/plot_mouse_hover.rst>)
+- a plugin mechanism for additional libraries
+- animations (see <project:gallery/other/plot_animation.rst>)
+- 3D visualisations
+- mouse/keyboard interaction and events (e.g. hover, click, see <project:gallery/other/plot_mouse_hover.rst>)
 - ... and probably more by the time you read this.
 
 ## Styles
@@ -110,17 +105,25 @@ See <project:api.md> for reference documentation of all functions and classes in
 ## Rationale
 We believe graph **analysis**, graph **layouting**, and graph **visualisation** to be three separate tasks. `iplotx` currently focuses on visualisation. It can also compute simple tree layouts and might expand towards network layouts in the future.
 
+## Contributing
+Open an [issue on GitHub](https://github.com/fabilab/iplotx/issues) to request features, report bugs, or show intention in contributing. Pull requests are very welcome.
+
+```{important}
+  If you are the maintainer of a network/graph/tree analysis library and would like
+  to propose improvements or see support for it, please reach out with an issue/PR
+  on GitHub!
+```
+
+## Sitemap
 ```{toctree}
 :maxdepth: 2
 :caption: Contents
 
 gallery/index
 style
-Data providers <providers>
 API <api>
-Plotting API <api/plotting>
-Styling API <api/style>
 Complete style specification <api/complete_style_specification>
+Data providers <providers>
 Artist hierarchy <api/artists>
 Data provider protocols <api/providers>
 ```
