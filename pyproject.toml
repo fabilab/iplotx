@@ -21,7 +21,7 @@ dependencies = [
 ]
 license = {text = "MIT"}
 license-files = ["LICEN[CS]E.*"]
-keywords = ["network", "graph", "visualisation", "plotting"]
+keywords = ["network", "graph", "visualisation", "plotting", "tree", "phylogeny"]
 classifiers = [
   "Development Status :: 5 - Production/Stable",
   "Programming Language :: Python :: 3",
@@ -37,6 +37,7 @@ classifiers = [
   "Topic :: Scientific/Engineering :: Visualization",
   "Topic :: System :: Networking",
   "Typing :: Typed",
+  "Framework :: Matplotlib",
   ]
 
 [project.optional-dependencies]
