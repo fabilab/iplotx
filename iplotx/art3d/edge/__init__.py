@@ -21,6 +21,7 @@ from ...utils.matplotlib import (
     _forwarder,
     _proj_transform_vectors,
     _zalpha,
+    _get_data_scale,
 )
 from ...edge import (
     EdgeCollection,
@@ -110,7 +111,9 @@ class Edge3DCollection(Line3DCollection):
         LineCollection.set_segments(self, segments_2d)
 
         # Use the average projected z value of each line for depthshade
-        self._vzs = xyzs[..., 2].mean(axis=1)
+        xyzs_mean = xyzs.mean(axis=1)
+        self._data_scale = _get_data_scale(*(xyzs_mean.T))
+        self._vzs = xyzs_mean[..., 2]
 
         # FIXME
         if len(xyzs) > 0:
@@ -125,22 +128,70 @@ class Edge3DCollection(Line3DCollection):
                 color_array,
                 self._vzs,
                 min_alpha=self._depthshade_minalpha,
+                _data_scale=self._data_scale,
             )
             if self._vzs is not None and self._depthshade
             else color_array
         )
         return mcolors.to_rgba_array(color_array, self._alpha)
 
+    def set_edgecolor(self, color):
+        """Set the edge color of the collection."""
+        self._edgecolors = mcolors.to_rgba_array(color, self._alpha)
+        self._edgecolors_noshade = self._edgecolors.copy()
+
     def get_edgecolor(self):
+        """Set the edge color of the collection, including depth shading."""
         # We need this check here to make sure we do not double-apply the depth
         # based alpha shading when the edge color is "face" which means the
         # edge colour should be identical to the face colour.
-        return self._maybe_depth_shade_and_sort_colors(super().get_edgecolor())
+        if not hasattr(self, "_edgecolors_noshade"):
+            self._edgecolors_noshade = self._edgecolors.copy()
+        return self._maybe_depth_shade_and_sort_colors(self._edgecolors_noshade)
+
+    set_edgecolors = set_edgecolor
+    get_edgecolors = get_edgecolor
+
+    def get_depthshade(self):
+        """Get whether depth shading is performed on collection members."""
+        return self._depthshade
+
+    def get_depthshade_minalpha(self):
+        """The minimum alpha value used by depth-shading."""
+        return self._depthshade_minalpha
+
+    def set_depthshade(
+        self,
+        depthshade,
+        depthshade_minalpha=0.1,
+    ):
+        """
+        Set whether depth shading is performed on collection members.
+
+        Parameters
+        ----------
+        depthshade : bool
+            Whether to shade the patches in order to give the appearance of
+            depth.
+        depthshade_minalpha : float
+            Sets the minimum alpha value used by depth-shading.
+
+            .. versionadded:: 3.11
+        """
+        self._depthshade = depthshade
+        self._depthshade_minalpha = depthshade_minalpha
+        self.stale = True
 
     def _update_before_draw(self) -> None:
         """Update the collection before drawing."""
         if isinstance(self.axes, Axes3D) and hasattr(self, "do_3d_projection"):
             self.do_3d_projection()
+
+        if not hasattr(self, "_edgecolors_noshade"):
+            self._edgecolors_noshade = self._edgecolors.copy()
+        self._edgecolors = self._maybe_depth_shade_and_sort_colors(
+            self._edgecolors_noshade,
+        )
 
         # TODO: Here's where we would shorten the edges to fit the vertex
         # projections from 3D onto 2D, if we wanted to do that. Because edges
