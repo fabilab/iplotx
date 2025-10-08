@@ -37,6 +37,8 @@
         "edgecolor": str | Any,  # Color of the vertex edge (e.g. 'black', '#000000')
         "alpha": float,  # Opacity of the vertex (0.0 for fully transparent, 1.0 for fully opaque)
 
+        "depthshade": bool,  # Whether to shade the color based on depth (3D only)
+
         # Vertex label style
         "label": {
             "color": str | Any,  # Color of the vertex label (e.g. 'white', '#FFFFFF')
@@ -91,10 +93,12 @@
         # onto what color.
         "norm": tuple[float, float] | matplotlib.colors.Normalize,
 
-        # Opacity of the vertex (0.0 for fully transparent, 1.0 for fully opaque).
+        # Opacity of the edge (0.0 for fully transparent, 1.0 for fully opaque).
         # If a colormap is used and this option is also set, this opacity takes
         # priority and finally determines the transparency of the edges.
         "alpha": float,
+
+        "depthshade": bool,  # Whether to shade the color based on depth (3D only)
 
         "curved": bool,  # Whether the edge is curved (True) or straight (False)
 
@@ -189,7 +193,7 @@
             # unintuitive and interpret it the other way around, so think carefully.
             "rotate": bool,
 
-            "color": str | Any,  # Color of the vertex label (e.g. 'white', '#FFFFFF')
+            "color": str | Any,  # Color of the edge label (e.g. 'white', '#FFFFFF')
             "horizontalalignment": str,  # Horizontal alignment of the label ('left', 'center', 'right')
             "verticalalignment": str,  # Vertical alignment of the label ('top', 'center', 'bottom', 'baseline', 'center_baseline')
             "hpadding": float,  # Horizontal padding around the label
