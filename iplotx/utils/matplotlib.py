@@ -4,6 +4,7 @@ from math import atan2
 import numpy as np
 import pandas as pd
 import matplotlib as mpl
+import matplotlib.colors as mcolors
 
 from .geometry import (
     _evaluate_squared_bezier,
@@ -204,3 +205,57 @@ def _build_cmap_fun(
         norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
 
     return lambda x: cmap(norm(x))
+
+
+# NOTE: this is polyfill from future matplotlib versions
+# LICENSED UNDER THE MPL LICENSE from:
+# https://github.com/matplotlib/matplotlib/blob/main/lib/mpl_toolkits/mplot3d/proj3d.py
+def _proj_transform_vectors(vecs, M):
+    """
+    Vectorized version of ``_proj_transform_vec``.
+
+    Parameters
+    ----------
+    vecs : ... x 3 np.ndarray
+        Input vectors
+    M : 4 x 4 np.ndarray
+        Projection matrix
+    """
+    vecs_shape = vecs.shape
+    vecs = vecs.reshape(-1, 3).T
+
+    vecs_pad = np.empty((vecs.shape[0] + 1,) + vecs.shape[1:])
+    vecs_pad[:-1] = vecs
+    vecs_pad[-1] = 1
+    product = np.dot(M, vecs_pad)
+    tvecs = product[:3] / product[3]
+
+    return tvecs.T.reshape(vecs_shape)
+
+
+def _zalpha(
+    colors,
+    zs,
+    min_alpha=0.3,
+    _data_scale=None,
+):
+    """Modify the alpha values of the color list according to z-depth."""
+
+    if len(colors) == 0 or len(zs) == 0:
+        return np.zeros((0, 4))
+
+    # Alpha values beyond the range 0-1 inclusive make no sense, so clip them
+    min_alpha = np.clip(min_alpha, 0, 1)
+
+    if _data_scale is None or _data_scale == 0:
+        # Don't scale the alpha values since we have no valid data scale for reference
+        sats = np.ones_like(zs)
+
+    else:
+        # Deeper points have an increasingly transparent appearance
+        sats = np.clip(1 - (zs - np.min(zs)) / _data_scale, min_alpha, 1)
+
+    rgba = np.broadcast_to(mcolors.to_rgba_array(colors), (len(zs), 4))
+
+    # Change the alpha values of the colors using the generated alpha multipliers
+    return np.column_stack([rgba[:, :3], rgba[:, 3] * sats])

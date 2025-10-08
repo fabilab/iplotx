@@ -705,6 +705,7 @@ def make_stub_patch(**kwargs):
         "norm",
         "split",
         "shrink",
+        "depthshade",
         # DEPRECATED
         "padding",
     ]

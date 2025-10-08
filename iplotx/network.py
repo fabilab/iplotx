@@ -279,10 +279,11 @@ class NetworkArtist(mpl.artist.Artist):
         )
 
         if self.get_ndim() == 3:
+            depthshade = get_style(".vertex").get("depthshade", True)
             vertex_collection_2d_to_3d(
                 self._vertices,
                 zs=self.get_layout().iloc[:, 2].values,
-                depthshade=False,
+                depthshade=depthshade,
             )
 
     def _add_edges(self):
@@ -367,8 +368,10 @@ class NetworkArtist(mpl.artist.Artist):
             self._edges.set_array(colorarray)
 
         if self.get_ndim() == 3:
+            depthshade = get_style(".edge").get("depthshade", True)
             edge_collection_2d_to_3d(
                 self._edges,
+                depthshade=depthshade,
             )
 
     @_stale_wrapper

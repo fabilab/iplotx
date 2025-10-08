@@ -2,13 +2,25 @@
 Module containing code to manipulate edge visualisations in 3D, especially the Edge3DCollection class.
 """
 
-from mpl_toolkits.mplot3d import Axes3D
+import numpy as np
+from matplotlib import (
+    colors as mcolors,
+)
+from matplotlib.collections import (
+    LineCollection,
+)
+from mpl_toolkits.mplot3d import (
+    Axes3D,
+)
 from mpl_toolkits.mplot3d.art3d import (
     Line3DCollection,
+    _viewlim_mask,
 )
 
 from ...utils.matplotlib import (
     _forwarder,
+    _proj_transform_vectors,
+    _zalpha,
 )
 from ...edge import (
     EdgeCollection,
@@ -73,6 +85,58 @@ class Edge3DCollection(Line3DCollection):
             segments3d.append(segment)
         self.set_segments(segments3d)
 
+    def do_3d_projection(self):
+        """
+        Project the points according to renderer matrix.
+        """
+        segments = np.asanyarray(self._segments3d)
+
+        mask = False
+        if np.ma.isMA(segments):
+            mask = segments.mask
+
+        if self._axlim_clip:
+            viewlim_mask = _viewlim_mask(
+                segments[..., 0], segments[..., 1], segments[..., 2], self.axes
+            )
+            if np.any(viewlim_mask):
+                # broadcast mask to 3D
+                viewlim_mask = np.broadcast_to(
+                    viewlim_mask[..., np.newaxis], (*viewlim_mask.shape, 3)
+                )
+                mask = mask | viewlim_mask
+        xyzs = np.ma.array(_proj_transform_vectors(segments, self.axes.M), mask=mask)
+        segments_2d = xyzs[..., 0:2]
+        LineCollection.set_segments(self, segments_2d)
+
+        # Use the average projected z value of each line for depthshade
+        self._vzs = xyzs[..., 2].mean(axis=1)
+
+        # FIXME
+        if len(xyzs) > 0:
+            minz = min(xyzs[..., 2].min(), 1e9)
+        else:
+            minz = np.nan
+        return minz
+
+    def _maybe_depth_shade_and_sort_colors(self, color_array):
+        color_array = (
+            _zalpha(
+                color_array,
+                self._vzs,
+                min_alpha=self._depthshade_minalpha,
+            )
+            if self._vzs is not None and self._depthshade
+            else color_array
+        )
+        return mcolors.to_rgba_array(color_array, self._alpha)
+
+    def get_edgecolor(self):
+        # We need this check here to make sure we do not double-apply the depth
+        # based alpha shading when the edge color is "face" which means the
+        # edge colour should be identical to the face colour.
+        return self._maybe_depth_shade_and_sort_colors(super().get_edgecolor())
+
     def _update_before_draw(self) -> None:
         """Update the collection before drawing."""
         if isinstance(self.axes, Axes3D) and hasattr(self, "do_3d_projection"):
@@ -111,6 +175,7 @@ def edge_collection_2d_to_3d(
     col: EdgeCollection,
     zdir: str = "z",
     axlim_clip: bool = False,
+    depthshade: bool = True,
 ):
     """Convert a 2D EdgeCollection to a 3D Edge3DCollection.
 
@@ -127,6 +192,9 @@ def edge_collection_2d_to_3d(
     # NOTE: after this line, none of the EdgeCollection methods will work
     # It's become a static drawer now. It uses segments instead of paths.
     col.__class__ = Edge3DCollection
+    col._depthshade = depthshade
+    col._depthshade_minalpha = 0.1
+
     col._compute_edge_segments()
 
     col._axlim_clip = axlim_clip
