@@ -519,6 +519,18 @@ wheels = [
 ]
 
 [[package]]
+name = "dendropy"
+version = "5.0.8"
+source = { registry = "https://pypi.org/simple" }
+dependencies = [
+    { name = "setuptools" },
+]
+sdist = { url = "https://files.pythonhosted.org/packages/76/e4/ea83865a284c81e58d55936578dbfaa012afd7a791a75e1105c46e928f1d/DendroPy-5.0.8.tar.gz", hash = "sha256:1aa901399dc588d56f155930992dd03549f5d8e617ae09a65686bbda98b6ace3", size = 398493, upload-time = "2025-06-04T01:44:28.767Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/29/3d/d93dfd44e8615b39fab0b939bc7d8030021c092bffb3cc3c50580e75fc8f/DendroPy-5.0.8-py3-none-any.whl", hash = "sha256:6fa3fe71c67cf71d262cf33f12395735de9cd439852d0bd2d229c19df89a2992", size = 465072, upload-time = "2025-06-04T01:44:27.069Z" },
+]
+
+[[package]]
 name = "dill"
 version = "0.4.0"
 source = { registry = "https://pypi.org/simple" }
@@ -715,6 +727,7 @@ networkx = [
 docs = [
     { name = "biopython" },
     { name = "cogent3" },
+    { name = "dendropy" },
     { name = "ete4" },
     { name = "igraph" },
     { name = "myst-parser" },
@@ -729,6 +742,7 @@ docs = [
 test = [
     { name = "biopython" },
     { name = "cogent3" },
+    { name = "dendropy" },
     { name = "ete4" },
     { name = "flake8" },
     { name = "igraph" },
@@ -748,6 +762,7 @@ typing = [
 typing-test = [
     { name = "biopython" },
     { name = "cogent3" },
+    { name = "dendropy" },
     { name = "ete4" },
     { name = "flake8" },
     { name = "igraph" },
@@ -777,6 +792,7 @@ provides-extras = ["igraph", "networkx"]
 docs = [
     { name = "biopython", specifier = ">=1.85" },
     { name = "cogent3", specifier = ">=2025.9.8a2" },
+    { name = "dendropy", specifier = ">=5.0.8" },
     { name = "ete4", specifier = ">=4.3.0" },
     { name = "igraph", specifier = ">=0.11.8" },
     { name = "myst-parser", specifier = ">=4.0.1" },
@@ -791,6 +807,7 @@ docs = [
 test = [
     { name = "biopython", specifier = ">=1.85" },
     { name = "cogent3", specifier = ">=2025.9.8a2" },
+    { name = "dendropy", specifier = ">=5.0.8" },
     { name = "ete4", specifier = ">=4.3.0" },
     { name = "flake8", specifier = ">=3.9.0" },
     { name = "igraph", specifier = ">=0.11.8" },
@@ -811,6 +828,7 @@ typing = [
 typing-test = [
     { name = "biopython", specifier = ">=1.85" },
     { name = "cogent3", specifier = ">=2025.9.8a2" },
+    { name = "dendropy", specifier = ">=5.0.8" },
     { name = "ete4", specifier = ">=4.3.0" },
     { name = "flake8", specifier = ">=3.9.0" },
     { name = "igraph", specifier = ">=0.11.8" },
@@ -1821,6 +1839,15 @@ source = { registry = "https://pypi.org/simple" }
 sdist = { url = "https://files.pythonhosted.org/packages/cf/16/f83a00cb3252d7e3f5b913b9a03afdb299b0d43a1bb4f1e6b7e13ff1312e/scitrack-2024.10.8.tar.gz", hash = "sha256:2694a67212c075006324ef1371291868500a21cbe8e6c92402f0b2ac1a7bc7e0", size = 7308, upload-time = "2024-10-07T23:58:47.158Z" }
 wheels = [
     { url = "https://files.pythonhosted.org/packages/b4/dc/454a7c2896ea5e70442cdb314b5603fc48a507bb5d480a4763815a3622b4/scitrack-2024.10.8-py3-none-any.whl", hash = "sha256:1cee964d15e7e50b7013767ec73b24e2cc54d03ffc5ea9278aeba98675bf7780", size = 7788, upload-time = "2024-10-07T23:58:45.495Z" },
+]
+
+[[package]]
+name = "setuptools"
+version = "80.9.0"
+source = { registry = "https://pypi.org/simple" }
+sdist = { url = "https://files.pythonhosted.org/packages/18/5d/3bf57dcd21979b887f014ea83c24ae194cfcd12b9e0fda66b957c69d1fca/setuptools-80.9.0.tar.gz", hash = "sha256:f36b47402ecde768dbfafc46e8e4207b4360c654f1f3bb84475f0a28628fb19c", size = 1319958, upload-time = "2025-05-27T00:56:51.443Z" }
+wheels = [
+    { url = "https://files.pythonhosted.org/packages/a3/dc/17031897dae0efacfea57dfd3a82fdd2a2aeb58e0ff71b77b87e44edc772/setuptools-80.9.0-py3-none-any.whl", hash = "sha256:062d34222ad13e0cc312a4c02d73f059e86a4acbfbdea8f8f76b28c99f306922", size = 1201486, upload-time = "2025-05-27T00:56:49.664Z" },
 ]
 
 [[package]]

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.085** total execution time for 74 files **from all galleries**:
+**00:00.525** total execution time for 75 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_style_plot_depthshade.py` (``../../gallery/style/plot_depthshade.py``)
-     - 00:00.085
+   * - :ref:`sphx_glr_gallery_tree_plot_dendropy.py` (``../../gallery/tree/plot_dendropy.py``)
+     - 00:00.525
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
@@ -165,6 +165,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_arrows.py` (``../../gallery/style/plot_arrows.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_style_plot_depthshade.py` (``../../gallery/style/plot_depthshade.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_edgepadding.py` (``../../gallery/style/plot_edgepadding.py``)

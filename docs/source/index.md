@@ -1,6 +1,6 @@
 # iplotx documentation
 
-[iplotx](https://github.com/fabilab/iplotx) is a Python library to display graphs/networks and trees with [matplotlib](https://matplotlib.org/). It natively supports [networkx](https://networkx.org/) and [igraph](https://python.igraph.org/) networks and [biopython](https://biopython.org/), [scikit-bio](https://scikit.bio/), [cogent3](https://cogent3.org/), and [ETE4](https://etetoolkit.github.io/ete/) trees.
+[iplotx](https://github.com/fabilab/iplotx) is a Python library to display graphs/networks and trees with [matplotlib](https://matplotlib.org/). It natively supports [networkx](https://networkx.org/) and [igraph](https://python.igraph.org/) networks and [biopython](https://biopython.org/), [scikit-bio](https://scikit.bio/), [cogent3](https://cogent3.org/), [ETE4](https://etetoolkit.github.io/ete/), and [dendropy](https://jeetsukumaran.github.io/DendroPy/index.html) trees.
 
 `iplotx` guarantees the **exact same visual appearance** independently of what library you used to construct the network/tree.
 

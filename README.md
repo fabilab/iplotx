@@ -15,13 +15,14 @@ Supports:
 - **networks**:
   - [networkx](https://networkx.org/)
   - [igraph](igraph.readthedocs.io/)
-  - [minimal network data structure](https://iplotx.readthedocs.io/en/latest/gallery/plot_simplenetworkdataprovider.html#sphx-glr-gallery-plot-simplenetworkdataprovider-py) (for educational purposes)
+  - [minimal network data structure](https://iplotx.readthedocs.io/en/latest/gallery/plot_simplenetworkdataprovider.html#sphx-glr-gallery-plot-simplenetworkdataprovider-py) (zero dependency)
 - **trees**:
   - [ETE4](https://etetoolkit.github.io/ete/)
   - [cogent3](https://cogent3.org/)
   - [Biopython](https://biopython.org/)
   - [scikit-bio](https://scikit.bio)
-  - [minimal tree data structure](https://iplotx.readthedocs.io/en/latest/gallery/tree/plot_simpletreedataprovider.html#sphx-glr-gallery-tree-plot-simpletreedataprovider-py) (for educational purposes)
+  - [dendropy](https://jeetsukumaran.github.io/DendroPy/index.html)
+  - [minimal tree data structure](https://iplotx.readthedocs.io/en/latest/gallery/tree/plot_simpletreedataprovider.html#sphx-glr-gallery-tree-plot-simpletreedataprovider-py) (zero dependency)
 
 In addition to the above, *any* network or tree analysis library can register an [entry point](https://iplotx.readthedocs.io/en/latest/providers.html#creating-a-custom-data-provider) to gain compatibility with `iplotx` with no intervention from our side.
 
@@ -52,15 +53,17 @@ See [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
 
 ## Features
 - Plot networks from multiple libraries including networkx and igraph, using matplotlib as a backend. ✅
-- Plot trees from multiple libraries such as cogent3, ETE4, skbio, and biopython. ✅
+- Plot trees from multiple libraries such as cogent3, ETE4, skbio, biopython, and dendropy. ✅
 - Flexible yet easy styling, including an internal library of styles ✅
 - Interactive plotting, e.g. zooming and panning after the plot is created. ✅
 - Store the plot to disk thanks to the many matplotlib backends (SVG, PNG, PDF, etc.). ✅
-- Efficient plotting of large graphs using matplotlib's collection functionality. ✅
+- 3D network visualisation with depth shading. ✅
+- Efficient plotting of large graphs (up to ~1 million nodes on a laptop). ✅
 - Edit plotting elements after the plot is created, e.g. changing node colors, labels, etc. ✅
 - Animations, e.g. showing the evolution of a network over time. ✅
 - Mouse and keyboard interaction, e.g. hovering over nodes/edges to get information about them. ✅
 - Node clustering and covers, e.g. showing communities in a network. ✅
+- Edge tension, edge waypoints, and edge ports. ✅
 - Choice of tree layouts and orientations. ✅
 - Tree-specific options: cascades, subtree styling, split edges, etc. ✅
 - (WIP) Support uni- and bi-directional communication between graph object and plot object.🏗️

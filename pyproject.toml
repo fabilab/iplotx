@@ -64,6 +64,7 @@ test = [
   "pytest-cov>=6.2.1",
   "networkx>=2.0.0,<=3.4.2",
   "pylint>=3.3.7",
+  "dendropy>=5.0.8",
 ]
 docs = [
   "sphinx",
@@ -78,6 +79,7 @@ docs = [
   "cogent3>=2025.9.8a2",
   "pylint>=3.3.7",
   "pydata-sphinx-theme>=0.16.1",
+  "dendropy>=5.0.8",
 ]
 typing = ["mypy", "types-requests"]
 typing-test = [{include-group = "typing"}, {include-group = "test"}, "useful-types"]
