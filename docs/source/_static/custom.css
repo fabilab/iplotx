@@ -1,0 +1,9 @@
+/* Use full page width without sidebars */
+.bd-content {
+  max-width: 100%;
+  flex-grow: 1;
+}
+
+.ex-border {
+  border: 2px solid #ddd;
+}

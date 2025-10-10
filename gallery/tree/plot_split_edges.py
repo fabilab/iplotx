@@ -3,7 +3,7 @@ Split edges
 ===========
 
 This example shows how to use split edges, i.e. how to apply different styles to
-tree edges that are composed of multiple segments. See also :doc:`plot_simpletreedataprovider`
+tree edges that are composed of multiple segments. See also :doc:`../zero_dependency/plot_simpletreedataprovider`
 for the basic example of how to plot a tree with ``iplotx``'s internal tree representation.
 
 .. note::

@@ -44,7 +44,10 @@ napoleon_preprocess_types = False
 napoleon_type_aliases = None
 napoleon_attr_annotations = True
 
-myst_enable_extensions = ["colon_fence"]
+myst_enable_extensions = [
+    "colon_fence",
+    "attrs_inline",
+]
 
 sphinx_gallery_conf = {
     "examples_dirs": "../../gallery",  # path to your example scripts
@@ -69,9 +72,12 @@ exclude_patterns = []
 
 html_theme = "pydata_sphinx_theme"
 html_static_path = ["_static"]
+html_css_files = ["_static/custom.css"]
 html_js_files = [
     ("custom-icons.js", {"defer": "defer"}),
 ]
+html_sidebars = {"**": []}
+
 
 html_theme_options = {
     "header_links_before_dropdown": 4,
@@ -88,6 +94,10 @@ html_theme_options = {
             "icon": "fa-custom fa-pypi",
         },
     ],
+    "secondary_sidebar_items": {
+        "**": ["page-toc", "sourcelink"],
+        "index": [],
+    },
 }
 
 # -----------------------------------------------------------------------------

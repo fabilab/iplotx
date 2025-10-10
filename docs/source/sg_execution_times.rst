@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.525** total execution time for 75 files **from all galleries**:
+**00:00.521** total execution time for 75 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_tree_plot_dendropy.py` (``../../gallery/tree/plot_dendropy.py``)
-     - 00:00.525
+   * - :ref:`sphx_glr_gallery_tree_plot_split_edges.py` (``../../gallery/tree/plot_split_edges.py``)
+     - 00:00.521
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
@@ -218,6 +218,9 @@ Computation times
    * - :ref:`sphx_glr_gallery_tree_plot_cogent3_tree.py` (``../../gallery/tree/plot_cogent3_tree.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_tree_plot_dendropy.py` (``../../gallery/tree/plot_dendropy.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_elements_tree.py` (``../../gallery/tree/plot_elements_tree.py``)
      - 00:00.000
      - 0.0
@@ -231,9 +234,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_skbio_tree.py` (``../../gallery/tree/plot_skbio_tree.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_tree_plot_split_edges.py` (``../../gallery/tree/plot_split_edges.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_tree_plot_style_tree.py` (``../../gallery/tree/plot_style_tree.py``)
