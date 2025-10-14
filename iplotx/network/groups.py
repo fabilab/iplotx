@@ -1,5 +1,5 @@
 """
-Module for vertex groupings code, especially the GroupingArtist class.
+Module for vertex groupings code, especially the GroupingCollection class.
 """
 
 from typing import Union
@@ -9,22 +9,22 @@ import matplotlib as mpl
 from matplotlib.collections import PatchCollection
 
 
-from .typing import (
+from ..typing import (
     GroupingType,
     LayoutType,
 )
-from .ingest.heuristics import (
+from ..ingest.heuristics import (
     normalise_layout,
     normalise_grouping,
 )
-from .style import get_style, rotate_style
-from .utils.geometry import (
+from ..style import get_style, rotate_style
+from ..utils.geometry import (
     convex_hull,
     _compute_group_path_with_vertex_padding,
 )
 
 
-class GroupingArtist(PatchCollection):
+class GroupingCollection(PatchCollection):
     """Matplotlib artist for a vertex grouping (clustering/cover).
 
     This class is used to plot patches surrounding groups of vertices in a network.

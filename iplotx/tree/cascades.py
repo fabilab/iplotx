@@ -5,16 +5,15 @@ from typing import (
 import warnings
 import numpy as np
 import pandas as pd
-
-from .typing import (
-    TreeType,
-)
-from .ingest.typing import (
-    TreeDataProvider,
-)
 import matplotlib as mpl
 
-from .style import (
+from ..typing import (
+    TreeType,
+)
+from ..ingest.typing import (
+    TreeDataProvider,
+)
+from ..style import (
     copy_with_deep_values,
     rotate_style,
 )

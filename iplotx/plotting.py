@@ -13,7 +13,7 @@ from .typing import (
     TreeType,
 )
 from .network import NetworkArtist
-from .groups import GroupingArtist
+from .network.groups import GroupingCollection
 from .tree import TreeArtist
 from .style import context
 
@@ -101,7 +101,7 @@ def network(
             nwkart = None
 
         if grouping is not None:
-            grpart = GroupingArtist(
+            grpart = GroupingCollection(
                 grouping,
                 layout,
                 network=network,

@@ -10,38 +10,41 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
-from .style import (
+from ..style import (
     context,
     get_style,
     rotate_style,
     merge_styles,
 )
-from .utils.matplotlib import (
+from ..utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
     _build_cmap_fun,
 )
-from .ingest import (
+from ..ingest import (
     ingest_tree_data,
     data_providers,
 )
-from .vertex import (
+from ..vertex import (
     VertexCollection,
 )
-from .edge import (
+from ..edge import (
     EdgeCollection,
     make_stub_patch as make_undirected_edge_patch,
 )
-from .edge.leaf import (
+from ..edge.leaf import (
     LeafEdgeCollection,
 )
-from .label import (
+from ..label import (
     LabelCollection,
 )
 from .cascades import (
     CascadeCollection,
 )
-from .network import (
+from .scalebar import (
+    TreeScalebarArtist,
+)
+from ..network import (
     _update_from_internal,
 )
 
@@ -662,6 +665,22 @@ class TreeArtist(mpl.artist.Artist):
     def get_orientation(self) -> Optional[str]:
         """Get the orientation of the tree layout."""
         return self._ipx_internal_data.get("orientation", None)
+
+    def scalebar(self, length: float, loc: str = "upper left"):
+        """Create scalebar for the tree.
+
+        Parameters:
+            legth: Length of the scalebar in data units.
+            loc: Location of the scalebar. Same options as `matplotlib.legend`.
+        Returns:
+            The artist with the tree scale bar.
+        """
+        if self.axes is None:
+            raise RuntimeError("Cannot add a scalebar if the artist is not in an Axes.")
+
+        scalebar = TreeScalebarArtist(self, length, loc=loc)
+
+        return scalebar
 
     def style_subtree(
         self,

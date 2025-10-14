@@ -7,33 +7,33 @@ import numpy as np
 import pandas as pd
 import matplotlib as mpl
 
-from .typing import (
+from ..typing import (
     GraphType,
     LayoutType,
 )
-from .style import (
+from ..style import (
     get_style,
     rotate_style,
 )
-from .utils.matplotlib import (
+from ..utils.matplotlib import (
     _stale_wrapper,
     _forwarder,
     _build_cmap_fun,
 )
-from .ingest import (
+from ..ingest import (
     ingest_network_data,
 )
-from .vertex import (
+from ..vertex import (
     VertexCollection,
 )
-from .edge import (
+from ..edge import (
     EdgeCollection,
     make_stub_patch as make_undirected_edge_patch,
 )
-from .art3d.vertex import (
+from ..art3d.vertex import (
     vertex_collection_2d_to_3d,
 )
-from .art3d.edge import (
+from ..art3d.edge import (
     Edge3DCollection,
     edge_collection_2d_to_3d,
 )
