@@ -27,19 +27,28 @@ class TreeScalebarArtist(Legend):
     def __init__(
         self,
         treeartist,
-        length: float,
         layout: str = "horizontal",
         frameon=False,
         **kwargs,
     ):
         handles = [treeartist.get_edges()]
-        labels = [str(length)]
+        labels = [""]
         self._layout = layout
+
+        if layout == "vertical":
+            handler_kwargs = dict(xerr_size=0, yerr_size=1)
+        else:
+            handler_kwargs = dict(xerr_size=1)
+        handler = TreeLegendHandler(
+            update_func=_update_prop,
+            **handler_kwargs,
+        )
+
         super().__init__(
             treeartist.axes,
             handles,
             labels,
-            handler_map={handles[0]: TreeLegendHandler(update_func=_update_prop, xerr_size=1)},
+            handler_map={handles[0]: handler},
             frameon=frameon,
             **kwargs,
         )
@@ -128,8 +137,12 @@ class TreeScalebarArtist(Legend):
             len, np.array_split(handles_and_labels, self._ncols)
         ):
             # pack handlebox and labelbox into itembox
+            if self._layout == "vertical":
+                itempacker = HPacker
+            else:
+                itempacker = VPacker
             itemboxes = [
-                VPacker(
+                itempacker(
                     pad=0,
                     sep=self.handletextpad * fontsize,
                     children=[h, t] if markerfirst else [t, h],
@@ -207,12 +220,10 @@ class TreeLegendHandler(HandlerErrorbar):
         trans,
     ):
         # docstring inherited
-        plotlines = orig_handle
+        plotline = orig_handle
 
         xdata, xdata_marker = self.get_xdata(legend, xdescent, ydescent, width, height, fontsize)
-
         ydata = np.full_like(xdata, (height - ydescent) / 2)
-        legline = Line2D(xdata, ydata)
 
         xdata_marker = np.asarray(xdata_marker)
         ydata_marker = np.asarray(ydata[: len(xdata_marker)])
@@ -221,20 +232,30 @@ class TreeLegendHandler(HandlerErrorbar):
             legend, xdescent, ydescent, width, height, fontsize
         )
 
+        if legend._layout == "vertical":
+            xdata, ydata = np.array(
+                [
+                    ((x, y - yerr_size), (x, y + yerr_size))
+                    for x, y in zip(xdata_marker, ydata_marker)
+                ]
+            ).T
+
+        legline = Line2D(xdata, ydata)
+
         legline_marker = Line2D(xdata_marker, ydata_marker)
 
         # when plotlines are None (only errorbars are drawn), we just
         # make legline invisible.
-        if plotlines is None:
+        if plotline is None:
             legline.set_visible(False)
             legline_marker.set_visible(False)
         else:
-            self.update_prop(legline, plotlines, legend)
+            self.update_prop(legline, plotline, legend)
 
             legline.set_drawstyle("default")
             legline.set_marker("none")
 
-            self.update_prop(legline_marker, plotlines, legend)
+            self.update_prop(legline_marker, plotline, legend)
             legline_marker.set_linestyle("None")
 
             if legend.markerscale != 1:
@@ -244,23 +265,42 @@ class TreeLegendHandler(HandlerErrorbar):
         handle_barlinecols = []
         handle_caplines = []
 
-        # Always show the error bar
-        if True:
+        if legend._layout != "vertical":
             verts = [
                 ((x - xerr_size, y), (x + xerr_size, y)) for x, y in zip(xdata_marker, ydata_marker)
             ]
             coll = mcoll.LineCollection(verts)
-            self.update_prop(coll, plotlines, legend)
+            self.update_prop(coll, plotline, legend)
             handle_barlinecols.append(coll)
 
             # Always show the cap lines
             if True:
                 capline_left = Line2D(xdata_marker - xerr_size, ydata_marker)
                 capline_right = Line2D(xdata_marker + xerr_size, ydata_marker)
-                self.update_prop(capline_left, plotlines, legend)
-                self.update_prop(capline_right, plotlines, legend)
+                self.update_prop(capline_left, plotline, legend)
+                self.update_prop(capline_right, plotline, legend)
                 capline_left.set_marker("|")
                 capline_right.set_marker("|")
+
+                handle_caplines.append(capline_left)
+                handle_caplines.append(capline_right)
+
+        else:
+            verts = [
+                ((x, y - yerr_size), (x, y + yerr_size)) for x, y in zip(xdata_marker, ydata_marker)
+            ]
+            coll = mcoll.LineCollection(verts)
+            self.update_prop(coll, plotline, legend)
+            handle_barlinecols.append(coll)
+
+            # Always show the cap lines
+            if True:
+                capline_left = Line2D(xdata_marker, ydata_marker - yerr_size)
+                capline_right = Line2D(xdata_marker, ydata_marker + yerr_size)
+                self.update_prop(capline_left, plotline, legend)
+                self.update_prop(capline_right, plotline, legend)
+                capline_left.set_marker("_")
+                capline_right.set_marker("_")
 
                 handle_caplines.append(capline_left)
                 handle_caplines.append(capline_right)

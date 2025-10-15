@@ -666,7 +666,7 @@ class TreeArtist(mpl.artist.Artist):
         """Get the orientation of the tree layout."""
         return self._ipx_internal_data.get("orientation", None)
 
-    def scalebar(self, length: float, loc: str = "upper left"):
+    def scalebar(self, loc: str = "upper left"):
         """Create scalebar for the tree.
 
         Parameters:
@@ -678,7 +678,11 @@ class TreeArtist(mpl.artist.Artist):
         if self.axes is None:
             raise RuntimeError("Cannot add a scalebar if the artist is not in an Axes.")
 
-        scalebar = TreeScalebarArtist(self, length, loc=loc)
+        scalebar = TreeScalebarArtist(
+            self,
+            layout=self.get_layout_name(),
+            loc=loc,
+        )
 
         self.axes.legend_ = scalebar
         self.axes.legend_._remove_method = self.axes._remove_legend
