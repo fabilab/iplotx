@@ -684,8 +684,12 @@ class TreeArtist(mpl.artist.Artist):
             loc=loc,
         )
 
-        self.axes.legend_ = scalebar
-        self.axes.legend_._remove_method = self.axes._remove_legend
+        # Remove previous scalebars if any
+        for art in self.axes._children:
+            if isinstance(art, TreeScalebarArtist) and art._treeartist == self:
+                art.remove()
+
+        self.axes.add_artist(scalebar)
 
         return scalebar
 

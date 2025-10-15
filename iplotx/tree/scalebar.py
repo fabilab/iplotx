@@ -18,9 +18,18 @@ from matplotlib.offsetbox import (
 
 
 def _update_prop(legend_artist, orig_handle):
-    legend_artist._linestyle = "-"  # orig_handle.get_linestyle()[0]
+    # NOTE: This is de facto a bug in mpl, because Line2D.set_linestyle()
+    # does two things: it reformats tuple-style dashing, and it sets the
+    # artist as stale. We want to do the former only here, so we reset
+    # the artist as the original stale state after calling it.
+    stale_orig = legend_artist.stale
+    legend_artist.set_linestyle(orig_handle.get_linestyle()[0])
+    legend_artist.stale = stale_orig
+
+    # These other properties can be set directly.
     legend_artist._linewidth = orig_handle.get_linewidth()[0]
     legend_artist._color = orig_handle.get_edgecolor()[0]
+    legend_artist._gapcolor = orig_handle._gapcolor
 
 
 class TreeScalebarArtist(Legend):
@@ -34,6 +43,7 @@ class TreeScalebarArtist(Legend):
         handles = [treeartist.get_edges()]
         labels = [""]
         self._layout = layout
+        self._treeartist = treeartist
 
         if layout == "vertical":
             handler_kwargs = dict(xerr_size=0, yerr_size=1)
