@@ -680,6 +680,9 @@ class TreeArtist(mpl.artist.Artist):
 
         scalebar = TreeScalebarArtist(self, length, loc=loc)
 
+        self.axes.legend_ = scalebar
+        self.axes.legend_._remove_method = self.axes._remove_legend
+
         return scalebar
 
     def style_subtree(
