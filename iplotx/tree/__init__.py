@@ -666,12 +666,19 @@ class TreeArtist(mpl.artist.Artist):
         """Get the orientation of the tree layout."""
         return self._ipx_internal_data.get("orientation", None)
 
-    def scalebar(self, loc: str = "upper left"):
+    def scalebar(
+        self,
+        loc: str = "upper left",
+        **kwargs,
+    ):
         """Create scalebar for the tree.
 
         Parameters:
             legth: Length of the scalebar in data units.
             loc: Location of the scalebar. Same options as `matplotlib.legend`.
+            kwargs: Additional keyword arguments passed to `TreeScalebarArtist`. These are
+                generally the same options that you would pass to a legend, such as
+                bbox_to_anchor, bbox_transform, etc.
         Returns:
             The artist with the tree scale bar.
         """
