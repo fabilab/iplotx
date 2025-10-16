@@ -64,9 +64,9 @@ jobs:
       run: conda install -c conda-forge graph-tool
     - name: Install pip
       run: conda install -c conda-forge pip
-    - name: Install main deps
-      run: pip install .
-    - name: Install test deps
-      run: pip install --group test
+    - name: Upgrade pip to >= 25.1 (which has dependency groups)
+      run: pip install --upgrade pip
+    - name: Install deps and package
+      run: pip install --group test .
     - name: Run pytest (graph-tool)
       run: pytest tests/test_graph_tool.py
