@@ -669,6 +669,7 @@ class TreeArtist(mpl.artist.Artist):
     def scalebar(
         self,
         loc: str = "upper left",
+        label_format: str = ".2f",
         **kwargs,
     ):
         """Create scalebar for the tree.
@@ -689,6 +690,8 @@ class TreeArtist(mpl.artist.Artist):
             self,
             layout=self.get_layout_name(),
             loc=loc,
+            label_format=label_format,
+            **kwargs,
         )
 
         # Remove previous scalebars if any

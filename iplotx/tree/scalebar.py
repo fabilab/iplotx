@@ -37,13 +37,15 @@ class TreeScalebarArtist(Legend):
         self,
         treeartist,
         layout: str = "horizontal",
-        frameon=False,
+        frameon: bool = False,
+        label_format: str = ".2f",
         **kwargs,
     ):
         handles = [treeartist.get_edges()]
         labels = [""]
         self._layout = layout
         self._treeartist = treeartist
+        self._label_format = label_format
 
         if layout == "vertical":
             handler_kwargs = dict(xerr_size=0, yerr_size=1)
@@ -191,13 +193,12 @@ class TreeScalebarArtist(Legend):
 
         bar_trans = bar_handle.get_transform()
         data_trans = self.parent.transData
-        # FIXME: this is off, probably because of some Packer anchor additional transform
         composite_trans = data_trans.inverted() + bar_trans
 
         p0_data = composite_trans.transform(p0)
         p1_data = composite_trans.transform(p1)
         distance = np.linalg.norm(p1_data - p0_data)
-        label = f"{distance:.2f}"
+        label = format(distance, self._label_format)
         return label
 
     def draw(self, renderer):
