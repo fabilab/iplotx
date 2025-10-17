@@ -15,14 +15,15 @@ Supports:
 - **networks**:
   - [networkx](https://networkx.org/)
   - [igraph](igraph.readthedocs.io/)
-  - [minimal network data structure](https://iplotx.readthedocs.io/en/latest/gallery/plot_simplenetworkdataprovider.html#sphx-glr-gallery-plot-simplenetworkdataprovider-py) (zero dependency)
+  - [graph-tool](https://graph-tool.skewed.de/)
+  - [zero-dependency](https://iplotx.readthedocs.io/en/latest/gallery/plot_simplenetworkdataprovider.html#sphx-glr-gallery-plot-simplenetworkdataprovider-py)
 - **trees**:
   - [ETE4](https://etetoolkit.github.io/ete/)
   - [cogent3](https://cogent3.org/)
   - [Biopython](https://biopython.org/)
   - [scikit-bio](https://scikit.bio)
   - [dendropy](https://jeetsukumaran.github.io/DendroPy/index.html)
-  - [minimal tree data structure](https://iplotx.readthedocs.io/en/latest/gallery/tree/plot_simpletreedataprovider.html#sphx-glr-gallery-tree-plot-simpletreedataprovider-py) (zero dependency)
+  - [zero-dependency](https://iplotx.readthedocs.io/en/latest/gallery/tree/plot_simpletreedataprovider.html#sphx-glr-gallery-tree-plot-simpletreedataprovider-py)
 
 In addition to the above, *any* network or tree analysis library can register an [entry point](https://iplotx.readthedocs.io/en/latest/providers.html#creating-a-custom-data-provider) to gain compatibility with `iplotx` with no intervention from our side.
 
@@ -43,7 +44,7 @@ fig, ax = plt.subplots(figsize=(3, 3))
 ipx.plot(g, ax=ax, layout=layout)
 ```
 
-![Quick start image](docs/source/_static/graph_basic.png)
+![Quick start image](/docs/source/_static/graph_basic.png)
 
 ## Documentation
 See [readthedocs](https://iplotx.readthedocs.io/en/latest/) for the full documentation.
@@ -52,11 +53,11 @@ See [readthedocs](https://iplotx.readthedocs.io/en/latest/) for the full documen
 See [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
 
 ## Features
-- Plot networks from multiple libraries including networkx and igraph, using matplotlib as a backend. ✅
+- Plot networks from multiple libraries including networkx, igraph and graph-tool, using Matplotlib. ✅
 - Plot trees from multiple libraries such as cogent3, ETE4, skbio, biopython, and dendropy. ✅
 - Flexible yet easy styling, including an internal library of styles ✅
 - Interactive plotting, e.g. zooming and panning after the plot is created. ✅
-- Store the plot to disk thanks to the many matplotlib backends (SVG, PNG, PDF, etc.). ✅
+- Store the plot to disk in many formats (SVG, PNG, PDF, GIF, etc.). ✅
 - 3D network visualisation with depth shading. ✅
 - Efficient plotting of large graphs (up to ~1 million nodes on a laptop). ✅
 - Edit plotting elements after the plot is created, e.g. changing node colors, labels, etc. ✅
