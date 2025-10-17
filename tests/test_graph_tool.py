@@ -31,3 +31,39 @@ def test_basic(layout_small_ring):
 
     fig, ax = plt.subplots(figsize=(3, 3))
     ipx.graph(g, ax=ax, layout=layout_small_ring)
+
+
+@image_comparison(baseline_images=["graph_directed"], remove_text=True)
+def test_directed(layout_small_ring):
+    g = gt.Graph(directed=True)
+    vertices = list(g.add_vertex(5))
+    for i in range(5):
+        g.add_edge(vertices[i], vertices[(i + 1) % 5])
+
+    fig, ax = plt.subplots(figsize=(3, 3))
+    ipx.graph(g, ax=ax, layout=layout_small_ring)
+
+
+@image_comparison(baseline_images=["graph_labels"], remove_text=True)
+def test_labels(layout_small_ring):
+    g = gt.Graph(directed=False)
+    vertices = list(g.add_vertex(5))
+    for i in range(5):
+        g.add_edge(vertices[i], vertices[(i + 1) % 5])
+
+    fig, ax = plt.subplots(figsize=(3, 3))
+    ipx.graph(
+        network=g,
+        ax=ax,
+        layout=layout_small_ring,
+        vertex_labels=["1", "2", "3", "4", "5"],
+        style={
+            "vertex": {
+                "size": 20,
+                "label": {
+                    "color": "white",
+                    "size": 10,
+                },
+            }
+        },
+    )

@@ -41,12 +41,12 @@ jobs:
     - name: Run flake8
       run: uv run flake8 iplotx --count --exit-zero --max-complexity=20 --max-line-length=127 --statistics
 
-  build_gt:
+  build_graph_tool:
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
-        python-version: ["3.13"]
+        python-version: ["3.11", "3.12", "3.13"]
 
     steps:
     - uses: actions/checkout@v5
@@ -58,6 +58,8 @@ jobs:
         python-version: ${{ matrix.python-version }}
         activate-environment: gt
         miniforge-version: latest
+        channels: conda-forge
+        conda-remove-defaults: true
     - name: Conda info
       shell: bash -el {0}
       run: conda info
