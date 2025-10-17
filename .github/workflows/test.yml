@@ -53,20 +53,32 @@ jobs:
 
     - uses: conda-incubator/setup-miniconda@v3
       with:
+        auto-activate-base: false
         auto-update-conda: true
         python-version: ${{ matrix.python-version }}
         activate-environment: gt
+        miniforge-version: latest
     - name: Conda info
+      shell: bash -el {0}
       run: conda info
     - name: Conda list
+      shell: bash -el {0}
       run: conda list
     - name: Install graph-tool
+      shell: bash -el {0}
       run: conda install -c conda-forge graph-tool
     - name: Install pip
+      shell: bash -el {0}
       run: conda install -c conda-forge pip
     - name: Upgrade pip to >= 25.1 (which has dependency groups)
+      shell: bash -el {0}
       run: pip install --upgrade pip
     - name: Install deps and package
+      shell: bash -el {0}
       run: pip install --group test .
+    - name: Check pytest
+      shell: bash -el {0}
+      run: which pytest
     - name: Run pytest (graph-tool)
+      shell: bash -el {0}
       run: pytest tests/test_graph_tool.py
