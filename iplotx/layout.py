@@ -2,7 +2,10 @@
 Layout functions, currently limited to trees.
 """
 
-from typing import Any
+from typing import (
+    Any,
+    Optional,
+)
 from collections.abc import (
     Hashable,
     Callable,
@@ -99,6 +102,8 @@ def _horizontal_tree_layout_right(
 
 def _horizontal_tree_layout(
     orientation="right",
+    start: tuple[float, float] = (0, 0),
+    span: Optional[float] = None,
     **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Horizontal tree layout."""
@@ -110,11 +115,24 @@ def _horizontal_tree_layout(
     if orientation == "left":
         for key in layout:
             layout[key][0] *= -1
+
+    if span is not None:
+        cur_span = len(layout) - 1
+        for key in layout:
+            layout[key][1] = float(layout[key][1]) * span / cur_span
+
+    if start != (0, 0):
+        for key in layout:
+            layout[key][0] += start[0]
+            layout[key][1] += start[1]
+
     return layout
 
 
 def _vertical_tree_layout(
     orientation="descending",
+    start: tuple[float, float] = (0, 0),
+    span: Optional[float] = None,
     **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Vertical tree layout."""
@@ -125,6 +143,17 @@ def _vertical_tree_layout(
         layout[key] = value[::-1]
         # Orient vertically
         layout[key][1] *= sign
+
+    if span is not None:
+        cur_span = len(layout) - 1
+        for key in layout:
+            layout[key][0] = float(layout[key][0]) * span / cur_span
+
+    if start != (0, 0):
+        for key in layout:
+            layout[key][0] += start[0]
+            layout[key][1] += start[1]
+
     return layout
 
 
