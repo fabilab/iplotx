@@ -274,8 +274,15 @@
         # - "radial" layout: "clockwise" or "counterclockwise"
         "orientation": str,
         "angular": bool,  # Whether to use an angular or waypoint-based layout
-        "start": float,  # Starting angle for radial layouts (in degrees)
-        "span": float,  # Angle span for radial layouts (in degrees)
+        # The following two parameters are used differently depending on the layout.
+        # For radial layouts:
+        #   start: Starting angle (in degrees, one float)
+        #   span: Angle span (in degrees)
+        # For horizontal and vertical layouts:
+        #   start: Starting position in data units (tuple of two floats)
+        #   span: Breadth in data units (float)
+        "start": float | tuple[float, float],
+        "span": float,
     },
     ############################################################################
 }

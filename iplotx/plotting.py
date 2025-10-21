@@ -346,13 +346,13 @@ def doubletree(
         artist2.shift(0.5 * xshift, 0)
         artist1.shift(-0.5 * xshift, 0)
 
-    _postprocess_axes(ax, [artist1, artist2], strip=strip_axes, quirk=True)
+    _postprocess_axes(ax, [artist1, artist2], strip=strip_axes, ignore_previous=True)
 
     return (artist1, artist2)
 
 
 # INTERNAL ROUTINES
-def _postprocess_axes(ax, artists, strip=True, had_data=None, quirk=False):
+def _postprocess_axes(ax, artists, strip=True, had_data=None, ignore_previous=False):
     """Postprocess axis after plotting."""
 
     if strip:
@@ -392,7 +392,7 @@ def _postprocess_axes(ax, artists, strip=True, had_data=None, quirk=False):
             bboxes.append(art.get_datalim(ax.transData))
         bbox = mpl.transforms.Bbox.union(bboxes)
 
-        if not quirk:
+        if not ignore_previous:
             ax.update_datalim(bbox)
         else:
             ax.dataLim.update_from_data_xy(bbox.corners(), ignore=True)
