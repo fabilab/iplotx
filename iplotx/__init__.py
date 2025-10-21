@@ -11,6 +11,7 @@ from .plotting import (
     network,
     graph,
     tree,
+    doubletree,
     plot,
 )
 import iplotx.artists as artists
@@ -20,6 +21,7 @@ import iplotx.style as style
 __all__ = [
     "network",
     "tree",
+    "doubletree",
     "plot",
     "graph",
     "artists",

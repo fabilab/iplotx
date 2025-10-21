@@ -274,6 +274,12 @@ class EdgeCollection(mpl.collections.PatchCollection):
         """Return mappable for colorbar."""
         return self
 
+    def shift(self, x: float, y: float) -> None:
+        """Shift the cascade by a certain amount."""
+        for path in self._paths:
+            path.vertices[:, 0] += x
+            path.vertices[:, 1] += y
+
     def _get_adjacent_vertices_info(self):
         index = self._vertex_collection.get_index()
         index = pd.Series(

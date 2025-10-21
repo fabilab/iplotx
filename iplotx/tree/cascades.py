@@ -158,6 +158,12 @@ class CascadeCollection(mpl.collections.PatchCollection):
             zorder=zorder,
         )
 
+    def shift(self, x: float, y: float) -> None:
+        """Shift the cascade by a certain amount."""
+        for path in self._paths:
+            path.vertices[:, 0] += x
+            path.vertices[:, 1] += y
+
     def get_maxdepth(self) -> float:
         """Get the maxdepth of the cascades.
 

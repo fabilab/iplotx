@@ -219,6 +219,31 @@ class TreeArtist(mpl.artist.Artist):
         else:
             raise ValueError(f"Unknown layout kind: {kind}. Use 'vertex' or 'edge'.")
 
+    def shift(self, x: float, y: float) -> None:
+        """Shift layout coordinates for all tree elements.
+
+        Paramerers:
+            x: The shift in x direction.
+            y: The shift in y direction.
+        """
+        layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
+        self._ipx_internal_data["vertex_df"][layout_columns[0]] += x
+        self._ipx_internal_data["vertex_df"][layout_columns[1]] += y
+
+        self.get_vertices()._layout.values[:, 0] += x
+        self.get_vertices()._layout.values[:, 1] += y
+        self.get_vertices()._update_offsets_from_layout()
+
+        self.get_edges().shift(x, y)
+
+        if hasattr(self, "_leaf_vertices"):
+            self.get_leaf_vertices()._layout.values[:, 0] += x
+            self.get_leaf_vertices()._layout.values[:, 1] += y
+            self.get_leaf_vertices()._update_offsets_from_layout()
+
+        if hasattr(self, "_cascades"):
+            self._cascades.shift(x, y)
+
     def get_datalim(self, transData, pad=0.15):
         """Get limits on x/y axes based on the graph layout data.
 

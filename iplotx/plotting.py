@@ -1,4 +1,8 @@
-from typing import Optional, Sequence
+from typing import (
+    Optional,
+    Sequence,
+    Any,
+)
 from contextlib import nullcontext
 import numpy as np
 import pandas as pd
@@ -269,8 +273,86 @@ def tree(
     return artist
 
 
+def doubletree(
+    tree_left: Optional[TreeType] = None,
+    tree_right: Optional[TreeType] = None,
+    kwargs_left: Optional[dict[Any]] = None,
+    kwargs_right: Optional[dict[Any]] = None,
+    gap: float = 0,
+    ax: Optional[mpl.axes.Axes] = None,
+    title: Optional[str] = None,
+    aspect: Optional[str | float] = None,
+    margins: float | tuple[float, float] = 0,
+    strip_axes: bool = True,
+    figsize: Optional[tuple[float, float]] = None,
+) -> tuple[TreeArtist, TreeArtist]:
+    """Visualize two trees facing each other.
+
+    Parameters:
+        tree_left: The tree to plot on the left side.
+        tree_right: The tree to plot on the right side.
+        kwargs_left: Additional keyword arguments passed to the left tree plotting function.
+        kwargs_right: Additional keyword arguments passed to the right tree plotting function.
+        ax: The axis to plot on. If None, a new figure and axis will be created. Defaults to
+            None.
+        title: If not None, set the axes title to this value.
+        aspect: If not None, set the aspect ratio of the axis to this value. The most common
+            value is 1.0, which proportionates x- and y-axes.
+        margins: How much margin to leave around the plot. A higher value (e.g. 0.1) can be
+            used as a quick fix when some vertex shapes reach beyond the plot edge. This is
+            a fraction of the data limits, so 0.1 means 10% of the data limits will be left
+            as margin.
+        strip_axes: If True, remove axis spines and ticks.
+        figsize: If ax is None, a new matplotlib Figure is created. This argument specifies
+            the (width, height) dimension of the figure in inches. If ax is not None, this
+            argument is ignored. If None, the default matplotlib figure size is used.
+    Returns:
+        A tuple with the left and right TreeArtist objects.
+    """
+    artist1 = tree(
+        tree_left,
+        layout="horizontal",
+        layout_orientation="right",
+        ax=ax,
+        strip_axes=False,
+        figsize=figsize,
+        **kwargs_left or {},
+    )
+
+    ax = artist1.axes
+
+    if kwargs_right is None:
+        kwargs_right = {}
+
+    had_layout_start = "layout_start" in kwargs_right
+
+    artist2 = tree(
+        tree_right,
+        layout="horizontal",
+        layout_orientation="left",
+        ax=ax,
+        title=title,
+        aspect=aspect,
+        strip_axes=False,
+        margins=margins,
+        **kwargs_right,
+    )
+
+    if not had_layout_start:
+        x2min = artist2.get_layout().values[:, 0].min()
+        x1max = artist1.get_layout().values[:, 0].max()
+        xshift = x1max - x2min + gap
+
+        artist2.shift(0.5 * xshift, 0)
+        artist1.shift(-0.5 * xshift, 0)
+
+    _postprocess_axes(ax, [artist1, artist2], strip=strip_axes, quirk=True)
+
+    return (artist1, artist2)
+
+
 # INTERNAL ROUTINES
-def _postprocess_axes(ax, artists, strip=True, had_data=None):
+def _postprocess_axes(ax, artists, strip=True, had_data=None, quirk=False):
     """Postprocess axis after plotting."""
 
     if strip:
@@ -309,7 +391,11 @@ def _postprocess_axes(ax, artists, strip=True, had_data=None):
         for art in artists:
             bboxes.append(art.get_datalim(ax.transData))
         bbox = mpl.transforms.Bbox.union(bboxes)
-        ax.update_datalim(bbox)
+
+        if not quirk:
+            ax.update_datalim(bbox)
+        else:
+            ax.dataLim.update_from_data_xy(bbox.corners(), ignore=True)
 
         # Autoscale for x/y axis limits
         ax.autoscale_view()
