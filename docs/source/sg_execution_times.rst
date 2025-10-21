@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.542** total execution time for 77 files **from all galleries**:
+**00:00.565** total execution time for 77 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_tree_plot_double_tree.py` (``../../gallery/tree/plot_double_tree.py``)
-     - 00:00.542
+     - 00:00.565
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
