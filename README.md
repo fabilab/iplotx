@@ -40,8 +40,7 @@ import iplotx as ipx
 
 g = nx.Graph([(0, 1), (1, 2), (2, 3), (3, 4), (4, 0)])
 layout = nx.layout.circular_layout(g)
-fig, ax = plt.subplots(figsize=(3, 3))
-ipx.plot(g, ax=ax, layout=layout)
+ipx.plot(g, layout)
 ```
 
 ![Quick start image](/docs/source/_static/graph_basic.png)
