@@ -27,8 +27,10 @@ def compute_tree_layout(
     root: Any,
     preorder_fun: Callable,
     postorder_fun: Callable,
+    levelorder_fun: Callable,
     children_fun: Callable,
     branch_length_fun: Callable,
+    leaves_fun: Callable,
     **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Compute the layout for a tree.
@@ -44,8 +46,8 @@ def compute_tree_layout(
     kwargs["root"] = root
     kwargs["preorder_fun"] = preorder_fun
     kwargs["postorder_fun"] = postorder_fun
+    kwargs["levelorder_fun"] = levelorder_fun
     kwargs["children_fun"] = children_fun
-    kwargs["branch_length_fun"] = branch_length_fun
     kwargs["orientation"] = orientation
 
     # Angular or not, the vertex layout is unchanged. Since we do not
@@ -59,6 +61,8 @@ def compute_tree_layout(
     elif layout == "vertical":
         layout_dict = _vertical_tree_layout(**kwargs)
     elif layout == "equalangle":
+        kwargs["leaves_fun"] = leaves_fun
+        kwargs["branch_length_fun"] = branch_length_fun
         layout_dict = _equalangle_tree_layout(**kwargs)
     elif layout == "daylight":
         layout_dict = _daylight_tree_layout(**kwargs)

@@ -294,8 +294,10 @@ class TreeDataProvider(Protocol):
             root=tree_data["root"],
             preorder_fun=self.preorder,
             postorder_fun=self.postorder,
+            levelorder_fun=self.levelorder,
             children_fun=self.get_children,
             branch_length_fun=self.get_branch_length_default_to_one,
+            leaves_fun=self.get_leaves,
             **layout_style,
         )
         if layout in ("radial",):

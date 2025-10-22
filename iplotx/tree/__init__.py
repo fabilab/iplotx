@@ -445,7 +445,7 @@ class TreeArtist(mpl.artist.Artist):
         leaf_layout = self.get_layout("leaf").copy()
 
         # Set all to max depth
-        if user_leaf_style.get("deep", True):
+        if user_leaf_style.get("deep", False):
             if layout_name == "radial":
                 leaf_layout.iloc[:, 0] = leaf_layout.iloc[:, 0].max()
             elif (layout_name, orientation) == ("horizontal", "right"):
@@ -666,7 +666,10 @@ class TreeArtist(mpl.artist.Artist):
             norm = mpl.colors.Normalize(vmin=vmin, vmax=vmax)
             edge_style["norm"] = norm
 
-        if get_style(".layout", {}).get("angular", False):
+        angular_layout = get_style(".layout", {}).get("angular", False)
+        if self._ipx_internal_data["layout_name"] in ("equalangle", "daylight"):
+            angular_layout = True
+        if angular_layout:
             edge_style.pop("waypoints", None)
         else:
             edge_style["waypoints"] = waypoints
