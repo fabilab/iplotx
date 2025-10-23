@@ -140,12 +140,16 @@ def _daylight_tree_layout(
         ninternal = 0
         for node in levelorder_fun():
             # Ignore leaves
-            if len(children_fun(node)) == 0:
-                continue
-
-            res = _apply_daylight_single_node(node, layout)
-            change_sum += res
-            ninternal += 1
+            for child in children_fun(node):
+                res = _apply_daylight_single_node(
+                    child,
+                    node,
+                    layout,
+                    leaves_fun,
+                    children_fun,
+                )
+                change_sum += res
+                ninternal += 1
 
         change_avg = change_sum / ninternal
         if change_avg < delta_angle_min:
@@ -154,7 +158,13 @@ def _daylight_tree_layout(
     return layout
 
 
-def _apply_daylight_single_node(node: Any, layout: dict[Hashable, list[float]]) -> float:
+def _apply_daylight_single_node(
+    node: Any,
+    parent: Any,
+    layout: dict[Hashable, list[float]],
+    leaves_fun: Callable,
+    children_fun: Callable,
+) -> float:
     """Apply daylight adjustment to a single internal node.
 
     Parameters:
@@ -164,8 +174,85 @@ def _apply_daylight_single_node(node: Any, layout: dict[Hashable, list[float]]) 
 
     NOTE: The layout is also changed in place.
     """
-    change = 0.0
+    # Three steps:
+    # 1. Find subtrees
+    # 2. Find angles of subtrees
+    # 3. Adjust angles of (rotate) subtrees
+    # (return angular change)
 
-    # TODO: implement
+    # https://github.com/thomasp85/ggraph/blob/6c4ce81e460c50a16f9cd97e0b3a089f36901316/src/unrooted.cpp#L122
+    # This algo needs to look at all leaves, not only the subtree. In other words, because
+    # it's an unrooted tree algo, it treats the node as a split and collects both leaves *below*
+    # this node and *above* this node. The latter are just the leaves below all siblings of this node.
+    leaves_below = list(leaves_fun(node))
+    leaves_above = sum(
+        (list(leaves_fun(sibling)) for sibling in children_fun(parent) if sibling != node),
+        [],
+    )
+    leaves = leaves_below + leaves_above
+    nl_below = len(leaves_below)
 
-    return change
+    children = children_fun(node)
+
+    bounds_lower = {}
+    bounds_upper = {}
+
+    x0, y0 = layout[node]
+    for il, leaf in enumerate(leaves):
+        if il < nl_below:
+            dv = layout[leaf][0] - x0, layout[leaf][1] - y0
+        else:
+            dv = layout[parent][0] - x0, layout[parent][1] - y0
+        lower, upper = 0, 0
+        lower_angle, upper_angle = 2 * np.pi, -2 * np.pi
+        for leaf2 in ...:
+            dv2 = layout[leaf2][0] - x0, layout[leaf2][1] - y0
+
+            # Anticlockwise angle between dv and dv2
+            angle = _angle_between_vectors(dv, dv2)
+
+            if angle < lower_angle:
+                lower_angle = angle
+                lower = leaf2
+            if angle > upper_angle:
+                upper_angle = angle
+                upper = leaf2
+
+        bounds_lower[leaf] = lower
+        bounds_upper[leaf] = upper
+
+    daylight = {}
+    daylight_sum = 0.0
+    old_leaf = leaves[-1]
+    for leaf in bounds_lower:
+        dx, dy = layout[old_leaf][0] - x0, layout[old_leaf][1] - y0
+        dx2, dy2 = layout[leaf][0] - x0, layout[leaf][1] - y0
+        dot = dx * dx2 + dy * dy2
+        determinant = dx * dy2 - dy * dx2
+        angle = np.arctan2(determinant, dot)
+
+        daylight[leaf] = angle
+        daylight_sum += angle
+
+        old_leaf = leaf
+
+    daylight_avg = daylight_sum / len(leaves)
+    deylight_cumsum = 0.0
+    daylight_changes = 0
+    for leaf in leaves:
+        daylight_cumsum += daylight_avg - daylight[leaf]
+        daylight_changes += abs(daylight_cumsum)
+        layout[child] = _rotate_around_point(
+            layout[child],
+            daylight_cumsum,
+            (x0, y0),
+        )
+
+    return daylight_changes / len(leaves)
+
+
+# see: https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors
+def _anticlockwise_angle(v1, v2):
+    dot = v1[0] * v2[0] + v1[1] * v2[1]
+    determinant = v1[0] * v2[1] - v1[1] * v2[0]
+    return np.arctan2(determinant, dot)
