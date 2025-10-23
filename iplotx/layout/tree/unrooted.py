@@ -6,6 +6,7 @@ from typing import (
     Any,
 )
 from collections.abc import (
+    Hashable,
     Callable,
 )
 import numpy as np
@@ -22,7 +23,7 @@ def _equalangle_tree_layout(
     start: float = 180,
     span: float = 360,
     **kwargs,
-):
+) -> dict[Hashable, list[float]]:
     """Equal angle unrooted tree layout.
 
     Parameters:
@@ -66,7 +67,7 @@ def _equalangle_tree_layout(
         # Get current node props
         start = props["start"].get(node, 0)
         end = props["end"].get(node, 0)
-        cur_x, cur_y = props["layout"].get(node, (0.0, 0.0))
+        cur_x, cur_y = props["layout"].get(node, [0.0, 0.0])
 
         total_angle = end - start
 
@@ -101,7 +102,7 @@ def _daylight_tree_layout(
     span: float = 360,
     max_iter: int = 5,
     **kwargs,
-):
+) -> dict[Hashable, list[float]]:
     """Daylight unrooted tree layout.
 
     Parameters:
@@ -135,11 +136,36 @@ def _daylight_tree_layout(
 
     change_avg = 1.0
     for it in range(max_iter):
+        change_sum = 0
+        ninternal = 0
         for node in levelorder_fun():
-            # TODO: write this
-            pass
+            # Ignore leaves
+            if len(children_fun(node)) == 0:
+                continue
 
+            res = _apply_daylight_single_node(node, layout)
+            change_sum += res
+            ninternal += 1
+
+        change_avg = change_sum / ninternal
         if change_avg < delta_angle_min:
             break
 
     return layout
+
+
+def _apply_daylight_single_node(node: Any, layout: dict[Hashable, list[float]]) -> float:
+    """Apply daylight adjustment to a single internal node.
+
+    Parameters:
+        node: The internal node to adjust.
+    Returns:
+        The total change in angle applied.
+
+    NOTE: The layout is also changed in place.
+    """
+    change = 0.0
+
+    # TODO: implement
+
+    return change
