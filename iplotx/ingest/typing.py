@@ -7,12 +7,18 @@ work as well on general networks.
 
 import sys
 from typing import (
-    Protocol,
     Optional,
     Sequence,
     Any,
     Iterable,
 )
+# NOTE: __init__ in Protocols has had a difficult gestation
+# https://github.com/python/cpython/issues/88970
+if sys.version_info < (3, 11):
+    Protocol = object
+else:
+    from typing import Protocol
+
 from collections.abc import Hashable
 import numpy as np
 import pandas as pd
