@@ -1,6 +1,6 @@
 .. _scipy-coc:
 
-ilpotx Code of Conduct
+iplotx Code of Conduct
 ======================
 
 
