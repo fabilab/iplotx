@@ -5,9 +5,8 @@ Networkx and trees are treated separately for practical reasons: many tree analy
 work as well on general networks.
 """
 
+import sys
 from typing import (
-    NotRequired,
-    TypedDict,
     Protocol,
     Optional,
     Sequence,
@@ -25,6 +24,11 @@ from ..typing import (
 from .heuristics import (
     normalise_tree_layout,
 )
+
+if sys.version_info < (3, 11):
+    from typing_extensions import TypedDict, NotRequired
+else:
+    from typing import TypedDict, NotRequired
 
 
 class NetworkData(TypedDict):
