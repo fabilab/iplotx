@@ -2,7 +2,12 @@
 Module for edge arrows in iplotx.
 """
 
-from typing import Never, Optional
+import sys
+if sys.version_info < (3, 11):
+    from typing_extensions import Never
+else:
+    from typing import Never
+from typing import Optional
 
 from math import atan2, cos, sin
 import numpy as np

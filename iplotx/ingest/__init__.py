@@ -2,6 +2,7 @@
 This module focuses on how to ingest network/tree data into standard data structures no matter what library they come from.
 """
 
+import sys
 import pathlib
 import pkgutil
 import importlib
@@ -35,6 +36,9 @@ provider_protocols = {
 data_providers: dict[str, dict[str, Protocol]] = {kind: {} for kind in provider_protocols}
 for kind in data_providers:
     providers_path = pathlib.Path(__file__).parent.joinpath("providers").joinpath(kind)
+    if sys.version_info < (3, 11):
+        providers_path = str(providers_path)
+
     for importer, module_name, _ in pkgutil.iter_modules([providers_path]):
         module = importlib.import_module(f"iplotx.ingest.providers.{kind}.{module_name}")
         for key, val in module.__dict__.items():
