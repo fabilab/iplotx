@@ -138,11 +138,11 @@ def ingest_tree_data(
 
 
 # INTERNAL FUNCTIONS
-def _update_data_providers(kind):
-    """Update data provieders dynamically from external packages."""
+def _update_data_providers(kind: str):
+    """Update data providers dynamically from external packages."""
     discovered_providers = importlib.metadata.entry_points(group=f"iplotx.{kind}_data_providers")
     for entry_point in discovered_providers:
-        if entry_point.name not in data_providers["network"]:
+        if entry_point.name not in data_providers[kind]:
             try:
                 data_providers[kind][entry_point.name] = entry_point.load()
             except Exception as e:
