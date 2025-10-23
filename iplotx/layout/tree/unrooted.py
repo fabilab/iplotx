@@ -38,40 +38,44 @@ def _equalangle_tree_layout(
     Reference: "Inferring Phylogenies" by Joseph Felsenstein, ggtree.
     """
 
-    layout = {}
     props = {
+        "layout": {},
+        "nleaves": {},
         "start": {},
         "end": {},
         "angle": {},
-        "number_of_leaves": {},
     }
 
-    layout[root] = [0.0, 0.0]
+    props["layout"][root] = [0.0, 0.0]
     props["start"][root] = 0.0
     props["end"][root] = 360.0
     props["angle"][root] = 0.0
 
     # Count the number of leaves in each subtree
     for node in postorder_fun():
+        props["nleaves"][node] = sum(props["nleaves"][child] for child in children_fun(node)) or 1
+
+    # Set the layout of everyone except the root
+    # NOTE: In ggtree, it says "postorder", but I cannot quite imagine how that would work,
+    # given that in postorder the root is visited last but it's also the only node about
+    # which we know anything at this point.
+    for node in preorder_fun():
+        nleaves = props["nleaves"][node]
         children = children_fun(node)
-        if len(children) == 0:
-            nleaves = 1
-        else:
-            nleaves = sum(props["number_of_leaves"][child] for child in children_fun(node))
 
         # Get current node props
         start = props["start"].get(node, 0)
         end = props["end"].get(node, 0)
-        cur_x, cur_y = layout.get(node, (0.0, 0.0))
+        cur_x, cur_y = props["layout"].get(node, (0.0, 0.0))
 
         total_angle = end - start
 
         for child in children:
-            nleaves_child = props["number_of_leaves"][child]
+            nleaves_child = props["nleaves"][child]
             alpha = nleaves_child / nleaves * total_angle
             beta = start + alpha / 2
 
-            layout[child] = [
+            props["layout"][child] = [
                 cur_x + branch_length_fun(child) * np.cos(np.radians(beta)),
                 cur_y + branch_length_fun(child) * np.sin(np.radians(beta)),
             ]
@@ -80,10 +84,8 @@ def _equalangle_tree_layout(
             props["end"][child] = start + alpha
             start += alpha
 
-        props["number_of_leaves"][node] = nleaves
-
     # FIXME: figure out how to tell the caller about "angle"
-    return layout
+    return props["layout"]
 
 
 def _daylight_tree_layout(

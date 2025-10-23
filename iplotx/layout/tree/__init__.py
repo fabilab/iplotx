@@ -49,6 +49,8 @@ def compute_tree_layout(
     kwargs["levelorder_fun"] = levelorder_fun
     kwargs["children_fun"] = children_fun
     kwargs["orientation"] = orientation
+    kwargs["branch_length_fun"] = branch_length_fun
+    kwargs["leaves_fun"] = leaves_fun
 
     # Angular or not, the vertex layout is unchanged. Since we do not
     # currently compute an edge layout here, we can ignore the option.
@@ -61,8 +63,6 @@ def compute_tree_layout(
     elif layout == "vertical":
         layout_dict = _vertical_tree_layout(**kwargs)
     elif layout == "equalangle":
-        kwargs["leaves_fun"] = leaves_fun
-        kwargs["branch_length_fun"] = branch_length_fun
         layout_dict = _equalangle_tree_layout(**kwargs)
     elif layout == "daylight":
         layout_dict = _daylight_tree_layout(**kwargs)

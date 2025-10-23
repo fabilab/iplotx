@@ -16,6 +16,9 @@ class Cogent3DataProvider(TreeDataProvider):
     def postorder(self) -> Sequence[Any]:
         return self.tree.postorder()
 
+    def levelorder(self) -> Sequence[Any]:
+        return self.tree.levelorder()
+
     def get_leaves(self) -> Sequence[Any]:
         return self.tree.tips()
 

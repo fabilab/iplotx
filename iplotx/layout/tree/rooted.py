@@ -20,6 +20,7 @@ def _horizontal_tree_layout_right(
     postorder_fun: Callable,
     children_fun: Callable,
     branch_length_fun: Callable,
+    **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Build a tree layout horizontally, left to right.
 
