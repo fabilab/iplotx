@@ -3,16 +3,23 @@ This module focuses on how to ingest network/tree data into standard data struct
 """
 
 import sys
+from typing import (
+    Optional,
+    Sequence,
+)
+
+# NOTE: __init__ in Protocols has had a difficult gestation
+# https://github.com/python/cpython/issues/88970
+if sys.version_info < (3, 11):
+    Protocol = object
+else:
+    from typing import Protocol
+
+from collections.abc import Hashable
 import pathlib
 import pkgutil
 import importlib
 import warnings
-from typing import (
-    Optional,
-    Sequence,
-    Protocol,
-)
-from collections.abc import Hashable
 import pandas as pd
 
 from ..typing import (
