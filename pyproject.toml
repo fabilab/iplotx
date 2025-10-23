@@ -11,7 +11,7 @@ authors = [
 maintainers = [
   {name = "Fabio Zanini", email = "fabio.zanini@unsw.edu.au"}
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
