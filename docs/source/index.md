@@ -36,4 +36,5 @@ Plotting API <api/plotting>
 Style API <api/style>
 Artist hierarchy <api/artists>
 Data provider protocols <api/providers>
+Code of conduct <code_of_conduct>
 ```
