@@ -3,7 +3,6 @@ from typing import (
     Optional,
     Sequence,
     Iterable,
-    Self,
 )
 
 from ...typing import (
@@ -19,12 +18,12 @@ class SimpleTree:
         branch_length: Length of the branch leading to this node/tree.
     """
 
-    children: Sequence[Self] = []
+    children: Sequence = []
     branch_length: float = 1
     name: str = ""
 
     @classmethod
-    def from_dict(cls, data: dict) -> Self:
+    def from_dict(cls, data: dict):
         """Create a SimpleTree from a dictionary.
 
         Parameters:

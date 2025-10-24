@@ -11,11 +11,11 @@ authors = [
 maintainers = [
   {name = "Fabio Zanini", email = "fabio.zanini@unsw.edu.au"}
 ]
-requires-python = ">=3.11"
+requires-python = ">=3.10"
 readme = "README.md"
 dynamic = ["version"]
 dependencies = [
-  "matplotlib>=2.0.0",
+  "matplotlib>=3.10.0",
   "numpy>=2.0.0",
   "pandas>=2.0.0",
 ]

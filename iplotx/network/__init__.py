@@ -1,7 +1,6 @@
 from typing import (
     Optional,
     Sequence,
-    Self,
 )
 import numpy as np
 import pandas as pd
@@ -103,8 +102,8 @@ class NetworkArtist(mpl.artist.Artist):
     @classmethod
     def from_other(
         cls: "NetworkArtist",  # NOTE: This is fixed in Python 3.14
-        other: Self,
-    ) -> Self:
+        other,
+    ):
         """Create a NetworkArtist as a copy of another one.
 
         Parameters:
@@ -123,7 +122,7 @@ class NetworkArtist(mpl.artist.Artist):
     def from_edgecollection(
         cls: "NetworkArtist",  # NOTE: This is fixed in Python 3.14
         edge_collection: EdgeCollection | Edge3DCollection,
-    ) -> Self:
+    ):
         """Create a NetworkArtist from iplotx artists.
 
         Parameters:

@@ -2,16 +2,24 @@
 This module focuses on how to ingest network/tree data into standard data structures no matter what library they come from.
 """
 
+import sys
+from typing import (
+    Optional,
+    Sequence,
+)
+
+# NOTE: __init__ in Protocols has had a difficult gestation
+# https://github.com/python/cpython/issues/88970
+if sys.version_info < (3, 11):
+    Protocol = object
+else:
+    from typing import Protocol
+
+from collections.abc import Hashable
 import pathlib
 import pkgutil
 import importlib
 import warnings
-from typing import (
-    Optional,
-    Sequence,
-    Protocol,
-)
-from collections.abc import Hashable
 import pandas as pd
 
 from ..typing import (
@@ -35,6 +43,9 @@ provider_protocols = {
 data_providers: dict[str, dict[str, Protocol]] = {kind: {} for kind in provider_protocols}
 for kind in data_providers:
     providers_path = pathlib.Path(__file__).parent.joinpath("providers").joinpath(kind)
+    if sys.version_info < (3, 11):
+        providers_path = str(providers_path)
+
     for importer, module_name, _ in pkgutil.iter_modules([providers_path]):
         module = importlib.import_module(f"iplotx.ingest.providers.{kind}.{module_name}")
         for key, val in module.__dict__.items():
@@ -138,11 +149,11 @@ def ingest_tree_data(
 
 
 # INTERNAL FUNCTIONS
-def _update_data_providers(kind):
-    """Update data provieders dynamically from external packages."""
+def _update_data_providers(kind: str):
+    """Update data providers dynamically from external packages."""
     discovered_providers = importlib.metadata.entry_points(group=f"iplotx.{kind}_data_providers")
     for entry_point in discovered_providers:
-        if entry_point.name not in data_providers["network"]:
+        if entry_point.name not in data_providers[kind]:
             try:
                 data_providers[kind][entry_point.name] = entry_point.load()
             except Exception as e:
