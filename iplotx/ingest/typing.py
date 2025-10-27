@@ -169,7 +169,7 @@ class TreeDataProvider(Protocol):
         if node is None:
             return self._get_leaves()
         else:
-            self.__class__(node)._get_leaves()
+            return self.__class__(node)._get_leaves()
 
     def _get_leaves(self) -> Sequence[Any]:
         """Get the whole tree leaves/tips in a provider-specific data structure.

@@ -180,10 +180,11 @@ def _apply_daylight_single_node(
     # This algo needs to look at all leaves, not only the subtree. In other words, because
     # it's an unrooted tree algo, it treats the node as a split and collects both leaves *below*
     # this node and *above* this node. The latter are just the leaves below all siblings of this node.
-    leaves_above = sum(
-        (list(leaves_fun(sibling)) for sibling in children_fun(parent) if sibling != node),
-        [],
-    )
+    leaves_above = []
+    for sibling in children_fun(parent):
+        if sibling == node:
+            continue
+        leaves_above += list(leaves_fun(sibling))
 
     children = children_fun(node)
 
