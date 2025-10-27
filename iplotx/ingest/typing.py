@@ -12,6 +12,7 @@ from typing import (
     Any,
     Iterable,
 )
+
 # NOTE: __init__ in Protocols has had a difficult gestation
 # https://github.com/python/cpython/issues/88970
 if sys.version_info < (3, 11):
@@ -156,8 +157,22 @@ class TreeDataProvider(Protocol):
                 return root_attr
         return self.tree.get_root()
 
-    def get_leaves(self) -> Sequence[Any]:
-        """Get the tree leaves/tips in a provider-specific data structure.
+    def get_leaves(self, node: Optional[TreeType] = None) -> Sequence[Any]:
+        """Get the leaves of the entire tree or a subtree.
+
+        Parameters:
+            node: The node to get the leaves from. If None, get from the entire
+                tree.
+        Returns:
+            The leaves or tips of the tree or node-anchored subtree.
+        """
+        if node is None:
+            return self._get_leaves()
+        else:
+            self.__class__(node)._get_leaves()
+
+    def _get_leaves(self) -> Sequence[Any]:
+        """Get the whole tree leaves/tips in a provider-specific data structure.
 
         Returns:
             The leaves or tips of the tree.
@@ -235,8 +250,6 @@ class TreeDataProvider(Protocol):
         NOTE: individual providers may implement more efficient versions of
         this function if desired.
         """
-        provider = self.__class__
-
         # Find leaves of the selected nodes
         leaves = set()
         for node in nodes:
@@ -244,7 +257,7 @@ class TreeDataProvider(Protocol):
             if len(self.get_children(node)) == 0:
                 leaves.add(node)
             else:
-                leaves |= set(provider(node).get_leaves())
+                leaves |= set(self.get_leaves(node))
 
         # Look for nodes with the same set of leaves, starting from the bottom
         # and stopping at the first (i.e. lowest) hit.
@@ -253,7 +266,7 @@ class TreeDataProvider(Protocol):
             if len(self.get_children(node)) == 0:
                 leaves_node = {node}
             else:
-                leaves_node = set(provider(node).get_leaves())
+                leaves_node = set(self.get_leaves(node))
             if leaves <= leaves_node:
                 root = node
                 break

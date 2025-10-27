@@ -19,7 +19,7 @@ class Cogent3DataProvider(TreeDataProvider):
     def levelorder(self) -> Sequence[Any]:
         return self.tree.levelorder()
 
-    def get_leaves(self) -> Sequence[Any]:
+    def _get_leaves(self) -> Sequence[Any]:
         return self.tree.tips()
 
     @staticmethod

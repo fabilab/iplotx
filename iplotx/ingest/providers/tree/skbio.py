@@ -16,7 +16,7 @@ class SkbioDataProvider(TreeDataProvider):
     def postorder(self) -> Sequence[Any]:
         return self.tree.postorder()
 
-    def get_leaves(self) -> Sequence[Any]:
+    def _get_leaves(self) -> Sequence[Any]:
         return self.tree.tips()
 
     @staticmethod

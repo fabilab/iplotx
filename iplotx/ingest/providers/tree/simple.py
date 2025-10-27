@@ -64,7 +64,7 @@ class SimpleTreeDataProvider(TreeDataProvider):
 
         yield from _recur(self.tree)
 
-    def get_leaves(self) -> Sequence[Any]:
+    def _get_leaves(self) -> Sequence[Any]:
         def _recur(node):
             if len(node.children) == 0:
                 yield node

@@ -20,7 +20,7 @@ class Ete4DataProvider(TreeDataProvider):
     postorder = partialmethod(_traverse, order="postorder")
     levelorder = partialmethod(_traverse, order="levelorder")
 
-    def get_leaves(self) -> Sequence[Any]:
+    def _get_leaves(self) -> Sequence[Any]:
         return self.tree.leaves()
 
     @staticmethod

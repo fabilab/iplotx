@@ -22,7 +22,7 @@ class BiopythonDataProvider(TreeDataProvider):
     preorder = partialmethod(_traverse, order="preorder")
     postorder = partialmethod(_traverse, order="postorder")
 
-    def get_leaves(self) -> Sequence[Any]:
+    def _get_leaves(self) -> Sequence[Any]:
         return self.tree.get_terminals()
 
     @staticmethod

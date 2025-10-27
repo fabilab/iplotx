@@ -36,7 +36,7 @@ class DendropyDataProvider(TreeDataProvider):
             return self.tree.postorder_node_iter()
         return self.tree.postorder_iter()
 
-    def get_leaves(self) -> Sequence[Any]:
+    def _get_leaves(self) -> Sequence[Any]:
         """Get a list of leaves."""
         return self.tree.leaf_nodes()
 
