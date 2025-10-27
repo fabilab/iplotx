@@ -157,6 +157,16 @@ class TreeDataProvider(Protocol):
                 return root_attr
         return self.tree.get_root()
 
+    def get_subtree(self, node: TreeType):
+        """Get the subtree rooted at the given node.
+
+        Parameters:
+            node: The node to get the subtree from.
+        Returns:
+            The subtree rooted at the given node.
+        """
+        return self.__class__(node)
+
     def get_leaves(self, node: Optional[TreeType] = None) -> Sequence[Any]:
         """Get the leaves of the entire tree or a subtree.
 
@@ -169,7 +179,7 @@ class TreeDataProvider(Protocol):
         if node is None:
             return self._get_leaves()
         else:
-            return self.__class__(node)._get_leaves()
+            return self.get_subtree(node)._get_leaves()
 
     def _get_leaves(self) -> Sequence[Any]:
         """Get the whole tree leaves/tips in a provider-specific data structure.

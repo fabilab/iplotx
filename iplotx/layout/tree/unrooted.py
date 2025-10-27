@@ -100,7 +100,7 @@ def _daylight_tree_layout(
     orientation: str = "right",
     start: float = 180,
     span: float = 360,
-    max_iter: int = 5,
+    max_iter: int = 1,
     **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Daylight unrooted tree layout.
@@ -134,6 +134,8 @@ def _daylight_tree_layout(
         **kwargs,
     )
 
+    all_leaves = list(leaves_fun(root))
+
     change_avg = 1.0
     for it in range(max_iter):
         change_sum = 0
@@ -144,6 +146,7 @@ def _daylight_tree_layout(
                 res = _apply_daylight_single_node(
                     child,
                     node,
+                    all_leaves,
                     layout,
                     leaves_fun,
                     children_fun,
@@ -161,6 +164,7 @@ def _daylight_tree_layout(
 def _apply_daylight_single_node(
     node: Any,
     parent: Any,
+    all_leaves: list[Any],
     layout: dict[Hashable, list[float]],
     leaves_fun: Callable,
     children_fun: Callable,
@@ -174,72 +178,86 @@ def _apply_daylight_single_node(
 
     NOTE: The layout is also changed in place.
     """
-
     # Inspired from:
     # https://github.com/thomasp85/ggraph/blob/6c4ce81e460c50a16f9cd97e0b3a089f36901316/src/unrooted.cpp#L122
-    # This algo needs to look at all leaves, not only the subtree. In other words, because
-    # it's an unrooted tree algo, it treats the node as a split and collects both leaves *below*
-    # this node and *above* this node. The latter are just the leaves below all siblings of this node.
-    leaves_above = []
-    for sibling in children_fun(parent):
-        if sibling == node:
-            continue
-        leaves_above += list(leaves_fun(sibling))
-
     children = children_fun(node)
 
     # 1. Find boundary leaves for each child and for the parent
     x0, y0 = layout[node]
-    bounds_lower = {}
-    bounds_upper = {}
+    bounds = {}
+
+    print("node")
+    print(node)
+    print(float(x0), float(y0))
+    print("parent side leaves:")
+
+    # To find the parent side leaves, we take all leaves and skip the ones
+    # downstream of this node
+    leaves_below = leaves_fun(node)
 
     # Check the parent first...
     vec1 = layout[parent][0] - x0, layout[parent][1] - y0
-    lower, upper = 0, 0
+    print(f"  node to parent vector: {vec1[0]:.2f}, {vec1[1]:.2f}")
     lower_angle, upper_angle = 2 * np.pi, -2 * np.pi
-    for leaf in leaves_above:
+    for leaf in all_leaves:
+        # Skip subtree leaves
+        if leaf in leaves_below:
+            continue
         vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
         angle = _anticlockwise_angle(vec1, vec2)
+        print("  parent side leaf:")
+        print(leaf)
+        print(f"  node to leaf vector: {vec2[0]:.2f}, {vec2[1]:.2f}")
+        print(f"  angle: {angle:.2f}")
         if angle < lower_angle:
             lower_angle = angle
             lower = leaf
         if angle > upper_angle:
             upper_angle = angle
             upper = leaf
-    bounds_lower[parent] = lower
-    bounds_upper[parent] = upper
+    bounds[parent] = (lower, upper, lower_angle, upper_angle)
 
     # ... and now repeat the exact same thing for each child rather than the parent
+    print("subtree leaves:")
     for child in children:
         vec1 = layout[child][0] - x0, layout[child][1] - y0
-        lower, upper = 0, 0
+        print(f"  node to child vector: {vec1[0]:.2f}, {vec1[1]:.2f}")
         lower_angle, upper_angle = 2 * np.pi, -2 * np.pi
 
         for leaf in leaves_fun(child):
             vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
             angle = _anticlockwise_angle(vec1, vec2)
+            print(f"  node to leaf vector: {vec2[0]:.2f}, {vec2[1]:.2f}")
+            print(leaf)
+            print(f"  angle: {angle:.2f}")
             if angle < lower_angle:
                 lower_angle = angle
                 lower = leaf
             if angle > upper_angle:
                 upper_angle = angle
                 upper = leaf
-        bounds_lower[child] = lower
-        bounds_upper[child] = upper
+        bounds[child] = (lower, upper, lower_angle, upper_angle)
+
+    print("final boundary leaves:")
+    print(bounds)
 
     # 2. Compute daylight angles
     # NOTE: Since Python 3.6, python keys are ordered by insertion order.
     daylight = {}
     daylight_sum = 0.0
     # TODO: Mayvbe optimise this by avoiding creating all these lists
-    prev_leaves = list(bounds_upper.keys())
-    leaves = list(bounds_lower.keys())[1:] + [parent]
+    prev_leaves = [bound[1] for bound in bounds.values()]
+    leaves = [bound[0] for bound in bounds.values()][1:] + [parent]
     for prev_leaf, leaf in zip(prev_leaves, leaves):
         vec1 = layout[prev_leaf][0] - x0, layout[prev_leaf][1] - y0
         vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
         angle = _anticlockwise_angle(vec1, vec2)
-        daylight[leaf] = angle
+        daylight[leaf] = float(angle)
         daylight_sum += angle
+
+    print("daylight")
+    print(daylight)
+    print(f"daylight sum: {daylight_sum:.2f}")
 
     # 3. Compute *excess* daylight, and correct it
     # NOTE: There seems to be this notion that you rotate a node by the accumulated daylight
@@ -258,7 +276,8 @@ def _apply_daylight_single_node(
         )
         daylight_changes += abs(daylight_cum_corr)
 
-    return daylight_changes / len(leaves)
+    # Caller wants degrees
+    return np.degrees(daylight_changes / len(leaves))
 
 
 # see: https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors
@@ -278,22 +297,24 @@ def _anticlockwise_angle(v1, v2):
 
 def _rotate_around_point(
     point,
-    piviot,
+    pivot,
     angle,
 ):
     """Rotate a point around a piviot by angle (in radians).
 
     Parameters:
         point: The point to rotate.
-        piviot: The piviot point.
+        pivot: The piviot point.
         angle: The angle in radians.
     Returns:
         The rotated point.
     """
-    vec = point[0] - piviot[0], point[1] - piviot[1]
+    vec = point[0] - pivot[0], point[1] - pivot[1]
     cos = np.cos(angle)
     sin = np.sin(angle)
+    vec_rot = [
+        vec[0] * cos - vec[1] * sin,
+        vec[0] * sin + vec[1] * cos,
+    ]
 
-    x = piviot[0] + vec[0] * cos - vec[1] * sin
-    y = piviot[1] + vec[0] * sin + vec[1] * cos
-    return [x, y]
+    return [pivot[0] + vec_rot[0], pivot[1] + vec_rot[1]]
