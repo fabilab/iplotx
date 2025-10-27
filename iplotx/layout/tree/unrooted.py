@@ -100,7 +100,8 @@ def _daylight_tree_layout(
     orientation: str = "right",
     start: float = 180,
     span: float = 360,
-    max_iter: int = 1,
+    max_iter: int = 5,
+    dampening: float = 0.3,
     **kwargs,
 ) -> dict[Hashable, list[float]]:
     """Daylight unrooted tree layout.
@@ -113,6 +114,9 @@ def _daylight_tree_layout(
             360, it leaves a small gap at the end to ensure the first and last leaf
             are not overlapping.
         max_iter: Maximum number of iterations to perform.
+        dampening: Dampening factor for angle adjustments. 1.0 means full adjustment.
+            The number must be strictily positive (usually between 0 excluded and 1
+            included).
     Returns:
         A dictionary with the layout.
 
@@ -134,22 +138,32 @@ def _daylight_tree_layout(
         **kwargs,
     )
 
+    if len(layout) <= 2:
+        return layout
+
+    # Make all arrays for easier manipulation
+    orig_class = next(iter(layout.values())).__class__
+    for key, value in layout.items():
+        layout[key] = np.asarray(value)
+
     all_leaves = list(leaves_fun(root))
 
     change_avg = 1.0
     for it in range(max_iter):
         change_sum = 0
         ninternal = 0
-        for node in levelorder_fun():
-            # Ignore leaves
-            for child in children_fun(node):
+        parents = [None] + list(levelorder_fun())
+        for parent in parents:
+            children = children_fun(parent) if parent is not None else [root]
+            for node in children:
                 res = _apply_daylight_single_node(
-                    child,
                     node,
+                    parent,
                     all_leaves,
                     layout,
                     leaves_fun,
                     children_fun,
+                    dampening,
                 )
                 change_sum += res
                 ninternal += 1
@@ -158,6 +172,10 @@ def _daylight_tree_layout(
         if change_avg < delta_angle_min:
             break
 
+    # Make all lists again
+    for key, value in layout.items():
+        layout[key] = orig_class(value)
+
     return layout
 
 
@@ -165,9 +183,10 @@ def _apply_daylight_single_node(
     node: Any,
     parent: Any,
     all_leaves: list[Any],
-    layout: dict[Hashable, list[float]],
+    layout: dict[Hashable, np.ndarray],
     leaves_fun: Callable,
     children_fun: Callable,
+    dampening: float,
 ) -> float:
     """Apply daylight adjustment to a single internal node.
 
@@ -177,55 +196,66 @@ def _apply_daylight_single_node(
         The total change in angle applied.
 
     NOTE: The layout is also changed in place.
-    """
+
     # Inspired from:
     # https://github.com/thomasp85/ggraph/blob/6c4ce81e460c50a16f9cd97e0b3a089f36901316/src/unrooted.cpp#L122
+    """
+
+    import os
+    from builtins import print as _print
+
+    DEBUG_DAYLIGHT = os.getenv("IPLOTX_DEBUG_DAYLIGHT", "0") == "1"
+
+    print = _print if DEBUG_DAYLIGHT else lambda *a, **k: None
+
     children = children_fun(node)
 
     # 1. Find boundary leaves for each child and for the parent
-    x0, y0 = layout[node]
+    p0 = layout[node]
     bounds = {}
 
     print("node")
     print(node)
-    print(float(x0), float(y0))
-    print("parent side leaves:")
+    print(float(p0[0]), float(p0[1]))
 
     # To find the parent side leaves, we take all leaves and skip the ones
     # downstream of this node
     leaves_below = leaves_fun(node)
 
-    # Check the parent first...
-    vec1 = layout[parent][0] - x0, layout[parent][1] - y0
-    print(f"  node to parent vector: {vec1[0]:.2f}, {vec1[1]:.2f}")
-    lower_angle, upper_angle = 2 * np.pi, -2 * np.pi
-    for leaf in all_leaves:
-        # Skip subtree leaves
-        if leaf in leaves_below:
-            continue
-        vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
-        angle = _anticlockwise_angle(vec1, vec2)
-        print("  parent side leaf:")
-        print(leaf)
-        print(f"  node to leaf vector: {vec2[0]:.2f}, {vec2[1]:.2f}")
-        print(f"  angle: {angle:.2f}")
-        if angle < lower_angle:
-            lower_angle = angle
-            lower = leaf
-        if angle > upper_angle:
-            upper_angle = angle
-            upper = leaf
-    bounds[parent] = (lower, upper, lower_angle, upper_angle)
+    # Check the parent first if there is one
+    if parent is not None:
+        vec1 = layout[parent] - p0
+        print("parent side leaves:")
+        print(parent)
+        print(f"  node to parent vector: {vec1[0]:.2f}, {vec1[1]:.2f}")
+        lower_angle, upper_angle = 2 * np.pi, -2 * np.pi
+        for leaf in all_leaves:
+            # Skip subtree leaves
+            if leaf in leaves_below:
+                continue
+            vec2 = layout[leaf] - p0
+            angle = _anticlockwise_angle(vec1, vec2)
+            print("  parent side leaf:")
+            print(leaf)
+            print(f"  node to leaf vector: {vec2[0]:.2f}, {vec2[1]:.2f}")
+            print(f"  angle: {angle:.2f}")
+            if angle < lower_angle:
+                lower_angle = angle
+                lower = leaf
+            if angle > upper_angle:
+                upper_angle = angle
+                upper = leaf
+        bounds[parent] = (lower, upper, lower_angle, upper_angle)
 
-    # ... and now repeat the exact same thing for each child rather than the parent
+    # Repeat the exact same thing for each child rather than the parent
     print("subtree leaves:")
     for child in children:
-        vec1 = layout[child][0] - x0, layout[child][1] - y0
+        vec1 = layout[child] - p0
         print(f"  node to child vector: {vec1[0]:.2f}, {vec1[1]:.2f}")
         lower_angle, upper_angle = 2 * np.pi, -2 * np.pi
 
         for leaf in leaves_fun(child):
-            vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
+            vec2 = layout[leaf] - p0
             angle = _anticlockwise_angle(vec1, vec2)
             print(f"  node to leaf vector: {vec2[0]:.2f}, {vec2[1]:.2f}")
             print(leaf)
@@ -247,13 +277,18 @@ def _apply_daylight_single_node(
     daylight_sum = 0.0
     # TODO: Mayvbe optimise this by avoiding creating all these lists
     prev_leaves = [bound[1] for bound in bounds.values()]
-    leaves = [bound[0] for bound in bounds.values()][1:] + [parent]
-    for prev_leaf, leaf in zip(prev_leaves, leaves):
-        vec1 = layout[prev_leaf][0] - x0, layout[prev_leaf][1] - y0
-        vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
+    leaves = [bound[0] for bound in bounds.values()]
+    leaves = leaves[1:] + [leaves[0]]  # cycle left
+    subtrees = children + ([parent] if parent is not None else [])
+    for subtree, prev_leaf, leaf in zip(subtrees, prev_leaves, leaves):
+        vec1 = layout[prev_leaf] - p0
+        vec2 = layout[leaf] - p0
         angle = _anticlockwise_angle(vec1, vec2)
-        daylight[leaf] = float(angle)
+
         daylight_sum += angle
+        if leaf != parent:
+            # daylight[leaf] = float(angle)
+            daylight[subtree] = float(angle)
 
     print("daylight")
     print(daylight)
@@ -264,17 +299,21 @@ def _apply_daylight_single_node(
     # correction (to fill the space on the left) plus its own correction (to fill the space on the right).
     # It reads funny and this is within a BFS iteration anyway so it's probably ok, but it's
     # curious.
+    # NOTE: The average adjustment is divided by children + 1 (the parent) bc this is unrooted.
     daylight_avg = daylight_sum / (len(children) + 1)
     daylight_cum_corr = 0.0
     daylight_changes = 0
-    for child in children:
+    for leaf in daylight:
         daylight_cum_corr += daylight_avg - daylight[leaf]
-        layout[child] = _rotate_around_point(
-            layout[child],
-            (x0, y0),
-            daylight_cum_corr,
+        _rotate_subtree_around_point(
+            leaf,
+            children_fun,
+            layout,
+            p0,
+            dampening * daylight_cum_corr,
+            recur=True,
         )
-        daylight_changes += abs(daylight_cum_corr)
+        daylight_changes += abs(dampening * daylight_cum_corr)
 
     # Caller wants degrees
     return np.degrees(daylight_changes / len(leaves))
@@ -295,6 +334,33 @@ def _anticlockwise_angle(v1, v2):
     return np.arctan2(determinant, dot)
 
 
+def _rotate_subtree_around_point(
+    node,
+    children_fun: Callable,
+    layout: dict[Hashable, list[float]],
+    pivot,
+    angle,
+    recur: bool = True,
+):
+    point = np.asarray(layout[node])
+    pivot = np.asarray(pivot)
+    layout[node] = _rotate_around_point(
+        point,
+        pivot,
+        angle,
+    )
+    if not recur:
+        return
+    for child in children_fun(node):
+        _rotate_subtree_around_point(
+            child,
+            children_fun,
+            layout,
+            pivot,
+            angle,
+        )
+
+
 def _rotate_around_point(
     point,
     pivot,
@@ -309,12 +375,9 @@ def _rotate_around_point(
     Returns:
         The rotated point.
     """
-    vec = point[0] - pivot[0], point[1] - pivot[1]
+    point = np.asarray(point)
+    pivot = np.asarray(pivot)
     cos = np.cos(angle)
     sin = np.sin(angle)
-    vec_rot = [
-        vec[0] * cos - vec[1] * sin,
-        vec[0] * sin + vec[1] * cos,
-    ]
-
-    return [pivot[0] + vec_rot[0], pivot[1] + vec_rot[1]]
+    rot = np.array([[cos, sin], [-sin, cos]])
+    return pivot + (point - pivot) @ rot
