@@ -174,85 +174,125 @@ def _apply_daylight_single_node(
 
     NOTE: The layout is also changed in place.
     """
-    # Three steps:
-    # 1. Find subtrees
-    # 2. Find angles of subtrees
-    # 3. Adjust angles of (rotate) subtrees
-    # (return angular change)
 
+    # Inspired from:
     # https://github.com/thomasp85/ggraph/blob/6c4ce81e460c50a16f9cd97e0b3a089f36901316/src/unrooted.cpp#L122
     # This algo needs to look at all leaves, not only the subtree. In other words, because
     # it's an unrooted tree algo, it treats the node as a split and collects both leaves *below*
     # this node and *above* this node. The latter are just the leaves below all siblings of this node.
-    leaves_below = list(leaves_fun(node))
     leaves_above = sum(
         (list(leaves_fun(sibling)) for sibling in children_fun(parent) if sibling != node),
         [],
     )
-    leaves = leaves_below + leaves_above
-    nl_below = len(leaves_below)
 
     children = children_fun(node)
 
+    # 1. Find boundary leaves for each child and for the parent
+    x0, y0 = layout[node]
     bounds_lower = {}
     bounds_upper = {}
 
-    x0, y0 = layout[node]
-    for il, leaf in enumerate(leaves):
-        if il < nl_below:
-            dv = layout[leaf][0] - x0, layout[leaf][1] - y0
-        else:
-            dv = layout[parent][0] - x0, layout[parent][1] - y0
+    # Check the parent first...
+    vec1 = layout[parent][0] - x0, layout[parent][1] - y0
+    lower, upper = 0, 0
+    lower_angle, upper_angle = 2 * np.pi, -2 * np.pi
+    for leaf in leaves_above:
+        vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
+        angle = _anticlockwise_angle(vec1, vec2)
+        if angle < lower_angle:
+            lower_angle = angle
+            lower = leaf
+        if angle > upper_angle:
+            upper_angle = angle
+            upper = leaf
+    bounds_lower[parent] = lower
+    bounds_upper[parent] = upper
+
+    # ... and now repeat the exact same thing for each child rather than the parent
+    for child in children:
+        vec1 = layout[child][0] - x0, layout[child][1] - y0
         lower, upper = 0, 0
         lower_angle, upper_angle = 2 * np.pi, -2 * np.pi
-        for leaf2 in ...:
-            dv2 = layout[leaf2][0] - x0, layout[leaf2][1] - y0
 
-            # Anticlockwise angle between dv and dv2
-            angle = _angle_between_vectors(dv, dv2)
-
+        for leaf in leaves_fun(child):
+            vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
+            angle = _anticlockwise_angle(vec1, vec2)
             if angle < lower_angle:
                 lower_angle = angle
-                lower = leaf2
+                lower = leaf
             if angle > upper_angle:
                 upper_angle = angle
-                upper = leaf2
+                upper = leaf
+        bounds_lower[child] = lower
+        bounds_upper[child] = upper
 
-        bounds_lower[leaf] = lower
-        bounds_upper[leaf] = upper
-
+    # 2. Compute daylight angles
+    # NOTE: Since Python 3.6, python keys are ordered by insertion order.
     daylight = {}
     daylight_sum = 0.0
-    old_leaf = leaves[-1]
-    for leaf in bounds_lower:
-        dx, dy = layout[old_leaf][0] - x0, layout[old_leaf][1] - y0
-        dx2, dy2 = layout[leaf][0] - x0, layout[leaf][1] - y0
-        dot = dx * dx2 + dy * dy2
-        determinant = dx * dy2 - dy * dx2
-        angle = np.arctan2(determinant, dot)
-
+    # TODO: Mayvbe optimise this by avoiding creating all these lists
+    prev_leaves = list(bounds_upper.keys())
+    leaves = list(bounds_lower.keys())[1:] + [parent]
+    for prev_leaf, leaf in zip(prev_leaves, leaves):
+        vec1 = layout[prev_leaf][0] - x0, layout[prev_leaf][1] - y0
+        vec2 = layout[leaf][0] - x0, layout[leaf][1] - y0
+        angle = _anticlockwise_angle(vec1, vec2)
         daylight[leaf] = angle
         daylight_sum += angle
 
-        old_leaf = leaf
-
-    daylight_avg = daylight_sum / len(leaves)
-    deylight_cumsum = 0.0
+    # 3. Compute *excess* daylight, and correct it
+    # NOTE: There seems to be this notion that you rotate a node by the accumulated daylight
+    # correction (to fill the space on the left) plus its own correction (to fill the space on the right).
+    # It reads funny and this is within a BFS iteration anyway so it's probably ok, but it's
+    # curious.
+    daylight_avg = daylight_sum / (len(children) + 1)
+    daylight_cum_corr = 0.0
     daylight_changes = 0
-    for leaf in leaves:
-        daylight_cumsum += daylight_avg - daylight[leaf]
-        daylight_changes += abs(daylight_cumsum)
+    for child in children:
+        daylight_cum_corr += daylight_avg - daylight[leaf]
         layout[child] = _rotate_around_point(
             layout[child],
-            daylight_cumsum,
             (x0, y0),
+            daylight_cum_corr,
         )
+        daylight_changes += abs(daylight_cum_corr)
 
     return daylight_changes / len(leaves)
 
 
 # see: https://stackoverflow.com/questions/14066933/direct-way-of-computing-the-clockwise-angle-between-two-vectors
 def _anticlockwise_angle(v1, v2):
+    """Compute the anticlockwise angle between two 2D vectors.
+
+    Parameters:
+        v1: First vector.
+        v2: Second vector.
+    Returns:
+        The angle in radians.
+    """
     dot = v1[0] * v2[0] + v1[1] * v2[1]
     determinant = v1[0] * v2[1] - v1[1] * v2[0]
     return np.arctan2(determinant, dot)
+
+
+def _rotate_around_point(
+    point,
+    piviot,
+    angle,
+):
+    """Rotate a point around a piviot by angle (in radians).
+
+    Parameters:
+        point: The point to rotate.
+        piviot: The piviot point.
+        angle: The angle in radians.
+    Returns:
+        The rotated point.
+    """
+    vec = point[0] - piviot[0], point[1] - piviot[1]
+    cos = np.cos(angle)
+    sin = np.sin(angle)
+
+    x = piviot[0] + vec[0] * cos - vec[1] * sin
+    y = piviot[1] + vec[0] * sin + vec[1] * cos
+    return [x, y]
