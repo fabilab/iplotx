@@ -51,6 +51,13 @@ See [readthedocs](https://iplotx.readthedocs.io/en/latest/) for the full documen
 ## Gallery
 See [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
 
+## Citation
+If you use `iplotx` for publication figures, please cite the [zenodo preprint](https://doi.org/10.5281/zenodo.16599333):
+
+```
+F. Zanini. (2025). Unified network visualisation in Python. Zenodo [PREPRINT]. https://doi.org/10.5281/zenodo.16599333
+```
+
 ## Features
 - Plot networks from multiple libraries including networkx, igraph and graph-tool, using Matplotlib. ✅
 - Plot trees from multiple libraries such as cogent3, ETE4, skbio, biopython, and dendropy. ✅
