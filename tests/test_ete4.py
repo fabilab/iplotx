@@ -1,6 +1,4 @@
 import pytest
-import unittest
-import importlib
 import matplotlib as mpl
 
 mpl.use("agg")
@@ -8,8 +6,7 @@ import matplotlib.pyplot as plt
 import iplotx as ipx
 from utils import image_comparison
 
-if importlib.util.find_spec("ete4") is None:
-    raise unittest.SkipTest("ete4 not found, skipping tests")
+ete4 = pytest.importorskip("ete4")
 
 
 @pytest.fixture
@@ -81,4 +78,25 @@ def test_split_edges(small_tree):
         ax=ax,
         layout="horizontal",
         edge_split_linestyle=":",
+    )
+
+
+@image_comparison(baseline_images=["equalangle_layout"], remove_text=True)
+def test_equalangle_layout(small_tree):
+    fig, ax = plt.subplots(figsize=(4, 4))
+    ipx.plotting.tree(
+        tree=small_tree,
+        ax=ax,
+        layout="equalangle",
+    )
+
+
+@pytest.mark.skip(reason="Daylight layout is experimental for now.")
+@image_comparison(baseline_images=["daylight_layout"], remove_text=True)
+def test_daylight_layout(small_tree):
+    fig, ax = plt.subplots(figsize=(4, 4))
+    ipx.plotting.tree(
+        tree=small_tree,
+        ax=ax,
+        layout="daylight",
     )

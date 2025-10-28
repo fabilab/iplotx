@@ -64,6 +64,16 @@ class SimpleTreeDataProvider(TreeDataProvider):
 
         yield from _recur(self.tree)
 
+    def levelorder(self) -> Iterable[dict[dict | str, Any]]:
+        from collections import deque
+
+        queue = deque([self.get_root()])
+        while queue:
+            node = queue.popleft()
+            for child in self.get_children(node):
+                queue.append(child)
+            yield node
+
     def _get_leaves(self) -> Sequence[Any]:
         def _recur(node):
             if len(node.children) == 0:

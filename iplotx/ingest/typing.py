@@ -308,8 +308,25 @@ class TreeDataProvider(Protocol):
                 orientation = "right"
             elif layout == "vertical":
                 orientation = "descending"
-            elif layout == "radial":
+            elif layout in ("radial", "equalangle", "daylight"):
                 orientation = "clockwise"
+
+        # Validate orientation
+        valid = (layout == "horizontal") and (orientation in ("right", "left"))
+        valid |= (layout == "vertical") and (orientation in ("ascending", "descending"))
+        valid |= (layout == "radial") and (
+            orientation in ("clockwise", "counterclockwise", "left", "right")
+        )
+        valid |= (layout == "equalangle") and (
+            orientation in ("clockwise", "counterclockwise", "left", "right")
+        )
+        valid |= (layout == "daylight") and (
+            orientation in ("clockwise", "counterclockwise", "left", "right")
+        )
+        if not valid:
+            raise ValueError(
+                f"Orientation '{orientation}' is not valid for layout '{layout}'.",
+            )
 
         tree_data = {
             "root": self.get_root(),

@@ -36,6 +36,15 @@ class DendropyDataProvider(TreeDataProvider):
             return self.tree.postorder_node_iter()
         return self.tree.postorder_iter()
 
+    def levelorder(self) -> Any:
+        """Levelorder traversal of the tree.
+
+        NOTE: This will work on both entire Trees and Nodes (which means a subtree including self).
+        """
+        if hasattr(self.tree, "levelorder_node_iter"):
+            return self.tree.levelorder_node_iter()
+        return self.tree.levelorder_iter()
+
     def _get_leaves(self) -> Sequence[Any]:
         """Get a list of leaves."""
         return self.tree.leaf_nodes()

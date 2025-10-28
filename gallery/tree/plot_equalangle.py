@@ -21,3 +21,15 @@ ipx.plotting.tree(
     tree,
     layout="equalangle",
 )
+
+
+# %%
+# The "equal daylight" layout is an adjustment of the equal angle layout that attempts to spread out leaves more evenly
+# for imbalanced trees. ``iplotx`` has an experimental implementation of this layout.
+#
+# .. warning:: "Experimental" means you can use it but the API and resulting layout may change in future releases.
+
+ipx.plotting.tree(
+    tree,
+    layout="daylight",
+)
