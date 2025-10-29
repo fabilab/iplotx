@@ -370,6 +370,9 @@ class EdgeCollection(mpl.collections.PatchCollection):
             if edge_stylei.get("curved", False):
                 tension = edge_stylei.get("tension", 5)
                 ports = edge_stylei.get("ports", (None, None))
+            elif edge_stylei.get("arc", False):
+                tension = edge_stylei.get("tension", 1)
+                ports = None
             else:
                 tension = 0
                 ports = None
@@ -391,6 +394,8 @@ class EdgeCollection(mpl.collections.PatchCollection):
             if waypoints != "none":
                 ports = edge_stylei.get("ports", (None, None))
 
+            arc = edge_stylei.get("arc", False)
+
             # Compute actual edge path
             path, angles = _compute_edge_path(
                 vcoord_data,
@@ -401,6 +406,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 tension=tension,
                 waypoints=waypoints,
                 ports=ports,
+                arc=arc,
                 layout_coordinate_system=self._vertex_collection.get_layout_coordinate_system(),
                 shrink=shrink,
             )
@@ -712,6 +718,7 @@ def make_stub_patch(**kwargs):
         "split",
         "shrink",
         "depthshade",
+        "arc",
         # DEPRECATED
         "padding",
     ]

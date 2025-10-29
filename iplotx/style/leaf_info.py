@@ -41,6 +41,7 @@ nonrotating_leaves = (
     "deep",
     "angular",
     "curved",
+    "arc",
     "capstyle",
     "depthshade",
 )

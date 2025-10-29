@@ -204,6 +204,35 @@ class GraphTestRunner(unittest.TestCase):
         ipx.graph(g, ax=ax)
         ax.set_aspect(1.0)
 
+    @image_comparison(baseline_images=["arcs"])
+    def test_arcs(self):
+        g = ig.Graph.Full(4)
+        layout = [[0, 0], [1, 0], [2, 0], [3, 0]]
+
+        fig, ax = plt.subplots()
+        ipx.plot(
+            g,
+            layout=layout,
+            ax=ax,
+            edge_arc=True,
+            edge_tension=-1,
+        )
+
+    @image_comparison(baseline_images=["large_arcs"])
+    def test_large_arcs(self):
+        g = ig.Graph.Full(4)
+        layout = [[0, 0], [1, 0], [2, 0], [3, 0]]
+
+        fig, ax = plt.subplots()
+        ipx.plot(
+            g,
+            layout=layout,
+            ax=ax,
+            edge_arc=True,
+            edge_tension=-3,
+            margins=0.2,
+        )
+
 
 class ClusteringTestRunner(unittest.TestCase):
     @property

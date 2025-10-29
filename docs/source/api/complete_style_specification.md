@@ -102,9 +102,14 @@
 
         "curved": bool,  # Whether the edge is curved (True) or straight (False)
 
-        # Tension for curved edges (0.0 for straight, higher values position the
-        # Bezier control points further away from the nodes, creating more wiggly lines)
+        # Tension for curved edges and arcs.
+        # For Bezier (curved) edges, 0.0 means straight, higher values position the
+        # Bezier control points further away from the nodes, creating more wiggly lines.
         # Negative values bend the curve on the other side of the straight line.
+        # For arc edges, 0.0 means straight, higher values draw larger arcs. 1.0
+        # means a semicircle, and numbers above 5 create very large arcs, almost full
+        # circles. The exact definition of tension for arcs is the tangent of a
+        # quarter of the angle spanned by the arc.
         "tension": float,
 
         # Tension for self-loops (higher values create more bigger loops).
@@ -281,7 +286,7 @@
         # For horizontal and vertical layouts:
         #   start: Starting position in data units (tuple of two floats)
         #   span: Breadth in data units (float)
-        "start": float | tuple[float, float],
+        "start": float | tuple[float            margins=0.2,
         "span": float,
     },
     ############################################################################

@@ -393,6 +393,108 @@ def _compute_edge_path_waypoints(
     return path, angles
 
 
+def _compute_edge_path_arc(
+    tension,
+    vcoord_data,
+    vpath_fig,
+    vsize_fig,
+    trans,
+    trans_inv,
+    ports: Pair[Optional[str]] = (None, None),
+    shrink: float = 0,
+):
+    """Shorten the edge path along an arc.
+
+    Parameters:
+        tension: the tension of the arc. This is defined, for this function, as the tangent
+            of the angle spanning the arc. For instance, for a semicircle, the angle is
+            180 degrees, so the tension is +-1 (depending on the orientation).
+    """
+
+    # Coordinates in figure (default) coords
+    vcoord_fig = trans(vcoord_data)
+
+    dv = vcoord_fig[1] - vcoord_fig[0]
+
+    # Tension is the fraction of the semicircle covered by the
+    # arc. Values are clipped between -1 (left-hand semicircle)
+    # and 1 (right-hand semicircle). 0 means a straight line,
+    # which is a (degenerate) arc too.
+    if tension == 0:
+        vs = [None, None]
+        thetas = [atan2(dv[1], dv[0])]
+        thetas.append(-thetas[0])
+        for i in range(2):
+            vs[i] = (
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], shrink)
+                + vcoord_fig[i]
+            )
+        auxs = []
+
+    else:
+        edge_straight_length = np.sqrt((dv**2).sum())
+        theta_straight = atan2(dv[1], dv[0])
+        theta_tension = 4 * np.arctan(tension)
+        # print(f"theta_straight: {np.degrees(theta_straight):.2f}")
+        # print(f"theta_tension: {np.degrees(theta_tension):.2f}")
+        # NOTE: positive tension means an arc shooting off to the right of the straight
+        # line, same convensio as for tension elsewhere in the codebase.
+        thetas = [theta_straight - theta_tension / 2, np.pi + theta_straight + theta_tension / 2]
+        # This is guaranteed to be finite because tension == 0 is taken care of above,
+        # and tension = np.inf is not allowed.
+        mid = vcoord_fig.mean(axis=0)
+        # print(f"theta_s: {thetas}")
+        # print(f"mid: {mid}")
+        theta_offset = theta_straight + np.pi / 2
+        if np.abs(tension) <= 1:
+            offset_length = edge_straight_length / 2 / np.tan(theta_tension / 2)
+        else:
+            # print("Large tension arc")
+            offset_length = -edge_straight_length / 2 * np.tan(theta_tension / 2 - np.pi / 2)
+        # print(f"theta_offset: {np.degrees(theta_offset):.2f}")
+        offset = offset_length * np.array([np.cos(theta_offset), np.sin(theta_offset)])
+        # print(f"offset: {offset}")
+        center = mid + offset
+        # print(f"center: {center}")
+
+        # Compute shorter start and end points
+        vs = [None, None]
+        for i in range(2):
+            vs[i] = (
+                _get_shorter_edge_coords(vpath_fig[i], vsize_fig[i], thetas[i], shrink)
+                + vcoord_fig[i]
+            )
+        angle_start = atan2(*(vs[0] - center)[::-1])
+        angle_end = atan2(*(vs[1] - center)[::-1])
+        if (np.abs(tension) > 1) and (np.abs(angle_end - angle_start) < np.pi):
+            if angle_end > angle_start:
+                angle_start += 2 * np.pi
+            else:
+                angle_end += 2 * np.pi
+        # print(f"angle_start: {np.degrees(angle_start):.2f}")
+        # print(f"angle_end: {np.degrees(angle_end):.2f}")
+
+        naux = 30
+        angles = np.linspace(angle_start, angle_end, naux + 2)[1:-1]
+        auxs = center + np.array([np.cos(angles), np.sin(angles)]).T * np.linalg.norm(
+            vs[0] - center
+        )
+
+    path = {
+        "vertices": [vs[0]] + list(auxs) + [vs[1]],
+        "codes": ["MOVETO"] + ["LINETO"] * (len(auxs) + 1),
+    }
+
+    path = mpl.path.Path(
+        path["vertices"],
+        codes=[getattr(mpl.path.Path, x) for x in path["codes"]],
+    )
+
+    # Return to data transform
+    path.vertices = trans_inv(path.vertices)
+    return path, tuple(thetas)
+
+
 def _compute_edge_path_curved(
     tension,
     vcoord_data,
@@ -483,12 +585,15 @@ def _compute_edge_path(
     tension: float = 0,
     waypoints: str | tuple[float, float] | Sequence[tuple[float, float]] | np.ndarray = "none",
     ports: Pair[Optional[str]] = (None, None),
+    arc: bool = False,
     layout_coordinate_system: str = "cartesian",
     **kwargs,
 ):
     """Compute the edge path in a few different ways."""
     if (waypoints != "none") and (tension != 0):
         raise ValueError("Waypoints not supported for curved edges.")
+    if (waypoints != "none") and arc:
+        raise ValueError("Waypoint not supported for arc edges.")
 
     if waypoints != "none":
         return _compute_edge_path_waypoints(
@@ -503,6 +608,14 @@ def _compute_edge_path(
         return _compute_edge_path_straight(
             *args,
             layout_coordinate_system=layout_coordinate_system,
+            **kwargs,
+        )
+
+    if arc:
+        return _compute_edge_path_arc(
+            tension,
+            *args,
+            ports=ports,
             **kwargs,
         )
 
