@@ -233,6 +233,21 @@ class GraphTestRunner(unittest.TestCase):
             margins=0.2,
         )
 
+    @image_comparison(baseline_images=["directed_arcs"])
+    def test_directed_arcs(self):
+        g = ig.Graph.Full(4, directed=True)
+        layout = [[0, 0], [1, 0], [2, 0], [3, 0]]
+
+        fig, ax = plt.subplots()
+        ipx.plot(
+            g,
+            layout=layout,
+            ax=ax,
+            edge_arc=True,
+            edge_tension=-3,
+            margins=0.2,
+        )
+
 
 class ClusteringTestRunner(unittest.TestCase):
     @property

@@ -453,7 +453,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
         # If none found, empty the dictionary already
         if (len(parallel_edges) == 0) or (max(parallel_edges.values(), key=len) == 1):
             parallel_edges = {}
-        if not self._style.get("curved", False):
+        if (not self._style.get("curved", False)) and (not self._style.get("arc", False)):
             while len(parallel_edges) > 0:
                 (v1, v2), indices = parallel_edges.popitem()
                 indices_inv = parallel_edges.pop((v2, v1), [])
