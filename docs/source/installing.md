@@ -44,9 +44,6 @@ Either way, the result is the same:
 
 ![graph_basic](_static/graph_basic.png)
 
-## Gallery
-See <project:gallery/index.rst> for examples of plots made with `iplotx`. Feel free to suggest new examples on GitHub by opening a new issue or pull request!
-
 ## Features
 `iplotx`'s features' include:
 - per-edge and per-vertex styling using sequences or dictionaries
@@ -72,32 +69,17 @@ See <project:gallery/index.rst> for examples of plots made with `iplotx`. Feel f
 - animations (see <project:gallery/other/plot_animation.rst>)
 - 3D visualisations
 - mouse/keyboard interaction and events (e.g. hover, click, see <project:gallery/other/plot_mouse_hover.rst>)
-- ... and probably more by the time you read this.
-
-## Styles
-`iplotx` is designed to produce publication-quality figures using **styles**, which are dictionaries specifying the visual properties of each graph element, including vertices, edges, arrows, labels, and groupings.
-
-An example of style specification is as follows:
-
-```python
-import iplotx as ipx
-with ipx.style.context({
-    'vertex': {
-        'size': 30,
-        'facecolor': 'red',
-        'edgecolor': 'none',
-    }
-}):
-    ipx.plot(...)
-```
-
-See <project:style.md> for more info.
-
-## Reference API
-See <project:api.md> for reference documentation of all functions and classes in `iplotx`.
+- ... and many more.
 
 ## Rationale
 We believe graph **analysis**, graph **layouting**, and graph **visualisation** to be three separate tasks. `iplotx` currently focuses on visualisation. It can also compute simple tree layouts and might expand towards network layouts in the future.
+
+## Citation
+If you use `iplotx` for publication figures, please cite the [zenodo preprint](https://doi.org/10.5281/zenodo.16599333):
+
+```
+F. Zanini. (2025). Unified network visualisation in Python. Zenodo [PREPRINT]. https://doi.org/10.5281/zenodo.16599333
+```
 
 ## Contributing
 Open an [issue on GitHub](https://github.com/fabilab/iplotx/issues) to request features, report bugs, or show intention in contributing. Pull requests are very welcome.
