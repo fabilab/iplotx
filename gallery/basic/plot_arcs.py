@@ -23,11 +23,8 @@ ipx.plot(
 )
 
 # %%
-# ..tip::
-#   Specifically, tension is defined as the tangent of the quarter of the angle spanned by the arc. A tension of 0 gives
-#   a straight line, a tension of 1 gives a semicircle, and higher tensions give increasingly larger arcs. A tension of
-#   infinity would give you a straight line away from the target vertex, but is not accepted by the library. Negative
-#   tensions result in arcs curving in the opposite direction.
+#
+# Other values of tension can be used to create different arc shapes:
 
 fig, axs = plt.subplots(2, 2, figsize=(8, 8))
 for tension, ax in zip([0.5, 2.5, -0.5, -2.5], axs.ravel()):
@@ -40,3 +37,11 @@ for tension, ax in zip([0.5, 2.5, -0.5, -2.5], axs.ravel()):
         margins=0.15,
         title=f"Edge tension = {tension:.2f}",
     )
+
+# %%
+# .. tip::
+#  Tension is defined as the tangent of the quarter of the angle spanned by the arc. A tension of 0 gives
+#  a straight line, a tension of 1 gives a semicircle, and higher tensions give increasingly larger arcs. A tension of
+#  infinity would give you a straight line away from the target vertex, but is not accepted by the library. Negative
+#  tensions result in arcs curving in the opposite direction.
+#
