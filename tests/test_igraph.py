@@ -239,13 +239,28 @@ class GraphTestRunner(unittest.TestCase):
         layout = [[0, 0], [1, 0], [2, 0], [3, 0]]
 
         fig, ax = plt.subplots()
-        ipx.plot(
+        ipx.graph(
             g,
             layout=layout,
             ax=ax,
             edge_arc=True,
             edge_tension=-3,
             margins=0.2,
+        )
+
+    @image_comparison(baseline_images=["multiarc45"])
+    def test_multiarc(self):
+        g = ig.Graph.Ring(4, directed=True)
+        layout = [[1, 0], [0, 1], [-1, 0], [0, -1]]
+
+        fig, ax = plt.subplots()
+        ipx.graph(
+            g,
+            layout,
+            ax=ax,
+            edge_arc=True,
+            edge_tension=1,
+            aspect=1,
         )
 
 

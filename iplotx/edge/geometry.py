@@ -466,15 +466,17 @@ def _compute_edge_path_arc(
             )
         angle_start = atan2(*(vs[0] - center)[::-1])
         angle_end = atan2(*(vs[1] - center)[::-1])
-        if (np.abs(tension) > 1) and (np.abs(angle_end - angle_start) < np.pi):
-            if angle_end > angle_start:
-                angle_start += 2 * np.pi
-            else:
-                angle_end += 2 * np.pi
+
+        # Figure out how to draw the correct arc of the two
+        if (tension > 0) and (angle_end < angle_start):
+            angle_end += 2 * np.pi
+        elif (tension < 0) and (angle_end > angle_start):
+            angle_start += 2 * np.pi
+
         # print(f"angle_start: {np.degrees(angle_start):.2f}")
         # print(f"angle_end: {np.degrees(angle_end):.2f}")
 
-        naux = 30
+        naux = max(30, int(np.ceil(np.degrees(np.abs(angle_end - angle_start)))) // 3)
         angles = np.linspace(angle_start, angle_end, naux + 2)[1:-1]
         auxs = center + np.array([np.cos(angles), np.sin(angles)]).T * np.linalg.norm(
             vs[0] - center

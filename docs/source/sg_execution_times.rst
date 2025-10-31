@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.158** total execution time for 80 files **from all galleries**:
+**00:00.092** total execution time for 82 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,11 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_style_plot_edge_geometries.py` (``../../gallery/style/plot_edge_geometries.py``)
-     - 00:00.158
+   * - :ref:`sphx_glr_gallery_other_plot_multiarc.py` (``../../gallery/other/plot_multiarc.py``)
+     - 00:00.060
+     - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_filled_edges.py` (``../../gallery/other/plot_filled_edges.py``)
+     - 00:00.032
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
@@ -171,6 +174,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_depthshade.py` (``../../gallery/style/plot_depthshade.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_style_plot_edge_geometries.py` (``../../gallery/style/plot_edge_geometries.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_edgepadding.py` (``../../gallery/style/plot_edgepadding.py``)
