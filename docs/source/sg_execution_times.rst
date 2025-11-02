@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.092** total execution time for 82 files **from all galleries**:
+**00:00.202** total execution time for 83 files **from all galleries**:
 
 .. container::
 
@@ -32,11 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_other_plot_multiarc.py` (``../../gallery/other/plot_multiarc.py``)
-     - 00:00.060
-     - 0.0
-   * - :ref:`sphx_glr_gallery_other_plot_filled_edges.py` (``../../gallery/other/plot_filled_edges.py``)
-     - 00:00.032
+   * - :ref:`sphx_glr_gallery_other_plot_geomap.py` (``../../gallery/other/plot_geomap.py``)
+     - 00:00.202
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
@@ -161,10 +158,16 @@ Computation times
    * - :ref:`sphx_glr_gallery_other_plot_feedbacks.py` (``../../gallery/other/plot_feedbacks.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_filled_edges.py` (``../../gallery/other/plot_filled_edges.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_graph.py` (``../../gallery/other/plot_graph.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_mouse_hover.py` (``../../gallery/other/plot_mouse_hover.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_multiarc.py` (``../../gallery/other/plot_multiarc.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_train.py` (``../../gallery/other/plot_train.py``)
