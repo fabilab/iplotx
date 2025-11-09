@@ -14,6 +14,7 @@ import matplotlib as mpl
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import (
     Patch,
+    PathPatch,
     Polygon,
     Ellipse,
     Circle,
@@ -393,7 +394,7 @@ class VertexCollection(PatchCollection):
 
 
 def make_patch(
-    marker: str = "o",
+    marker: str | Polygon | mpl.path.Path = "o",
     size: float | Sequence[float] = 20,
     **kwargs,
 ) -> tuple[Patch, float]:
@@ -473,6 +474,23 @@ def make_patch(
                 (-size[0] / 7, size[1] / 7),
                 (0, size[1] / 2),
             ][::-1],
+            **kwargs,
+        )
+    elif isinstance(marker, Polygon):
+        xy = marker.get_xy()
+        xy_sizes = xy.max(axis=0) - xy.min(axis=0)
+        art = Polygon(
+            xy * size / xy_sizes,
+            **kwargs,
+        )
+    elif isinstance(marker, mpl.path.Path):
+        xy = marker.vertices
+        xy_sizes = xy.max(axis=0) - xy.min(axis=0)
+        art = PathPatch(
+            mpl.path.Path(
+                xy * size / xy_sizes,
+                codes=marker.codes,
+            ),
             **kwargs,
         )
     else:
