@@ -101,19 +101,27 @@ window2 = Path(
         (0.6, -0.1),
     ]
 )
-roof_trait1 = Path(
+roof_highlight1 = Path(
     [
-        (-0.9, 0.6),
-        (0, 1.4),
-    ],
-)
-roof_trait2 = Path(
-    [
-        (0, 1.4),
         (0.9, 0.6),
+        (0, 1.4),
+        (-0.9, 0.6),
     ],
 )
-custom_marker = Path.make_compound_path(main_house, window1, window2, roof_trait1, roof_trait2)
+roof_highlight2 = Path(
+    [
+        (0.6, 0.6),
+        (0, 1.1),
+        (-0.6, 0.6),
+    ],
+)
+custom_marker = Path.make_compound_path(
+    main_house,
+    window1,
+    window2,
+    roof_highlight1,
+    roof_highlight2,
+)
 
 ipx.network(
     g,
@@ -130,3 +138,9 @@ ipx.network(
 # .. warning::
 #   Curved paths will not throw an error but might result in inaccurate edge joints.
 #   You can approximate Bezier curves with segments of straight lines if needed.
+#
+# .. tip::
+#   If you are creating non-degenerate polygons this way - polygons with holes such
+#   as the house above - remember that the filling of each individual path will be
+#   ignored if the are drawn anticlockwise (e.g. the roof roof highlights) and
+#   considered - that is, hollowed out - if drawn clockwise (e.g. the windows).

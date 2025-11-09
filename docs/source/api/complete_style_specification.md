@@ -31,7 +31,9 @@
         # h, hexagon: hexagon
         # 8, octagon: octagon
         # *, star: 5-point star, upright
-        "marker": str,
+        # A custom matplotlib.patches.Polygon
+        # A custom matplotlib.path.Path (with caveats, see gallery)
+        "marker": str | matplotlib.patches.Polygon | matplotlib.path.Path,
 
         "facecolor": str | Any,  # Color of the vertex face (e.g. 'red', '#FF0000')
         "edgecolor": str | Any,  # Color of the vertex edge (e.g. 'black', '#000000')

@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.070** total execution time for 85 files **from all galleries**:
+**00:00.069** total execution time for 85 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_style_plot_custom_vertex.py` (``../../gallery/style/plot_custom_vertex.py``)
-     - 00:00.070
+     - 00:00.069
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
