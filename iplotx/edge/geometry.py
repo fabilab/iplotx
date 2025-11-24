@@ -239,6 +239,7 @@ def _compute_edge_path_straight(
 
 def _compute_edge_path_waypoints(
     waypoints,
+    curved,
     vcoord_data,
     vpath_fig,
     vsize_fig,
@@ -277,8 +278,19 @@ def _compute_edge_path_waypoints(
                 + vcoord_fig[i]
             )
 
-        points = [vshorts[0]] + list(waypoints) + [vshorts[1]]
-        codes = ["MOVETO"] + ["LINETO"] * len(waypoints) + ["LINETO"]
+        if not curved:
+            points = [vshorts[0]] + list(waypoints) + [vshorts[1]]
+            codes = ["MOVETO"] + ["LINETO"] * len(waypoints) + ["LINETO"]
+        else:
+            points = [vshorts[0]]
+            for i, waypoint in enumerate(waypoints):
+                if i != 0:
+                    points.append(0.5 * (points[-1] + waypoint))
+                points.append(waypoint)
+                points.append(waypoint)
+            points.append(vshorts[1])
+            codes = ["MOVETO"] + ["CURVE4"] * (len(points) - 1)
+
         angles = tuple(thetas)
 
     elif waypoints in ("x0y1", "y0x1"):
@@ -587,6 +599,7 @@ def _compute_edge_path(
     tension: float = 0,
     waypoints: str | tuple[float, float] | Sequence[tuple[float, float]] | np.ndarray = "none",
     ports: Pair[Optional[str]] = (None, None),
+    curved: bool = False,
     arc: bool = False,
     layout_coordinate_system: str = "cartesian",
     **kwargs,
@@ -600,6 +613,7 @@ def _compute_edge_path(
     if waypoints != "none":
         return _compute_edge_path_waypoints(
             waypoints,
+            curved,
             *args,
             layout_coordinate_system=layout_coordinate_system,
             ports=ports,

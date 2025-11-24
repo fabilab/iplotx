@@ -62,6 +62,7 @@ def test_compute_waypoints(args_make_paths, waypoints, expected):
     vpath, trans, trans_inv = args_make_paths
     epath, angles = geometry._compute_edge_path_waypoints(
         waypoints,
+        False,
         [[0, 0], [10, 5]],
         [vpath] * 2,
         (2, 2),
@@ -77,6 +78,7 @@ def test_compute_waypoints_port(args_make_paths):
     vpath, trans, trans_inv = args_make_paths
     epath, angles = geometry._compute_edge_path_waypoints(
         "x0y1",
+        False,
         [[0, 0], [10, 5]],
         [vpath] * 2,
         (2, 2),
@@ -100,6 +102,7 @@ def test_double_waypoints(args_make_paths, waypoints, expected):
     vpath, trans, trans_inv = args_make_paths
     epath, angles = geometry._compute_edge_path_waypoints(
         waypoints,
+        False,
         [[0, 0], [10, 5]],
         [vpath] * 2,
         (2, 2),
@@ -123,6 +126,7 @@ def test_double_waypoints_ports(args_make_paths, waypoints, expected, port):
     vpath, trans, trans_inv = args_make_paths
     epath, angles = geometry._compute_edge_path_waypoints(
         waypoints,
+        False,
         [[0, 0], [10, 5]],
         [vpath] * 2,
         (2, 2),

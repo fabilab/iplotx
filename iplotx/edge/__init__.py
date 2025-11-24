@@ -367,21 +367,13 @@ class EdgeCollection(mpl.collections.PatchCollection):
 
             # Leaf rotation
             edge_stylei = rotate_style(self._style, index=i, key=(v1, v2))
-            if edge_stylei.get("curved", False):
-                tension = edge_stylei.get("tension", 5)
-                ports = edge_stylei.get("ports", (None, None))
-            elif edge_stylei.get("arc", False):
-                tension = edge_stylei.get("tension", 1)
-                ports = None
-            else:
-                tension = 0
-                ports = None
 
             # Scale shrink by dpi
             dpi = self.figure.dpi if hasattr(self, "figure") else 72.0
             shrink = dpi / 72.0 * edge_stylei.pop("shrink", 0)
 
-            # False is a synonym for "none"
+            # Edge geometry and waypoints
+            # waypoints: False is a synonym for "none"
             waypoints = edge_stylei.get("waypoints", "none")
             if waypoints is False or waypoints is np.False_:
                 waypoints = "none"
@@ -391,10 +383,32 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 raise ValueError(
                     "Could not determine automatically type of edge waypoints.",
                 )
-            if waypoints != "none":
-                ports = edge_stylei.get("ports", (None, None))
 
+            # Waypoints, curved, and arc have a complex logic
+            # TODO: This could be simplified I suppose
+            has_waypoints = waypoints != "none"
+            curved = edge_stylei.get("curved", False)
             arc = edge_stylei.get("arc", False)
+            ports = edge_stylei.get("ports", (None, None))
+
+            # For now, we establish a hierarchy from the most specialised to
+            # the most common cases. Each specialisation silences lower levels
+            # Tension and ports are entirely enslaved to the
+            # waypoint/arc/curved geometry settings.
+            # NOTE: The idea here is to not punish users for slight style
+            # inconsistencies that may well stem from fallback libraries
+            if has_waypoints:
+                tension = 0
+                arc = False
+            elif arc:
+                tension = edge_stylei.get("tension", 1)
+                ports = None
+                curved = False
+            elif curved:
+                tension = edge_stylei.get("tension", 5)
+            else:
+                tension = 0
+                ports = None
 
             # Compute actual edge path
             path, angles = _compute_edge_path(
@@ -406,6 +420,7 @@ class EdgeCollection(mpl.collections.PatchCollection):
                 tension=tension,
                 waypoints=waypoints,
                 ports=ports,
+                curved=curved,
                 arc=arc,
                 layout_coordinate_system=self._vertex_collection.get_layout_coordinate_system(),
                 shrink=shrink,

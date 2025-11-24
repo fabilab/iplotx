@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.069** total execution time for 85 files **from all galleries**:
+**00:00.136** total execution time for 87 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_style_plot_custom_vertex.py` (``../../gallery/style/plot_custom_vertex.py``)
-     - 00:00.069
+   * - :ref:`sphx_glr_gallery_style_plot_curved_waypoints.py` (``../../gallery/style/plot_curved_waypoints.py``)
+     - 00:00.136
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
@@ -152,6 +152,9 @@ Computation times
    * - :ref:`sphx_glr_gallery_other_plot_animation.py` (``../../gallery/other/plot_animation.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_bundles.py` (``../../gallery/other/plot_bundles.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_constellation.py` (``../../gallery/other/plot_constellation.py``)
      - 00:00.000
      - 0.0
@@ -159,9 +162,6 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_feedbacks.py` (``../../gallery/other/plot_feedbacks.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_other_plot_filled_edges.py` (``../../gallery/other/plot_filled_edges.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_geomap.py` (``../../gallery/other/plot_geomap.py``)
@@ -182,6 +182,9 @@ Computation times
    * - :ref:`sphx_glr_gallery_style_plot_arrows.py` (``../../gallery/style/plot_arrows.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_style_plot_custom_vertex.py` (``../../gallery/style/plot_custom_vertex.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_depthshade.py` (``../../gallery/style/plot_depthshade.py``)
      - 00:00.000
      - 0.0
@@ -192,6 +195,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_elements.py` (``../../gallery/style/plot_elements.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_style_plot_filled_edges.py` (``../../gallery/style/plot_filled_edges.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_four_grids.py` (``../../gallery/style/plot_four_grids.py``)

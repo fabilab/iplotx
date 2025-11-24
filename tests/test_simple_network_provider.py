@@ -134,3 +134,25 @@ class GraphTestRunner(unittest.TestCase):
                 }
             },
         )
+
+    @image_comparison(baseline_images=["curved_waypoints"], remove_text=True)
+    def test_curved_waypoints(self):
+        g = {
+            "edges": [
+                ("A", "B"),
+            ],
+        }
+        layout = {
+            "A": (0, 0),
+            "B": (1, 2),
+        }
+
+        fig, ax = plt.subplots(figsize=(3, 3))
+        ipx.network(
+            g,
+            layout=layout,
+            ax=ax,
+            vertex_labels=True,
+            edge_waypoints=[[[1, 1], [0, 1.5]]],
+            edge_curved=True,
+        )
