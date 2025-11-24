@@ -6,10 +6,6 @@ This example demonstrates the use of curved edge waypoints.
 For straight waypoints, the edge will pass through each waypoint.
 For curved waypoints, they are used as cubic Bezier points to
 interpolate smoothly between.
-
-
-.. tip:
-  The edge will actually pass through the midpoints between two consecutive waypoints.
 """
 
 import matplotlib.pyplot as plt
@@ -41,3 +37,7 @@ for ax, curved in zip(axs, [False, True]):
     else:
         ax.set_title("Curved waypoints")
 fig.tight_layout()
+
+#%%
+# .. tip:: The edge will actually pass through the midpoints between two consecutive waypoints.
+#

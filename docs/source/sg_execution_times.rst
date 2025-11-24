@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.136** total execution time for 87 files **from all galleries**:
+**00:00.065** total execution time for 87 files **from all galleries**:
 
 .. container::
 
@@ -33,7 +33,7 @@ Computation times
      - Time
      - Mem (MB)
    * - :ref:`sphx_glr_gallery_style_plot_curved_waypoints.py` (``../../gallery/style/plot_curved_waypoints.py``)
-     - 00:00.136
+     - 00:00.065
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000

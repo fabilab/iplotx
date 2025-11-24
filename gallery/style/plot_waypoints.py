@@ -34,7 +34,3 @@ ipx.network(
     edge_waypoints=["none", [(1, 1), (0.5, 1.5), (1, 1.5)], "none", "none"],
 )
 plt.ion(); plt.show()
-
-# %%
-# .. note::
-#   Edge waypoints are not currently compatible with curved edges.

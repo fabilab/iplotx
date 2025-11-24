@@ -112,6 +112,7 @@
         # means a semicircle, and numbers above 5 create very large arcs, almost full
         # circles. The exact definition of tension for arcs is the tangent of a
         # quarter of the angle spanned by the arc.
+        # Tension is not used if explicit waypoints are set for the edge.
         "tension": float,
 
         # Tension for self-loops (higher values create more bigger loops).
@@ -151,8 +152,17 @@
         # - ymidx0,ymidx1: The xy swap of the previous option.
         # - x0y1: One waypoint, with x of the first point and y of the second point.
         # - x1y0: The xy swap of the previous option.
-        # We are looking into ways to generalise this idea.
-        "waypoints": str,
+        #
+        # Instead of a string you can also specify a per-edge list of waypoints.
+        # Each waypoint is a tuple of two floats (x,y) in data coordinates. Each
+        # edge can have zero, one, or multiple waypoints.
+        # If used in this way, this option will have slightly different appearances
+        # depending of whether the edges are curved or straight (edge_curved). For
+        # straight edges, the edge will always pass through all waypoints. For
+        # curved edges, the waypoints are used as cubic Bezier control points and
+        # the edge will pass through the midpoints between each pair of consecutive
+        # waypoints.
+        "waypoints": str | list[list[tuple[float, float]]],
 
         # Edge arrow style for directed graphs
         "arrow": {
