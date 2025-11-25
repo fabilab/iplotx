@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.065** total execution time for 87 files **from all galleries**:
+**00:00.046** total execution time for 88 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_style_plot_curved_waypoints.py` (``../../gallery/style/plot_curved_waypoints.py``)
-     - 00:00.065
+   * - :ref:`sphx_glr_gallery_style_plot_edge_multicolor.py` (``../../gallery/style/plot_edge_multicolor.py``)
+     - 00:00.046
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
@@ -180,6 +180,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_arrows.py` (``../../gallery/style/plot_arrows.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_style_plot_curved_waypoints.py` (``../../gallery/style/plot_curved_waypoints.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_custom_vertex.py` (``../../gallery/style/plot_custom_vertex.py``)
