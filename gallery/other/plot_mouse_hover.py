@@ -43,7 +43,7 @@ def hover_callback(event):
     if event.inaxes == ax:
         vc = art.get_vertices()
         cont, ind = vc.contains(event)
-        # If mouse is over a vertex, show the buble
+        # If mouse is over a vertex, show the bubble
         if cont:
             i = ind["ind"][0]
             annot.xy = vc.get_offsets()[i]
