@@ -6,7 +6,7 @@
 
 Computation times
 =================
-**00:00.100** total execution time for 89 files **from all galleries**:
+**00:00.068** total execution time for 90 files **from all galleries**:
 
 .. container::
 
@@ -32,8 +32,8 @@ Computation times
    * - Example
      - Time
      - Mem (MB)
-   * - :ref:`sphx_glr_gallery_other_plot_hover_neighborhood.py` (``../../gallery/other/plot_hover_neighborhood.py``)
-     - 00:00.100
+   * - :ref:`sphx_glr_gallery_fun_plot_67.py` (``../../gallery/fun/plot_67.py``)
+     - 00:00.068
      - 0.0
    * - :ref:`sphx_glr_gallery_basic_plot_3d.py` (``../../gallery/basic/plot_3d.py``)
      - 00:00.000
@@ -90,6 +90,9 @@ Computation times
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_biology_plot_tca_cycle.py` (``../../gallery/biology/plot_tca_cycle.py``)
+     - 00:00.000
+     - 0.0
+   * - :ref:`sphx_glr_gallery_fun_plot_train.py` (``../../gallery/fun/plot_train.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_network_science_plot_arrowlawn.py` (``../../gallery/network_science/plot_arrowlawn.py``)
@@ -170,13 +173,13 @@ Computation times
    * - :ref:`sphx_glr_gallery_other_plot_graph.py` (``../../gallery/other/plot_graph.py``)
      - 00:00.000
      - 0.0
+   * - :ref:`sphx_glr_gallery_other_plot_hover_neighborhood.py` (``../../gallery/other/plot_hover_neighborhood.py``)
+     - 00:00.000
+     - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_mouse_hover.py` (``../../gallery/other/plot_mouse_hover.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_other_plot_multiarc.py` (``../../gallery/other/plot_multiarc.py``)
-     - 00:00.000
-     - 0.0
-   * - :ref:`sphx_glr_gallery_other_plot_train.py` (``../../gallery/other/plot_train.py``)
      - 00:00.000
      - 0.0
    * - :ref:`sphx_glr_gallery_style_plot_arrows.py` (``../../gallery/style/plot_arrows.py``)
