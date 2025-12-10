@@ -71,10 +71,10 @@ Either way, the result is the same:
 We believe graph **analysis**, graph **layouting**, and graph **visualisation** to be three separate tasks. `iplotx` currently focuses on visualisation. It can also compute simple tree layouts and might expand towards network layouts in the future.
 
 ## Citation
-If you use `iplotx` for publication figures, please cite the [zenodo preprint](https://doi.org/10.5281/zenodo.16599333):
+If you use `iplotx` for publication figures, please cite:
 
 ```
-F. Zanini. (2025). Unified network visualisation in Python. Zenodo [PREPRINT]. https://doi.org/10.5281/zenodo.16599333
+F. Zanini. A universal tool for visualisation of networks and trees in Python. F1000Research 2025, 14:1377. https://doi.org/10.12688/f1000research.173131.1
 ```
 
 ## Contributing

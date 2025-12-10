@@ -3,7 +3,7 @@
 [![RTD](https://readthedocs.org/projects/iplotx/badge/?version=latest)](https://iplotx.readthedocs.io/en/latest/)
 [![Coverage Status](https://coveralls.io/repos/github/fabilab/iplotx/badge.svg?branch=main)](https://coveralls.io/github/fabilab/iplotx?branch=main)
 ![pylint](assets/pylint.svg)
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.16599333.svg)](https://doi.org/10.5281/zenodo.16599333)
+[DOI](https://doi.org/10.12688/f1000research.173131.1)
 
 
 # iplotx
@@ -52,10 +52,10 @@ See [readthedocs](https://iplotx.readthedocs.io/en/latest/) for the full documen
 See [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
 
 ## Citation
-If you use `iplotx` for publication figures, please cite the [zenodo preprint](https://doi.org/10.5281/zenodo.16599333):
+If you use `iplotx` for publication figures, please cite:
 
 ```
-F. Zanini. (2025). Unified network visualisation in Python. Zenodo [PREPRINT]. https://doi.org/10.5281/zenodo.16599333
+F. Zanini. A universal tool for visualisation of networks and trees in Python. F1000Research 2025, 14:1377. https://doi.org/10.12688/f1000research.173131.1
 ```
 
 ## Features

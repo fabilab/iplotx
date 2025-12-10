@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "iplotx"
-description = "Plot networkx from igraph and networkx."
+description = "Universal network and tree visualisation library."
 authors = [
   {name = "Fabio Zanini", email = "fabio.zanini@unsw.edu.au"}
 ]
