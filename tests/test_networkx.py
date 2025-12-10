@@ -71,6 +71,14 @@ def test_simple_graph():
     )
 
 
+@image_comparison(baseline_images=["triangular_lattice"], remove_text=True)
+def test_triangular_lattice():
+    G = nx.triangular_lattice_graph(3, 2)
+    layout = {node: attr["pos"] for node, attr in G.nodes(data=True)}
+
+    ipx.network(G, layout, aspect=1.0)
+
+
 @image_comparison(baseline_images=["cluster-layout"], remove_text=True)
 def test_cluster_layout():
     G = nx.davis_southern_women_graph()
