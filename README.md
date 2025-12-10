@@ -3,7 +3,7 @@
 [![RTD](https://readthedocs.org/projects/iplotx/badge/?version=latest)](https://iplotx.readthedocs.io/en/latest/)
 [![Coverage Status](https://coveralls.io/repos/github/fabilab/iplotx/badge.svg?branch=main)](https://coveralls.io/github/fabilab/iplotx?branch=main)
 ![pylint](assets/pylint.svg)
-[DOI](https://doi.org/10.12688/f1000research.173131.1)
+[DOI](https://f1000research.com/articles/14-1377)
 
 
 # iplotx
