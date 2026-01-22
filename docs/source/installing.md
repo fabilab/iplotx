@@ -3,6 +3,12 @@
 pip install iplotx
 ```
 
+To also install [ilayoutx](https://ilayoutx.readthedocs.io/en/main/) to compute network layouts before visualising them:
+
+```
+pip install iplotx ilayoutx
+```
+
 
 ## Quick Start
 ::::{tab-set}
