@@ -20,6 +20,7 @@ from .network import NetworkArtist
 from .network.groups import GroupingCollection
 from .tree import TreeArtist
 from .style import context
+from .utils.matplotlib import _heuristic_show
 
 
 def network(
@@ -36,6 +37,7 @@ def network(
     margins: float | tuple[float, float] | tuple[float, float, float] = 0,
     strip_axes: bool = True,
     figsize: Optional[tuple[float, float]] = None,
+    show: Optional[bool] = None,
     **kwargs,
 ) -> list[mpl.artist.Artist]:
     """Plot this network and/or vertex grouping using the specified layout.
@@ -70,6 +72,9 @@ def network(
         figsize: If ax is None, a new matplotlib Figure is created. This argument specifies
             the (width, height) dimension of the figure in inches. If ax is not None, this
             argument is ignored. If None, the default matplotlib figure size is used.
+        show: If True, call plt.show() after plotting. If False, do not call plt.show(). If
+            None (default), try to guess based on the environment and do not show in case of
+            doubt.
         kwargs: Additional arguments are treated as an alternate way to specify style. If
             both "style" and additional **kwargs are provided, they are both applied in that
             order (style, then **kwargs).
@@ -78,7 +83,12 @@ def network(
         A list of mpl.artist.Artist objects, set as a direct child of the matplotlib Axes.
         The list can have one or two elements, depending on whether you are requesting to
         plot a network, a grouping, or both.
+
+    NOTE: If your plots are now showing to screen, try passing show=True.
     """
+    if show is None:
+        show = _heuristic_show()
+
     # Equivalence of node_labels and vertex_labels
     if node_labels is not None:
         vertex_labels = node_labels
@@ -164,6 +174,9 @@ def network(
         if (margins[0] != 0) or (margins[1] != 0) or ((len(margins) == 3) and (margins[2] != 0)):
             ax.margins(*margins)
 
+        if show:
+            plt.show()
+
         return artists
 
 
@@ -187,6 +200,7 @@ def tree(
     margins: float | tuple[float, float] = 0,
     strip_axes: bool = True,
     figsize: Optional[tuple[float, float]] = None,
+    show: Optional[bool] = None,
     **kwargs,
 ) -> TreeArtist:
     """Plot a tree using the specified layout.
@@ -226,13 +240,21 @@ def tree(
         figsize: If ax is None, a new matplotlib Figure is created. This argument specifies
             the (width, height) dimension of the figure in inches. If ax is not None, this
             argument is ignored. If None, the default matplotlib figure size is used.
+        show: If True, call plt.show() after plotting. If False, do not call plt.show(). If
+            None (default), try to guess based on the environment and do not show in case of
+            doubt.
         kwargs: Additional arguments are treated as an alternate way to specify style. If
             both "style" and additional **kwargs are provided, they are both applied in that
             order (style, then **kwargs).
 
     Returns:
         A TreeArtist object, set as a direct child of the matplotlib Axes.
+
+    NOTE: If your plots are now showing to screen, try passing show=True.
     """
+    if show is None:
+        show = _heuristic_show()
+
     # Equivalence of node_labels and vertex_labels
     if node_labels is not None:
         vertex_labels = node_labels
@@ -270,6 +292,9 @@ def tree(
         if (margins[0] != 0) or (margins[1] != 0):
             ax.margins(*margins)
 
+        if show:
+            plt.show()
+
     return artist
 
 
@@ -285,6 +310,7 @@ def doubletree(
     margins: float | tuple[float, float] = 0,
     strip_axes: bool = True,
     figsize: Optional[tuple[float, float]] = None,
+    show: Optional[bool] = None,
 ) -> tuple[TreeArtist, TreeArtist]:
     """Visualize two trees facing each other.
 
@@ -306,9 +332,26 @@ def doubletree(
         figsize: If ax is None, a new matplotlib Figure is created. This argument specifies
             the (width, height) dimension of the figure in inches. If ax is not None, this
             argument is ignored. If None, the default matplotlib figure size is used.
+        show: If True, call plt.show() after plotting. If False, do not call plt.show(). If
+            None (default), try to guess based on the environment and do not show in case of
+            doubt.
     Returns:
         A tuple with the left and right TreeArtist objects.
+
+    NOTE: If your plots are now showing to screen, try passing show=True.
     """
+    if show is None:
+        show = _heuristic_show()
+
+    if kwargs_left is None:
+        kwargs_left = {}
+    if "show" not in kwargs_left:
+        kwargs_left["show"] = False
+    if kwargs_right is None:
+        kwargs_right = {}
+    if "show" not in kwargs_right:
+        kwargs_right["show"] = False
+
     artist1 = tree(
         tree_left,
         layout="horizontal",
@@ -316,13 +359,10 @@ def doubletree(
         ax=ax,
         strip_axes=False,
         figsize=figsize,
-        **kwargs_left or {},
+        **kwargs_left,
     )
 
     ax = artist1.axes
-
-    if kwargs_right is None:
-        kwargs_right = {}
 
     had_layout_start = "layout_start" in kwargs_right
 
@@ -347,6 +387,9 @@ def doubletree(
         artist1.shift(-0.5 * xshift, 0)
 
     _postprocess_axes(ax, [artist1, artist2], strip=strip_axes, ignore_previous=True)
+
+    if show:
+        plt.show()
 
     return (artist1, artist2)
 

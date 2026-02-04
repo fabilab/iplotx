@@ -282,3 +282,8 @@ def _get_data_scale(X, Y, Z):
     ptp_y = Y.max() - Y.min()
     ptp_z = Z.max() - Z.min()
     return np.sqrt(ptp_x**2 + ptp_y**2 + ptp_z**2)
+
+
+def _heuristic_show():
+    """Try guessing whether plt.show() should be called automatically."""
+    return False
