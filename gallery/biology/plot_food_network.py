@@ -14,11 +14,13 @@ import iplotx as ipx
 
 
 # Read in the data on how many times scat evidenced was found that each animal (column) ate each food item (row)
-table = pd.read_csv("data/fevo-08-588430_DataSheet1_S1.csv", skiprows=2, usecols=[0, 1, 2, 3, 6, 9, 12, 15, 18, 21]).iloc[1:]
+table = pd.read_csv("data/fevo-08-588430_DataSheet1_S1.csv", skiprows=2, usecols=[0, 1, 2, 3, 5, 6, 9, 12, 15, 18, 21]).iloc[1:]
 
+# Aggregate data from the same OTU across RefSeq reference sequences
+adjacency_matrix = table.groupby("OTUs").sum()
 
 # Only part of the table is relevant to build the network
-adjacency_matrix = table.set_index("OTUs").iloc[:, -6:].astype(int)
+adjacency_matrix = adjacency_matrix.iloc[:, -6:].astype(int)
 # Clean up column names a bit
 adjacency_matrix.columns = [x.split(" (")[0] for x in adjacency_matrix.columns]
 
@@ -29,7 +31,7 @@ edge_data.columns = ["predator", "prey", "weight"]
 
 # Build graph
 g = nx.DiGraph()
-g.add_weighted_edges_from(edge_data.values)
+g.add_weighted_edges_from(edge_data.to_numpy())
 
 # Compute force-directed layout
 layout = nx.spring_layout(g, seed=42)

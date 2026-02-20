@@ -32,7 +32,7 @@ edge_labels = {
 
 
 layout = pd.DataFrame(nx.circular_layout(g)).T
-layout.values[:] = layout.values @ np.array([[0, -1], [1, 0]])
+layout.iloc[:] = layout.values @ np.array([[0, -1], [1, 0]])
 layout[1] *= -1
 
 g.add_edges_from([
