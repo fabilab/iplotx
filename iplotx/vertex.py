@@ -214,10 +214,7 @@ class VertexCollection(PatchCollection):
             # Convert polar coordinates (r, theta) to cartesian (x, y)
             r = self._layout.iloc[:, 0].values
             theta = self._layout.iloc[:, 1].values
-            if self._offsets is None:
-                self._offsets = np.zeros((len(r), 2))
-            self._offsets[:, 0] = r * np.cos(theta)
-            self._offsets[:, 1] = r * np.sin(theta)
+            self._offsets = np.vstack([r * np.cos(theta), r * np.sin(theta)]).T
         else:
             raise ValueError(
                 f"Layout coordinate system not supported: {self._layout_coordinate_system}."
@@ -230,7 +227,7 @@ class VertexCollection(PatchCollection):
             offsets: Array of coordinates in the layout coordinate system. For polar layouts,
                 these should be in the form of (r, theta) pairs.
         """
-        self._layout.values[:] = offsets
+        self._layout.iloc[:] = offsets
         self._update_offsets_from_layout()
         self.stale = True
 

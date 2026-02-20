@@ -107,7 +107,7 @@ class TreeArtist(mpl.artist.Artist):
 
         if show_support:
             support = self._ipx_internal_data["vertex_df"]["support"]
-            self._ipx_internal_data["vertex_df"]["label"] = support
+            self._ipx_internal_data["vertex_df"].loc[:, "label"] = support
 
         super().__init__()
 
@@ -227,18 +227,18 @@ class TreeArtist(mpl.artist.Artist):
             y: The shift in y direction.
         """
         layout_columns = [f"_ipx_layout_{i}" for i in range(self._ipx_internal_data["ndim"])]
-        self._ipx_internal_data["vertex_df"][layout_columns[0]] += x
-        self._ipx_internal_data["vertex_df"][layout_columns[1]] += y
+        self._ipx_internal_data["vertex_df"].loc[:, layout_columns[0]] += x
+        self._ipx_internal_data["vertex_df"].loc[:, layout_columns[1]] += y
 
-        self.get_vertices()._layout.values[:, 0] += x
-        self.get_vertices()._layout.values[:, 1] += y
+        self.get_vertices()._layout.iloc[:, 0] += x
+        self.get_vertices()._layout.iloc[:, 1] += y
         self.get_vertices()._update_offsets_from_layout()
 
         self.get_edges().shift(x, y)
 
         if hasattr(self, "_leaf_vertices"):
-            self.get_leaf_vertices()._layout.values[:, 0] += x
-            self.get_leaf_vertices()._layout.values[:, 1] += y
+            self.get_leaf_vertices()._layout.iloc[:, 0] += x
+            self.get_leaf_vertices()._layout.iloc[:, 1] += y
             self.get_leaf_vertices()._update_offsets_from_layout()
 
         if hasattr(self, "_cascades"):
