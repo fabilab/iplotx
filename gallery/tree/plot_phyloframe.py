@@ -1,20 +1,19 @@
 """
-Phyloframe scatter tree
-=======================
+Phyloframe tree
+===============
 
-This example shows how to combine a phylogenetic tree with a scatter plot
-overlay using `phyloframe <https://github.com/mmore500/phyloframe>`_'s
-iplotx integration.
+This example shows how to use ``iplotx`` to plot trees from
+`phyloframe <https://github.com/mmore500/phyloframe>`_ DataFrames.
 
 Phyloframe represents phylogenies as DataFrames in the `alife standard
 <https://alife-data-standards.github.io/alife-data-standards/>`_ format.
 When installed, phyloframe registers an iplotx data provider so that
 alife-standard DataFrames can be passed directly to :func:`iplotx.tree`.
 
-This example adapts ``draw_scatter_tree`` from `hstrat-synthesis
+The ``draw_scatter_tree`` function below adapts `draw_scatter_tree from
+hstrat-synthesis
 <https://github.com/mmore500/hstrat-synthesis/blob/main/pylib/tree/_draw_scatter_tree.py>`_
 to use phyloframe's native iplotx provider instead of dendropy.
-
 """
 
 import matplotlib.pyplot as plt
@@ -22,7 +21,7 @@ import numpy as np
 import polars as pl
 import seaborn as sns
 import iplotx as ipx
-from phyloframe.legacy import alifestd_to_iplotx_polars
+from phyloframe import legacy as pfl
 
 
 def draw_scatter_tree(
@@ -70,7 +69,7 @@ def draw_scatter_tree(
         tree_kws = {}
 
     tree_artist = ipx.tree(
-        alifestd_to_iplotx_polars(phylogeny_df),
+        pfl.alifestd_to_iplotx_polars(phylogeny_df),
         ax=ax,
         layout=layout,
         **{"margins": 0.0, "edge_linewidth": 1.5, **tree_kws},
@@ -130,20 +129,21 @@ def draw_scatter_tree(
 # %%
 # Radial scatter tree
 # --------------------
-# A small vertebrate phylogeny displayed with the ``"radial"`` layout.
+# A small programming-language genealogy displayed with the ``"radial"``
+# layout and scatter points coloured by paradigm.
 
-vertebrate_df = pl.DataFrame({
+lang_df = pl.DataFrame({
     "id":          [0, 1, 2, 3, 4, 5, 6],
     "ancestor_id": [0, 0, 0, 1, 1, 2, 2],
-    "origin_time": [0, 2, 3, 5, 5, 6, 6],
-    "taxon_label": ["", "", "", "Salmon", "Frog", "Parrot", "Cat"],
-    "group":       ["", "", "", "fish", "amphibian", "bird", "mammal"],
+    "origin_time": [0, 1, 1, 2, 2, 2, 2],
+    "taxon_label": ["", "", "", "C++", "Java", "Haskell", "ML"],
+    "paradigm":    ["", "", "", "OOP", "OOP", "functional", "functional"],
 })
 
 fig, ax = plt.subplots(figsize=(6, 6))
 draw_scatter_tree(
-    vertebrate_df,
-    hue="group",
+    lang_df,
+    hue="paradigm",
     ax=ax,
     layout="radial",
     scatter_kws={
@@ -155,41 +155,30 @@ draw_scatter_tree(
     },
     tree_kws={"leaf_labels": True, "aspect": 1},
 )
-ax.set_title("Vertebrate phylogeny (radial)")
+ax.set_title("Language genealogy (radial)")
 fig.tight_layout()
 
 # %%
 # Vertical scatter tree
 # ----------------------
-# A larger primate phylogeny with scatter points coloured by diet and
-# sized by body mass, using the default ``"vertical"`` layout.
+# The same function with a ``"vertical"`` layout, using colour and size
+# to encode metadata columns.
 
-primate_df = pl.DataFrame({
-    "id":          [0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12],
-    "ancestor_id": [0,  0,  0,  1,  1,  2,  2,  3,  3,  5,  5,  6,  6],
-    "origin_time": [0,  2,  3,  4,  5,  6,  5,  7,  7,  8,  8,  7,  7],
-    "taxon_label": ["", "", "", "", "", "", "", "Human", "Chimp",
-                    "Gorilla", "Orangutan", "Macaque", "Marmoset"],
-    "body_mass_kg": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
-                     np.nan, 70, 45, 160, 60, 8, 0.4],
-    "diet":        ["", "", "", "", "", "", "", "omnivore", "omnivore",
-                    "herbivore", "herbivore", "omnivore", "omnivore"],
-})
-
-fig2, ax2 = plt.subplots(figsize=(8, 6))
+# sphinx_gallery_thumbnail_number = 2
+fig2, ax2 = plt.subplots(figsize=(8, 5))
 draw_scatter_tree(
-    primate_df,
-    hue="diet",
-    size="body_mass_kg",
+    lang_df,
+    hue="paradigm",
     ax=ax2,
     layout="vertical",
     scatter_kws={
         "edgecolor": "black",
         "linewidth": 0.5,
+        "s": 80,
         "legend": "brief",
         "palette": "dark",
     },
     tree_kws={"leaf_labels": True},
 )
-ax2.set_title("Primate phylogeny by diet and body mass")
+ax2.set_title("Language genealogy (vertical)")
 fig2.tight_layout()
