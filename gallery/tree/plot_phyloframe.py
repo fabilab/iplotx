@@ -13,7 +13,7 @@ alife-standard DataFrames can be passed directly to :func:`iplotx.tree`.
 The ``draw_scatter_tree`` function below adapts `draw_scatter_tree from
 hstrat-synthesis
 <https://github.com/mmore500/hstrat-synthesis/blob/main/pylib/tree/_draw_scatter_tree.py>`_
-to use phyloframe's native iplotx provider instead of dendropy.
+to use phyloframe's native iplotx provider.
 """
 
 import matplotlib.pyplot as plt
@@ -49,7 +49,7 @@ def draw_scatter_tree(
     hue, size, style : str, optional
         Column names forwarded to :func:`seaborn.scatterplot`.
     c : str, sequence, or None
-        Colour values; a column name or explicit array.
+        Colour values as a column name or explicit array.
     ax : matplotlib.axes.Axes, optional
         Target axes.  Created if *None*.
     layout : str
@@ -75,7 +75,7 @@ def draw_scatter_tree(
         **{"margins": 0.0, "edge_linewidth": 1.5, **tree_kws},
     )
 
-    # Extract node positions — radial layouts need Cartesian offsets
+    # Extract node positions; radial layouts need Cartesian offsets
     ipx_layout = tree_artist.get_layout()
     if layout == "radial":
         xs, ys = tree_artist.get_nodes().get_offsets().T
@@ -157,6 +157,7 @@ draw_scatter_tree(
 )
 ax.set_title("Language genealogy (radial)")
 fig.tight_layout()
+plt.show()
 
 # %%
 # Vertical scatter tree
@@ -182,3 +183,4 @@ draw_scatter_tree(
 )
 ax2.set_title("Language genealogy (vertical)")
 fig2.tight_layout()
+plt.show()
