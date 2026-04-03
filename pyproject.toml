@@ -81,6 +81,7 @@ docs = [
   "pydata-sphinx-theme>=0.16.1",
   "dendropy>=5.0.8",
   "cartopy>=0.25.0",
+  "phyloframe>=0.7.0",
 ]
 typing = ["mypy", "types-requests"]
 typing-test = [{include-group = "typing"}, {include-group = "test"}, "useful-types"]
