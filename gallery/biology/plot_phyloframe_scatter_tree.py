@@ -15,55 +15,41 @@ alife-standard DataFrames can be passed directly to :func:`iplotx.tree`.
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
+import polars as pl
 import iplotx as ipx
 from phyloframe import legacy as pfl
-from phyloframe.legacy import alifestd_to_iplotx_pandas
+from phyloframe.legacy import alifestd_to_iplotx_polars
 
 # %%
-# Build a synthetic phylogeny DataFrame
-# --------------------------------------
-# Create a small alife-standard phylogeny with trait metadata.
+# A hardcoded primate phylogeny
+# ------------------------------
+# Define a small primate phylogeny as a Polars DataFrame in the alife
+# standard format.  Only ``id``, ``ancestor_id``, and ``origin_time``
+# columns are required — no ``ancestor_list`` column needed.
 
-rng = np.random.default_rng(42)
-n_nodes = 31
-
-ancestor_id = np.zeros(n_nodes, dtype=int)
-# Root points to itself (alife standard convention)
-ancestor_id[0] = 0
-# Build a balanced binary tree
-for i in range(1, n_nodes):
-    ancestor_id[i] = (i - 1) // 2
-
-phylogeny_df = pd.DataFrame({
-    "id": np.arange(n_nodes),
-    "ancestor_id": ancestor_id,
-    "ancestor_list": [f"[{a}]" for a in ancestor_id],
-    "origin_time": [
-        int(np.floor(np.log2(i + 1))) if i > 0 else 0
-        for i in range(n_nodes)
-    ],
-    "trait": rng.normal(size=n_nodes),
+phylogeny_df = pl.DataFrame({
+    "id":          [0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12],
+    "ancestor_id": [0,  0,  0,  1,  1,  2,  2,  3,  3,  5,  5,  6,  6],
+    "origin_time": [0,  2,  3,  4,  5,  6,  5,  7,  7,  8,  8,  7,  7],
+    "taxon_label": ["", "", "", "", "", "", "", "Human", "Chimp",
+                    "Gorilla", "Orangutan", "Macaque", "Marmoset"],
+    "body_mass_kg": [np.nan, np.nan, np.nan, np.nan, np.nan, np.nan,
+                     np.nan, 70, 45, 160, 60, 8, 0.4],
 })
-
-# Collapse unifurcations (no-op here but standard practice)
-phylogeny_df = pfl.alifestd_collapse_unifurcations(
-    phylogeny_df, mutate=True,
-)
 
 # %%
 # Draw the tree and overlay a scatter plot
 # -----------------------------------------
-# Pass the phylogeny DataFrame directly to :func:`iplotx.tree`.
-# Phyloframe's data provider handles conversion automatically —
-# no dendropy or other tree library needed.
+# Pass the phylogeny DataFrame directly to :func:`iplotx.tree` via
+# phyloframe's data provider — no dendropy or other tree library needed.
 
 fig, ax = plt.subplots(figsize=(8, 6))
 
 tree_artist = ipx.tree(
-    alifestd_to_iplotx_pandas(phylogeny_df),
+    alifestd_to_iplotx_polars(phylogeny_df),
     ax=ax,
     layout="vertical",
+    leaf_labels=True,
     margins=0.0,
     edge_linewidth=1.5,
 )
@@ -72,26 +58,36 @@ tree_artist = ipx.tree(
 ipx_layout = tree_artist.get_layout()
 xs, ys = ipx_layout.T.to_numpy()
 
-# Build a lookup from node name (= string id) to position
-pos = {node.name: (x, y) for node, (x, y) in zip(ipx_layout.index, zip(xs, ys))}
+# Build a lookup from node name to position
+pos = {
+    node.name: (x, y)
+    for node, (x, y) in zip(ipx_layout.index, zip(xs, ys))
+}
 
-# Map positions back onto the DataFrame
-phylogeny_df["x"] = phylogeny_df["id"].astype(str).map(lambda k: pos.get(k, (np.nan,))[0])
-phylogeny_df["y"] = phylogeny_df["id"].astype(str).map(lambda k: pos[k][1] if k in pos else np.nan)
+# Map positions back onto the DataFrame and drop internal nodes
+phylogeny_df = phylogeny_df.with_columns(
+    pl.col("id").cast(pl.Utf8).replace_strict(
+        {k: v[0] for k, v in pos.items()}, default=None,
+    ).cast(pl.Float64).alias("x"),
+    pl.col("id").cast(pl.Utf8).replace_strict(
+        {k: v[1] for k, v in pos.items()}, default=None,
+    ).cast(pl.Float64).alias("y"),
+)
+leaves = phylogeny_df.filter(pl.col("body_mass_kg").is_not_null())
 
-# Scatter plot coloured by trait value
+# Scatter plot sized by body mass
 sc = ax.scatter(
-    phylogeny_df["x"],
-    phylogeny_df["y"],
-    c=phylogeny_df["trait"],
-    cmap="coolwarm",
-    s=40,
+    leaves["x"].to_numpy(),
+    leaves["y"].to_numpy(),
+    c=np.log10(leaves["body_mass_kg"].to_numpy()),
+    cmap="YlOrRd",
+    s=80,
     zorder=5,
-    edgecolors="white",
+    edgecolors="black",
     linewidths=0.5,
 )
-fig.colorbar(sc, ax=ax, label="Trait value")
-ax.set_title("Phylogeny coloured by trait")
+fig.colorbar(sc, ax=ax, label="log₁₀ body mass (kg)")
+ax.set_title("Primate phylogeny coloured by body mass")
 fig.tight_layout()
 
 # %%
@@ -105,7 +101,7 @@ newick_df = pfl.alifestd_from_newick(newick)
 
 fig2, ax2 = plt.subplots(figsize=(8, 4))
 ipx.tree(
-    alifestd_to_iplotx_pandas(newick_df),
+    alifestd_to_iplotx_polars(newick_df.pipe(pl.from_pandas)),
     ax=ax2,
     layout="horizontal",
     leaf_labels=True,
