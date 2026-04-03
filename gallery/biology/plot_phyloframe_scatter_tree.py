@@ -11,9 +11,6 @@ Phyloframe represents phylogenies as DataFrames in the `alife standard
 When installed, phyloframe registers an iplotx data provider so that
 alife-standard DataFrames can be passed directly to :func:`iplotx.tree`.
 
-This approach adapts the scatter tree visualisation from `hstrat
-<https://github.com/mmore500/hstrat>`_, which overlays per-node
-metadata (e.g. trait values) on a phylogeny.
 """
 
 import matplotlib.pyplot as plt
