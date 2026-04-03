@@ -11,15 +11,17 @@ Phyloframe represents phylogenies as DataFrames in the `alife standard
 When installed, phyloframe registers an iplotx data provider so that
 alife-standard DataFrames can be passed directly to :func:`iplotx.tree`.
 
+This example adapts ``draw_scatter_tree`` from `hstrat-synthesis
+<https://github.com/mmore500/hstrat-synthesis/blob/main/pylib/tree/_draw_scatter_tree.py>`_
+to use phyloframe's native iplotx provider instead of dendropy.
+
 """
 
 import matplotlib.pyplot as plt
 import numpy as np
-import pandas as pd
 import polars as pl
 import seaborn as sns
 import iplotx as ipx
-from phyloframe import legacy as pfl
 from phyloframe.legacy import alifestd_to_iplotx_polars
 
 
@@ -29,12 +31,17 @@ def draw_scatter_tree(
     hue=None,
     size=None,
     style=None,
+    c=None,
     ax=None,
     layout="vertical",
+    scatter_shuffle=False,
     scatter_kws=None,
     tree_kws=None,
 ):
     """Draw a phylogenetic tree with a seaborn scatter overlay.
+
+    Adapted from `hstrat-synthesis
+    <https://github.com/mmore500/hstrat-synthesis/blob/main/pylib/tree/_draw_scatter_tree.py>`_.
 
     Parameters
     ----------
@@ -42,10 +49,14 @@ def draw_scatter_tree(
         Alife-standard phylogeny with optional metadata columns.
     hue, size, style : str, optional
         Column names forwarded to :func:`seaborn.scatterplot`.
+    c : str, sequence, or None
+        Colour values; a column name or explicit array.
     ax : matplotlib.axes.Axes, optional
-        Target axes. Created if *None*.
+        Target axes.  Created if *None*.
     layout : str
         Tree layout forwarded to :func:`iplotx.tree`.
+    scatter_shuffle : bool or int
+        Shuffle scatter points to reduce overplotting.
     scatter_kws : dict, optional
         Extra keyword arguments for :func:`seaborn.scatterplot`.
     tree_kws : dict, optional
@@ -65,9 +76,13 @@ def draw_scatter_tree(
         **{"margins": 0.0, "edge_linewidth": 1.5, **tree_kws},
     )
 
-    # Read node positions from the tree layout
+    # Extract node positions — radial layouts need Cartesian offsets
     ipx_layout = tree_artist.get_layout()
-    xs, ys = ipx_layout.T.to_numpy()
+    if layout == "radial":
+        xs, ys = tree_artist.get_nodes().get_offsets().T
+    else:
+        xs, ys = ipx_layout.T.to_numpy()
+
     pos = {
         node.name: (x, y)
         for node, (x, y) in zip(ipx_layout.index, zip(xs, ys))
@@ -83,6 +98,20 @@ def draw_scatter_tree(
         ).cast(pl.Float64).alias("__y__"),
     ).to_pandas()
 
+    # Optionally shuffle to reduce overplotting
+    if scatter_shuffle:
+        rng = np.random.RandomState(
+            int(scatter_shuffle) if isinstance(scatter_shuffle, int)
+            and not isinstance(scatter_shuffle, bool) else None,
+        )
+        plot_df = plot_df.iloc[rng.permutation(len(plot_df))]
+
+    # Resolve colour argument
+    if isinstance(c, str):
+        c = plot_df[c].fillna("none").tolist()
+    elif c is None:
+        c = "none"
+
     sns.scatterplot(
         plot_df,
         x="__x__",
@@ -90,6 +119,7 @@ def draw_scatter_tree(
         hue=hue,
         size=size,
         style=style,
+        c=c,
         ax=ax,
         **{"legend": False, "zorder": 5, **scatter_kws},
     )
@@ -98,13 +128,43 @@ def draw_scatter_tree(
 
 
 # %%
-# A hardcoded primate phylogeny
-# ------------------------------
-# Define a small primate phylogeny as a Polars DataFrame in the alife
-# standard format.  Only ``id``, ``ancestor_id``, and ``origin_time``
-# columns are required — no ``ancestor_list`` column needed.
+# Radial scatter tree
+# --------------------
+# A small vertebrate phylogeny displayed with the ``"radial"`` layout.
 
-phylogeny_df = pl.DataFrame({
+vertebrate_df = pl.DataFrame({
+    "id":          [0, 1, 2, 3, 4, 5, 6],
+    "ancestor_id": [0, 0, 0, 1, 1, 2, 2],
+    "origin_time": [0, 2, 3, 5, 5, 6, 6],
+    "taxon_label": ["", "", "", "Salmon", "Frog", "Parrot", "Cat"],
+    "group":       ["", "", "", "fish", "amphibian", "bird", "mammal"],
+})
+
+fig, ax = plt.subplots(figsize=(6, 6))
+draw_scatter_tree(
+    vertebrate_df,
+    hue="group",
+    ax=ax,
+    layout="radial",
+    scatter_kws={
+        "edgecolor": "white",
+        "linewidth": 0.8,
+        "s": 90,
+        "legend": "brief",
+        "palette": "Set2",
+    },
+    tree_kws={"leaf_labels": True, "aspect": 1},
+)
+ax.set_title("Vertebrate phylogeny (radial)")
+fig.tight_layout()
+
+# %%
+# Vertical scatter tree
+# ----------------------
+# A larger primate phylogeny with scatter points coloured by diet and
+# sized by body mass, using the default ``"vertical"`` layout.
+
+primate_df = pl.DataFrame({
     "id":          [0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12],
     "ancestor_id": [0,  0,  0,  1,  1,  2,  2,  3,  3,  5,  5,  6,  6],
     "origin_time": [0,  2,  3,  4,  5,  6,  5,  7,  7,  8,  8,  7,  7],
@@ -116,41 +176,20 @@ phylogeny_df = pl.DataFrame({
                     "herbivore", "herbivore", "omnivore", "omnivore"],
 })
 
-# %%
-# Draw the scatter tree
-# ----------------------
-# Call ``draw_scatter_tree`` with seaborn aesthetics mapped to metadata
-# columns.  The function handles tree rendering, layout extraction, and
-# the scatter overlay in one step.
-
-fig, ax = plt.subplots(figsize=(8, 6))
+fig2, ax2 = plt.subplots(figsize=(8, 6))
 draw_scatter_tree(
-    phylogeny_df,
+    primate_df,
     hue="diet",
     size="body_mass_kg",
-    ax=ax,
+    ax=ax2,
     layout="vertical",
-    scatter_kws={"edgecolor": "black", "linewidth": 0.5, "legend": "brief"},
+    scatter_kws={
+        "edgecolor": "black",
+        "linewidth": 0.5,
+        "legend": "brief",
+        "palette": "dark",
+    },
     tree_kws={"leaf_labels": True},
 )
-ax.set_title("Primate phylogeny by diet and body mass")
-fig.tight_layout()
-
-# %%
-# Tree from a Newick string
-# --------------------------
-# Phyloframe can also parse Newick strings into alife-standard DataFrames
-# via :func:`phyloframe.legacy.alifestd_from_newick`.
-
-newick = "((Human:1,Chimp:1.2):3,(Mouse:2,(Zebrafish:3,Fugu:2.5):1.5):4);"
-newick_df = pfl.alifestd_from_newick(newick).pipe(pl.from_pandas)
-
-fig2, ax2 = plt.subplots(figsize=(8, 4))
-draw_scatter_tree(
-    newick_df,
-    ax=ax2,
-    layout="horizontal",
-    tree_kws={"leaf_labels": True, "edge_linewidth": 2, "margins": (0.2, 0)},
-)
-ax2.set_title("Phylogeny from Newick string")
+ax2.set_title("Primate phylogeny by diet and body mass")
 fig2.tight_layout()
