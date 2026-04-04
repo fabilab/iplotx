@@ -94,7 +94,7 @@ def draw_scatter_tree(
         .astype(float),
     )
 
-    # Resolve colour argument
+    # Resolve color argument
     if isinstance(c, str):
         c = plot_df[c].fillna("none").tolist()
     elif c is None:
