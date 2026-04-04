@@ -511,7 +511,7 @@ class TreeArtist(mpl.artist.Artist):
                     "catesian",
                 ),
                 style=leaf_vertex_style,
-                labels=self._get_label_series("leaf"),
+                labels=self._get_label_series("leaf")[leaf_layout.index],
                 transform=self.get_transform(),
                 offset_transform=self.get_offset_transform(),
             )
