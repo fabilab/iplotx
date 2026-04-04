@@ -504,6 +504,9 @@ class TreeArtist(mpl.artist.Artist):
                 # Reverse the horizontal margin
                 leaf_vertex_style["label"]["hmargin"] *= -1
 
+            leaf_labels = self._get_label_series("leaf")
+            if leaf_labels is not None:
+                leaf_labels = leaf_labels[leaf_layout.index]
             self._leaf_vertices = VertexCollection(
                 layout=leaf_layout,
                 layout_coordinate_system=self._ipx_internal_data.get(
@@ -511,7 +514,7 @@ class TreeArtist(mpl.artist.Artist):
                     "catesian",
                 ),
                 style=leaf_vertex_style,
-                labels=self._get_label_series("leaf")[leaf_layout.index],
+                labels=leaf_labels,
                 transform=self.get_transform(),
                 offset_transform=self.get_offset_transform(),
             )
