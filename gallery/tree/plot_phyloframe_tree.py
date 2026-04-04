@@ -1,18 +1,20 @@
 """
-Phyloframe scatter tree
-=======================
+phyloframe tree
+===============
 
-This example shows how to overlay scatter points on a iplotx tree using
-`phyloframe <https://github.com/mmore500/phyloframe>`.
+This example shows how to plot
+`phyloframe <https://github.com/mmore500/phyloframe>`, taking advantage of
+DataFrame interoperability with Seaborn to overlay scatter points.
 
 Phyloframe represents phylogenies within DataFrames in the `alife standard
-<https://alife-data-standards.github.io/alife-data-standards/>`_ format (i.e., edge list).
+<https://alife-data-standards.github.io/alife-data-standards/>`_ format (i.e.,
+edge list).
 DataFrames may be passed to :func:`iplotx.tree` using `phyloframe.legacy.alifestd_to_iplotx_pandas` or `phyloframe.legacy.alifestd_to_iplotx_polars`.
 """
 
 import matplotlib.pyplot as plt
-import numpy as np
 from phyloframe import legacy as pfl
+import pandas as pd
 import polars as pl
 import seaborn as sns
 import iplotx as ipx
@@ -27,7 +29,6 @@ def draw_scatter_tree(
     c=None,
     ax=None,
     layout="vertical",
-    scatter_shuffle=False,
     scatter_kws=None,
     tree_kws=None,
 ):
@@ -48,8 +49,6 @@ def draw_scatter_tree(
         Target axes.  Created if *None*.
     layout : str
         Tree layout forwarded to :func:`iplotx.tree`.
-    scatter_shuffle : bool or int
-        Shuffle scatter points to reduce overplotting.
     scatter_kws : dict, optional
         Extra keyword arguments for :func:`seaborn.scatterplot`.
     tree_kws : dict, optional
@@ -62,8 +61,13 @@ def draw_scatter_tree(
     if tree_kws is None:
         tree_kws = {}
 
+    try:
+        phylogeny_df = phylogeny_df.to_pandas()
+    except AttributeError:
+        pass
+
     tree_artist = ipx.tree(
-        pfl.alifestd_to_iplotx_polars(phylogeny_df),
+        pfl.alifestd_to_iplotx_pandas(phylogeny_df),
         ax=ax,
         layout=layout,
         **{"margins": 0.0, "edge_linewidth": 1.5, **tree_kws},
@@ -77,40 +81,18 @@ def draw_scatter_tree(
         xs, ys = ipx_layout.T.to_numpy()
 
     pos = {
-        node.name: (x, y) for node, (x, y) in zip(ipx_layout.index, zip(xs, ys))
+        node._id: (x, y) for node, (x, y) in zip(ipx_layout.index, zip(xs, ys))
     }
 
     # Map positions back onto the DataFrame
-    plot_df = phylogeny_df.with_columns(
-        pl.col("id")
-        .cast(pl.Utf8)
-        .replace_strict(
-            {k: v[0] for k, v in pos.items()},
-            default=None,
-        )
-        .cast(pl.Float64)
-        .alias("__x__"),
-        pl.col("id")
-        .cast(pl.Utf8)
-        .replace_strict(
-            {k: v[1] for k, v in pos.items()},
-            default=None,
-        )
-        .cast(pl.Float64)
-        .alias("__y__"),
-    ).to_pandas()
-
-    # Optionally shuffle to reduce overplotting
-    if scatter_shuffle:
-        rng = np.random.RandomState(
-            (
-                int(scatter_shuffle)
-                if isinstance(scatter_shuffle, int)
-                and not isinstance(scatter_shuffle, bool)
-                else None
-            ),
-        )
-        plot_df = plot_df.iloc[rng.permutation(len(plot_df))]
+    plot_df = phylogeny_df.assign(
+        __x__=phylogeny_df["id"]
+        .map({k: v[0] for k, v in pos.items()})
+        .astype(float),
+        __y__=phylogeny_df["id"]
+        .map({k: v[1] for k, v in pos.items()})
+        .astype(float),
+    )
 
     # Resolve colour argument
     if isinstance(c, str):
@@ -129,125 +111,128 @@ def draw_scatter_tree(
         ax=ax,
         **{"legend": False, "zorder": 5, **scatter_kws},
     )
-
     return ax
 
 
 # %%
 # Radial scatter tree
 # --------------------
-# A small vertebrate phylogeny displayed with the ``"radial"`` layout.
+# A small phylogeny with scatter points displayed using the ``"radial"`` layout.
 
-vertebrate_df = pl.DataFrame(
+vertebrate_df = pd.DataFrame(
     {
-        "id": [0, 1, 2, 3, 4, 5, 6],
-        "ancestor_id": [0, 0, 0, 1, 1, 2, 2],
-        "origin_time": [0, 2, 3, 5, 5, 6, 6],
-        "taxon_label": ["", "", "", "Salmon", "Frog", "Parrot", "Cat"],
-        "group": ["", "", "", "fish", "amphibian", "bird", "mammal"],
+        "id": [0, 1, 2, 3, 4, 5, 6, 7, 8],
+        "ancestor_id": [0, 0, 0, 1, 1, 2, 2, 6, 6],
+        "origin_time": [0, 2, 3, 5, 5, 6, 6, 7, 7],
+        "taxon_label": [
+            None,
+            None,
+            None,
+            "Salmon",
+            "Seahorse",
+            "Parrot",
+            None,
+            "Cat",
+            "Mouse",
+        ],
+        "group": [
+            None,
+            None,
+            None,
+            "fish",
+            "fish",
+            "bird",
+            None,
+            "mammal",
+            "mammal",
+        ],
     }
 )
 
-fig, ax = plt.subplots(figsize=(6, 6))
+fig, ax = plt.subplots(figsize=(5, 5))
 draw_scatter_tree(
-    vertebrate_df,
+    vertebrate_df.assign(taxon_label="\n" + vertebrate_df["taxon_label"]),
     hue="group",
+    style="group",
     ax=ax,
     layout="radial",
     scatter_kws=dict(
         edgecolor="white",
         linewidth=0.8,
         legend="brief",
+        markers=["o", "v", "^"],
         palette="Set2",
-        s=90,
+        s=220,
+        zorder=1,
     ),
     tree_kws=dict(
         aspect=1,
         leaf_labels=True,
-        margins=0.1,
+        margins=0.15,
+        style=[
+            "tree",
+            dict(
+                vertex=dict(
+                    label=dict(
+                        color="gray",
+                    ),
+                ),
+            ),
+        ],
     ),
 )
-ax.set_title("Vertebrate phylogeny (radial)")
 fig.tight_layout()
 plt.show()
 
 # %%
 # Vertical scatter tree
 # ----------------------
-# A larger primate phylogeny with scatter points coloured by diet and
-# sized by body mass, using the default ``"vertical"`` layout.
+# A small phylogeny with scatter points displayed using the ``"vertical"``
+# layout.
 
-primate_df = pl.DataFrame(
-    {
-        "id": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
-        "ancestor_id": [0, 0, 0, 1, 1, 2, 2, 3, 3, 5, 5, 6, 6],
-        "origin_time": [0, 2, 3, 4, 5, 6, 5, 7, 7, 8, 8, 7, 7],
-        "taxon_label": [
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "Human",
-            "Chimp",
-            "Gorilla",
-            "Orangutan",
-            "Macaque",
-            "Marmoset",
-        ],
-        "body_mass_kg": [
-            np.nan,
-            np.nan,
-            np.nan,
-            np.nan,
-            np.nan,
-            np.nan,
-            np.nan,
-            70,
-            45,
-            160,
-            60,
-            8,
-            0.4,
-        ],
-        "diet": [
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "",
-            "omnivore",
-            "omnivore",
-            "herbivore",
-            "herbivore",
-            "omnivore",
-            "omnivore",
-        ],
-    }
+body_weights = {
+    "species": ["Lion", "Tiger", "Cougar", "Cheetah", "Domestic Cat"],
+    "body weight": [190.0, 220.0, 70.0, 50.0, 4.5],
+}
+felid_df = (
+    pfl.alifestd_from_newick_polars(
+        "((Lion:0.05,Tiger:0.05):0.03,(Cougar:0.06,Cheetah:0.06):0.02,'Domestic Cat':0.05);",
+    )
+    .pipe(pfl.alifestd_mark_leaves_polars)
+    .with_columns(
+        domesticated=pl.when(pl.col("is_leaf"))
+        .then(pl.col("taxon_label") == "Domestic Cat")
+        .otherwise(None)
+        .cast(str)
+    )
+    .join(
+        pl.DataFrame(body_weights),
+        left_on="taxon_label",
+        right_on="species",
+        how="left",
+    )
 )
 
-fig2, ax2 = plt.subplots(figsize=(8, 6))
+fig2, ax2 = plt.subplots(figsize=(5, 5))
 draw_scatter_tree(
-    primate_df,
-    hue="diet",
-    size="body_mass_kg",
+    felid_df,
+    hue="domesticated",
+    size="body weight",
     ax=ax2,
     layout="vertical",
     scatter_kws=dict(
-        edgecolor="black",
+        edgecolor="none",
         linewidth=0.5,
         legend="brief",
-        palette="dark",
+        palette="RdBu",
+        sizes=(60, 800),
+        zorder=-100,
     ),
     tree_kws=dict(
         leaf_labels=True,
-        margins=0.1,
+        margins=0.15,
     ),
 )
-ax2.set_title("Primate phylogeny by diet and body mass")
+sns.move_legend(ax2, "upper left", bbox_to_anchor=(1, 0.8), frameon=False)
 fig2.tight_layout()
 plt.show()
