@@ -2,9 +2,8 @@
 phyloframe tree
 ===============
 
-This example shows how to plot
-`phyloframe <https://github.com/mmore500/phyloframe>`, taking advantage of
-DataFrame interoperability with Seaborn to overlay scatter points.
+This example shows how to plot trees from the
+`phyloframe <https://github.com/mmore500/phyloframe>`_ library, using Seaborn to overlay scatter points.
 
 Phyloframe represents phylogenies within DataFrames in the `alife standard
 <https://alife-data-standards.github.io/alife-data-standards/>`_ format (i.e.,
@@ -168,7 +167,7 @@ draw_scatter_tree(
     tree_kws=dict(
         aspect=1,
         leaf_labels=True,
-        margins=0.15,
+        margins=0.17,
         style=[
             "tree",
             dict(
@@ -176,6 +175,13 @@ draw_scatter_tree(
                     label=dict(
                         color="gray",
                     ),
+                ),
+                leaf=dict(
+                    label=dict(
+                        verticalalignment="baseline",
+                        hmargin=12,
+                    )
+
                 ),
             ),
         ],
@@ -235,4 +241,3 @@ draw_scatter_tree(
 )
 sns.move_legend(ax2, "upper left", bbox_to_anchor=(1, 0.8), frameon=False)
 fig2.tight_layout()
-plt.show()

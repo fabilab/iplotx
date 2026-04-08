@@ -65,6 +65,7 @@ test = [
   "networkx>=2.0.0,<=3.4.2",
   "pylint>=3.3.7",
   "dendropy>=5.0.8",
+  "phyloframe>=0.7.0",
 ]
 docs = [
   "sphinx",
