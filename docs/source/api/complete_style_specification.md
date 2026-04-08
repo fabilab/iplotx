@@ -260,6 +260,8 @@
         "label": {
             "color": str | Any,  # Color of the label text
             "hmargin": float,  # Horizontal offset (before rotation) off the leaf node
+            # NOTE: Other options such as "verticalalignment" are also accepted here
+            # and passed directly to matplotlib.
         }
     },
 

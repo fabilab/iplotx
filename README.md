@@ -20,6 +20,7 @@ Supports:
 - **trees**:
   - [ETE4](https://etetoolkit.github.io/ete/)
   - [cogent3](https://cogent3.org/)
+  - [phyloframe](https://phyloframe.readthedocs.io)
   - [Biopython](https://biopython.org/)
   - [scikit-bio](https://scikit.bio)
   - [dendropy](https://jeetsukumaran.github.io/DendroPy/index.html)
@@ -60,7 +61,7 @@ F. Zanini. A universal tool for visualisation of networks and trees in Python. F
 
 ## Features
 - Plot networks from multiple libraries including networkx, igraph and graph-tool, using Matplotlib. ✅
-- Plot trees from multiple libraries such as cogent3, ETE4, skbio, biopython, and dendropy. ✅
+- Plot trees from multiple libraries such as cogent3, ETE4, phyloframe, skbio, biopython, and dendropy. ✅
 - Flexible yet easy styling, including an internal library of styles ✅
 - Interactive plotting, e.g. zooming and panning after the plot is created. ✅
 - Store the plot to disk in many formats (SVG, PNG, PDF, GIF, etc.). ✅
