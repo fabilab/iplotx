@@ -40,6 +40,7 @@
         "alpha": float,  # Opacity of the vertex (0.0 for fully transparent, 1.0 for fully opaque)
 
         "depthshade": bool,  # Whether to shade the color based on depth (3D only)
+        "depthshade_minalpha": float,  # What is the minimum alpha to use for depthshading (3D only, must be between 0.0 and 1.0)
 
         # Vertex label style
         "label": {

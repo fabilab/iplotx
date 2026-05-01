@@ -60,6 +60,7 @@ def vertex_collection_2d_to_3d(
     zs: np.ndarray | float | Sequence[float] = 0,
     zdir: str = "z",
     depthshade: bool = True,
+    depthshade_minalpha: float = 0.3,
     axlim_clip: bool = False,
 ):
     """Convert a 2D VertexCollection to a 3D Vertex3DCollection.
@@ -77,6 +78,7 @@ def vertex_collection_2d_to_3d(
     col.__class__ = Vertex3DCollection
     col._offset_zordered = None
     col._depthshade = depthshade
+    col._depthshade_minalpha = depthshade_minalpha
     col._in_draw = False
     col.set_3d_properties(zs, zdir, axlim_clip)
 

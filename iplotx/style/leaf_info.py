@@ -44,6 +44,7 @@ nonrotating_leaves = (
     "arc",
     "capstyle",
     "depthshade",
+    "depthshade_minalpha",
 )
 
 # Union of all style leaves (rotating and nonrotating)

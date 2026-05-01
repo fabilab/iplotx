@@ -279,10 +279,12 @@ class NetworkArtist(mpl.artist.Artist):
 
         if self.get_ndim() == 3:
             depthshade = get_style(".vertex").get("depthshade", True)
+            depthshade_minalpha = get_style(".vertex").get("depthshade_minalpha", 0.3)
             vertex_collection_2d_to_3d(
                 self._vertices,
                 zs=self.get_layout().iloc[:, 2].values,
                 depthshade=depthshade,
+                depthshade_minalpha=depthshade_minalpha,
             )
 
     def _add_edges(self):

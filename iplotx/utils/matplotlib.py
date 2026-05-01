@@ -184,7 +184,11 @@ def _build_cmap_fun(
     values = style[key]
     cmap = style["cmap"]
 
-    cmap = mpl.cm._ensure_cmap(cmap)
+    # NOTE: matplotlib 3.11 changed the location of this function
+    if hasattr(mpl.cm, "_ensure_cmap"):
+        cmap = mpl.cm._ensure_cmap(cmap)
+    else:
+        cmap = mpl.colorizer._ensure_cmap(cmap)
 
     if isinstance(values, str):
         if not isinstance(internal, pd.DataFrame):
