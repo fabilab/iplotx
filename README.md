@@ -47,10 +47,7 @@ ipx.plot(g, layout)
 ![Quick start image](/docs/source/_static/graph_basic.png)
 
 ## Documentation
-See [readthedocs](https://iplotx.readthedocs.io/en/latest/) for the full documentation.
-
-## Gallery
-See [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
+See [documentation](https://iplotx.readthedocs.io/en/latest/) and [gallery](https://iplotx.readthedocs.io/en/latest/gallery/index.html).
 
 ## Citation
 If you use `iplotx` for publication figures, please cite:

@@ -91,3 +91,10 @@ Open an [issue on GitHub](https://github.com/fabilab/iplotx/issues) to request f
   to propose improvements or see support for it, please reach out with an issue/PR
   on GitHub!
 ```
+
+### Local development
+To develop `iplotx` locally:
+- Clone the repository
+- Set up the code infrastructure using [uv](https://docs.astral.sh/uv/).
+- Install the `test` dependency group: `uv sync --group test`
+- Run the test suite with `.venv/bin/pytest`.
