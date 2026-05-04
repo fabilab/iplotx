@@ -98,3 +98,10 @@ To develop `iplotx` locally:
 - Set up the code infrastructure using [uv](https://docs.astral.sh/uv/).
 - Install the `test` dependency group: `uv sync --group test`
 - Run the test suite with `.venv/bin/pytest`.
+
+### Release new version (maintainers only)
+To release a new version:
+- Change version in `iplotx/version.py` using semantic versioning (e.g. `1.2.3`).
+- Commit and push changes to GitHub.
+- Wait to confirm all CI tests pass.
+- Create a new release on GitHub. The title **must** be `v1.2.3` and the linked tag **must** be `1.2.3`. When you hit "publish", a new GitHub action is triggered, which will release to PyPI. In case of discrepancies, the release title wins: a "v" is stripped from the title and the rest is pasted into `iplotx/version.py` if it's a valid semantic version.
